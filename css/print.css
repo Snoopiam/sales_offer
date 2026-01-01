@@ -1,0 +1,200 @@
+/*
+================================================================================
+PRINT.CSS - Print Media Query Styles
+================================================================================
+
+PURPOSE: Styles applied ONLY when printing the document (File > Print).
+         Optimizes layout for physical/PDF printing.
+
+PRINT BEHAVIOR:
+- Hides input panel, shows only preview area
+- Removes all UI controls (modals, buttons, zoom controls)
+- Forces exact color printing (backgrounds, borders, brand colors)
+- Sets A4 page size and orientation
+- Prevents page breaks inside tables and content rows
+- Removes shadows and transforms for clean print output
+
+TECHNICAL NOTES:
+- @page rule sets print page size to A4 landscape by default
+- !important rules override screen styles for printing
+- print-color-adjust: exact forces background colors to print
+- page-break-inside: avoid keeps content blocks together
+
+USAGE:
+This file is automatically applied when user prints via:
+1. Browser Print Dialog (Ctrl+P / Cmd+P)
+2. PDF Export (using html2pdf library)
+
+================================================================================
+*/
+
+/* ============================================\n   @PAGE RULE - Print Page Setup\n   ============================================\n   Defines paper size and margins for the printer.\n   Default: A4 landscape (297mm \u00d7 210mm)\n   ============================================ */\n/* Print CSS - Print Media Styles */
+
+@page {
+    size: A4 landscape;                        /* Set paper to A4 landscape (297 × 210mm) */
+    margin: 0;                                 /* No printer margins (we handle margins in CSS) */
+}
+
+/* Body - reset for print */
+body {
+    background: white !important;              /* Force white background (no gray) */
+    height: auto !important;                   /* Auto height (don't constrain) */
+    display: block !important;                 /* Block layout for print */
+    margin: 0 !important;                      /* No margins */
+    padding: 0 !important;                     /* No padding */
+}
+
+/* Hide input panel - show only document preview */
+#inputPanel {
+    display: none !important;                  /* Completely hide input panel */
+}
+
+/* Preview area - full width, no background */
+#previewArea {
+    padding: 0 !important;                     /* Remove padding */
+    background: white !important;              /* White background */
+    overflow: visible !important;              /* Show all content */
+    display: block !important;                 /* Block layout */
+    margin: 0 !important;                      /* No margins */
+    width: 100% !important;                    /* Full width */
+}
+
+/* ============================================
+   A4 PAGE - Print Layout
+   ============================================
+   Optimizes the document for clean printing.
+   Removes screen-only decorations (shadows, transforms).
+   Sets exact dimensions for A4 landscape.
+   ============================================ */
+#a4Page {
+    box-shadow: none !important;               /* Remove drop shadow (screen only) */
+    margin: 0 !important;                      /* No margins (full page) */
+    padding: 8mm 12mm !important;              /* Reduced inner margins (printable area) */
+    page-break-after: avoid !important;        /* Don't break page after document */
+    page-break-before: avoid !important;       /* Don't break page before document */
+    width: 297mm !important;                   /* A4 landscape width */
+    height: 210mm !important;                  /* A4 landscape height */
+    transform: none !important;                /* Remove zoom transform (print at 100%) */
+    position: relative !important;             /* Relative for absolute children */
+    overflow: hidden !important;               /* Clip content to page */
+}
+
+/* Portrait variant - different dimensions */
+#a4Page.template-portrait {
+    width: 210mm !important;                   /* A4 portrait width (narrow) */
+    height: 297mm !important;                  /* A4 portrait height (tall) */
+}
+
+/* ============================================
+   COLOR PRINTING ENFORCEMENT
+   ============================================
+   Forces browsers to print backgrounds and colors.
+   Without this, brand colors and header bar wouldn't print.
+
+   WHY NEEDED:
+   Browsers default to "no backgrounds" for ink savings.
+   We override this to ensure brand consistency on print.
+   ============================================ */
+
+/* All elements - force colors to print (applies to all elements including header, images, etc.) */
+* {
+    -webkit-print-color-adjust: exact !important;  /* WebKit/Chrome */
+    print-color-adjust: exact !important;      /* Modern browsers */
+}
+
+/* Header bar - force teal background to print */
+.header-bar {
+    height: 8mm !important;                    /* Fixed height */
+    background-color: var(--primary-color, #62c6c1) !important;  /* Teal background */
+}
+
+/* Images - ensure proper scaling for print */
+img {
+    max-width: 100% !important;                /* Don't overflow page */
+    height: auto !important;                   /* Maintain aspect ratio */
+}
+
+/* ============================================
+   PAGE BREAK PREVENTION
+   ============================================
+   Prevents awkward page breaks inside content.
+   Keeps tables and content rows together on same page.
+   ============================================ */
+/* Prevent page breaks inside tables */
+.data-table,
+.content-row,
+tr,
+td,
+th {
+    page-break-inside: avoid !important;       /* Don't split these elements across pages */
+}
+
+/* Scale floor plan image to fit print page */
+#floorPlanImg {
+    max-height: 110mm !important;              /* Max height for landscape (leave room for header/footer) */
+    width: auto !important;                    /* Maintain aspect ratio */
+    object-fit: contain !important;            /* Scale to fit without cropping */
+}
+
+/* ============================================
+   UI CONTROLS HIDING
+   ============================================
+   Hides all screen-only interactive elements.
+   These should not appear on printed document.
+   ============================================ */
+/* Hide all modals and UI controls */
+.modal,
+.leaflet-control-zoom,
+.zoom-controls,
+.btn-container,
+.ui-controls {
+    display: none !important;                  /* Hide all UI controls */
+}
+
+/* Note: print-color-adjust is handled by the * selector above for all elements */
+
+/* ============================================
+   PORTRAIT-SPECIFIC PRINT ADJUSTMENTS
+   ============================================
+   When using portrait template (210mm × 297mm):
+   - Stack columns vertically instead of side-by-side
+   - Reduce floor plan height to fit tall page
+
+   WHY:
+   Portrait layout is narrower, so horizontal layout won't fit.
+   ============================================ */
+/* Portrait-specific print adjustments */
+#a4Page.template-portrait .content-row {
+    flex-direction: column !important;         /* Stack columns vertically */
+}
+
+/* Make columns full-width in portrait */
+#a4Page.template-portrait .col-left,
+#a4Page.template-portrait .col-right {
+    width: 100% !important;                    /* Full width (not 45%/55%) */
+}
+
+/* Reduce floor plan height in portrait */
+#a4Page.template-portrait #floorPlanImg {
+    max-height: 80mm !important;               /* Smaller height for portrait */
+}
+
+/* ============================================
+   FOOTER POSITIONING FIX
+   ============================================
+   Ensures "Created by" footer prints at bottom.
+   Prevents overlap with content above.
+   White background ensures visibility over content.
+   ============================================ */
+/* Fix footer overlap */
+.created-by-footer {
+    position: absolute !important;             /* Absolute positioning */
+    bottom: 5mm !important;                    /* Distance from bottom */
+    left: 0 !important;                        /* Full width */
+    right: 0 !important;                       /* Full width */
+    width: 100% !important;                    /* Explicit full width */
+    text-align: center !important;             /* Center text */
+    background: white !important;              /* White background (prevent overlap) */
+    padding-top: 2mm !important;               /* Small padding above */
+    z-index: 10 !important;                    /* Above other content */
+}

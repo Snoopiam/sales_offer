@@ -1,0 +1,44 @@
+{
+  "name": "sales-offer-generator",
+  "version": "1.0.0",
+  "description": "Professional real estate sales offer document generator",
+  "type": "module",
+  "scripts": {
+    "start": "npx http-server -p 8000 -c-1",
+    "test": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint js/",
+    "lint:fix": "eslint js/ --fix"
+  },
+  "keywords": [
+    "real-estate",
+    "sales-offer",
+    "document-generator",
+    "pdf-export"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@testing-library/dom": "^10.0.0",
+    "@vitest/coverage-v8": "^4.0.16",
+    "@vitest/ui": "^4.0.16",
+    "eslint": "^9.0.0",
+    "jsdom": "^27.4.0",
+    "vitest": "^4.0.16"
+  },
+  "browserslist": [
+    "Chrome >= 80",
+    "Firefox >= 75",
+    "Safari >= 13",
+    "Edge >= 80"
+  ],
+  "cdn-dependencies": {
+    "tailwindcss": "latest (CDN auto-updates)",
+    "xlsx": "0.18.5",
+    "html2pdf.js": "0.12.1",
+    "sortablejs": "1.15.6"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

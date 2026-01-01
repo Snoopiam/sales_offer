@@ -1,0 +1,6 @@
+node_modules/
+coverage/
+test-outputs/
+.DS_Store
+*.log
+nul

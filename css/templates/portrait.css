@@ -1,0 +1,138 @@
+/*
+================================================================================
+PORTRAIT.CSS - A4 Portrait Template
+================================================================================
+
+PURPOSE: Defines layout dimensions for A4 portrait orientation (210mm \u00d7 297mm).
+         Taller than it is wide - optimized for mobile viewing and vertical layouts.
+
+DIMENSIONS:
+- Page: 210mm wide \u00d7 297mm tall (narrow and tall)
+- Padding: 12mm top/bottom, 15mm left/right
+- Both columns: 100% width (stacked vertically)
+
+LAYOUT STRATEGY:
+- Vertical (stacked) layout: floor plan above, tables below
+- order: 1 for floor plan (shows first), order: 2 for tables (shows second)
+- Max floor plan height: 90mm (leaves room for tables below)
+- Larger font sizes for readability (more vertical space available)
+
+USAGE:
+Applied when user selects "Portrait" in Export modal.
+JavaScript adds .template-portrait class to #a4Page.
+
+IDEAL FOR:
+- Mobile devices (vertical orientation)
+- Floor plans that are square or vertical
+- Documents with less data (fewer payment rows)
+
+================================================================================
+*/
+
+/* Portrait Template - A4 Portrait */
+
+#a4Page.template-portrait {
+    width: 210mm;
+    height: 297mm;
+    padding: 12mm 15mm;
+    display: flex;
+    flex-direction: column;
+}
+
+.template-portrait .header-bar {
+    height: 10mm;
+}
+
+.template-portrait .logo-area {
+    top: 12mm;
+    right: 15mm;
+}
+
+.template-portrait .logo-img {
+    height: 35px;
+}
+
+.template-portrait .document-header {
+    margin-top: 8mm;
+    margin-bottom: 20px;
+}
+
+.template-portrait .section-label {
+    font-size: 11px;
+}
+
+.template-portrait .main-title {
+    font-size: 32px;
+    margin-bottom: 20px;
+}
+
+.template-portrait .content-row {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.template-portrait .col-left {
+    width: 100%;
+    order: 2;
+    padding-bottom: 18mm;                      /* Space for footer */
+}
+
+.template-portrait .col-right {
+    width: 100%;
+    order: 1;
+    max-height: 100mm;
+    margin-bottom: 15px;
+}
+
+.template-portrait #floorPlanImg {
+    max-height: 90mm;
+    max-width: 100%;
+}
+
+.template-portrait .data-table {
+    font-size: 11px;
+}
+
+.template-portrait .table-title {
+    font-size: 13px;
+    margin-bottom: 10px;
+}
+
+.template-portrait .data-table td {
+    padding: 4px 0;
+}
+
+.template-portrait .pp-table {
+    margin-top: 15px;
+}
+
+.template-portrait .footer-area {
+    bottom: 12mm;
+    right: 15mm;
+}
+
+.template-portrait .footer-proj {
+    font-size: 16px;
+}
+
+.template-portrait .footer-sub {
+    font-size: 11px;
+}
+
+.template-portrait .footnote {
+    max-width: 100%;
+    margin-top: 20px;
+    font-size: 8px;
+}
+
+.template-portrait .created-by-footer {
+    position: absolute;
+    bottom: 4mm;
+    left: 0;
+    right: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 7px;
+    background: white;
+}
