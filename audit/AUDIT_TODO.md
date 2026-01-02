@@ -1,179 +1,107 @@
-# AUDIT TODO
-**Project:** Sales Offer Generator | **Started:** 2025-12-31
+# Sales Offer Generator — Task List
 
-## Progress: [==--------] 0% (0/14)
-
----
-
-## CRITICAL (Do First)
-
-- [ ] **MP-01** Add test suite with Vitest
-  - Location: `New tests/ directory`
-  - Action: Install Vitest, create test files for helpers, calculator, validator, storage
-  - Effort: L (20-30h)
-  - From: Finding C-01
+**Started:** 2026-01-02
+**Progress:** 0 of 8 complete
 
 ---
 
-## HIGH Priority
+## High Priority
 
-- [ ] **QW-01** Add Content Security Policy
-  - Location: `index.html` (line 4, after charset meta)
-  - Action: Add CSP meta tag with appropriate directives
-  - Effort: XS (30min)
-  - From: Finding H-02
+- [ ] **TC-01** Fix test imports to use actual source modules
+  Location: `tests/*.test.js`
+  Action: Update imports to use actual module paths, not mocked functions
+  Time: 2h
 
-- [ ] **QW-04** Add API key storage warning
-  - Location: `index.html` (settings modal, AI tab)
-  - Action: Add warning text below API key input
-  - Effort: S (1h)
-  - From: Finding H-01
+- [ ] **TC-02** Add tests for calculator.js module
+  Location: `tests/calculator.test.js`
+  Action: Import and test actual calculator.js exports
+  Time: 3h
 
-- [ ] **MP-03** Implement server-side API proxy
-  - Location: `New server/ directory`
-  - Action: Create Node.js or serverless proxy for Gemini API
-  - Effort: L (15-20h)
-  - From: Finding H-01
+- [ ] **TC-03** Add tests for validator.js module
+  Location: `tests/validator.test.js`
+  Action: Import and test actual validator.js exports
+  Time: 3h
 
----
-
-## MEDIUM Priority
-
-- [ ] **QW-02** Remove debug console.log statements
-  - Location: `js/app.js` (lines 30, 60)
-  - Action: Delete or comment out "initializing" and "ready" logs
-  - Effort: XS (15min)
-  - From: Finding L-03
-
-- [ ] **QW-05** Create package.json for dependency tracking
-  - Location: `New package.json`
-  - Action: Create package.json with CDN versions documented
-  - Effort: S (30min)
-  - From: Finding L-02
-
-- [ ] **MP-02** Add ESLint configuration
-  - Location: `New eslint.config.js`
-  - Action: Install and configure ESLint with security plugin
-  - Effort: M (4-6h)
-  - From: Best practice
-
-- [ ] **MP-04** Encrypt sensitive localStorage data
-  - Location: `js/modules/storage.js`, new `js/utils/crypto.js`
-  - Action: Implement Web Crypto API encryption for sensitive fields
-  - Effort: M (6-8h)
-  - From: Finding M-02
+- [ ] **LN-01** Fix ESLint warnings in paymentPlan.js
+  Location: `js/modules/paymentPlan.js`
+  Action: Change `let` to `const` at line 272, prefix unused params with `_`
+  Time: 15min
 
 ---
 
-## LOW Priority
+## Medium Priority
 
-- [ ] **QW-03** Add .editorconfig file
-  - Location: `New .editorconfig`
-  - Action: Create editor configuration for code consistency
-  - Effort: XS (15min)
-  - From: Best practice
+- [ ] **TC-04** Increase helpers.js coverage to 60%
+  Location: `tests/helpers.test.js`
+  Action: Add tests for uncovered helper functions
+  Time: 4h
 
-- [ ] **FI-01** Update CDN dependencies
-  - Location: `index.html` (script tags)
-  - Action: Update xlsx, html2pdf.js, SortableJS to latest, regenerate SRI
-  - Effort: S (1h)
-  - From: Dependency analysis
-
-- [ ] **FI-02** Add loading states for async operations
-  - Location: `js/modules/export.js`, `js/modules/ai.js`, `js/modules/excel.js`
-  - Action: Add skeleton loaders and progress indicators
-  - Effort: M (3-4h)
-  - From: UX improvement
-
-- [ ] **FI-03** Add keyboard shortcuts
-  - Location: `js/app.js`
-  - Action: Implement Ctrl+S, Ctrl+E, Ctrl+P shortcuts
-  - Effort: S (2h)
-  - From: UX improvement
+- [ ] **TC-05** Add tests for storage.js core functions
+  Location: `tests/storage.test.js` (new)
+  Action: Test save/load state functions with mocked localStorage
+  Time: 4h
 
 ---
 
-## BACKLOG (Reconsider)
+## Low Priority
 
-- [ ] **R-01** TypeScript migration
-  - Location: All JS files
-  - Action: Convert codebase to TypeScript
-  - Effort: XL (40+h)
-  - Status: Consider only for major feature additions
+- [ ] **CL-01** Review console statements
+  Location: `js/modules/storage.js`, `js/modules/export.js`, `js/modules/excel.js`, `js/modules/ai.js`
+  Action: Evaluate if all 16 console statements are necessary for production
+  Time: 1h
 
-- [ ] **R-02** Framework migration
-  - Location: Entire project
-  - Action: Migrate to React/Vue
-  - Effort: XXL (80+h)
-  - Status: Skip - vanilla JS works well for this app size
+- [ ] **DC-01** Update README test coverage badge
+  Location: `README.md`
+  Action: Update badge to reflect actual coverage percentage
+  Time: 10min
 
 ---
 
 ## Completed
 
-| Date | ID | Notes |
-|------|-----|-------|
-| 2025-12-01 | SEC-01 | XSS protection via escapeHtml and DOM methods |
-| 2025-12-01 | SEC-02 | File validation with magic bytes |
-| 2025-12-01 | SEC-03 | SRI hashes added for CDN scripts |
-| 2025-12-01 | SEC-04 | Input sanitization function added |
-| 2025-12-01 | SEC-05 | localStorage quota handling |
-| 2025-12-01 | SEC-06 | Image compression to prevent quota issues |
+| Date | Task | Notes |
+|------|------|-------|
+| 2026-01-01 | ESLint config fixed | ESLint 9 flat config working |
+| 2026-01-01 | Security vulnerabilities | All 7 resolved via updates |
+| 2026-01-01 | Dependencies updated | vitest 4.0.16, jsdom 27.4.0 |
+| 2026-01-01 | Test suite created | 93 tests passing |
+| 2026-01-01 | TODO markers removed | 0 markers in codebase |
+
+---
+
+## Metrics
+
+**Current:** 74/100
+**Target:** 85/100
+
+| Metric | Now | Goal |
+|--------|-----|------|
+| Test Coverage | 2% | 40%+ |
+| ESLint Warnings | 3 | 0 |
+| Console Statements | 16 | <10 |
+| Health Score | 74 | 85 |
 
 ---
 
 ## Quick Commands
 
 ```bash
-# Run local server
-python -m http.server 8000
-
-# Future: Run tests (after MP-01)
+# Run tests
 npm test
 
-# Future: Run linter (after MP-02)
+# Run tests with coverage
+npm run test:coverage
+
+# Run linter
 npm run lint
+
+# Fix lint issues
+npm run lint:fix
+
+# Start local server
+npm start
 ```
 
 ---
 
-## Metrics Dashboard
-
-### Current
-| Metric | Value | Status |
-|--------|-------|--------|
-| Health Score | 67/100 | CAUTION |
-| Test Coverage | 0% | CRITICAL |
-| Security Issues (HIGH) | 2 | AT RISK |
-| TODO/FIXME | 0 | HEALTHY |
-| Documentation | 85% | HEALTHY |
-
-### Target (After Quick Wins + MP-01)
-| Metric | Value | Status |
-|--------|-------|--------|
-| Health Score | 80+/100 | HEALTHY |
-| Test Coverage | 60%+ | CAUTION |
-| Security Issues (HIGH) | 0 | HEALTHY |
-| TODO/FIXME | 0 | HEALTHY |
-| Documentation | 90% | HEALTHY |
-
----
-
-## Notes
-
-### Priority Order
-1. **QW-01** (CSP) - Quick security win
-2. **QW-02** (Debug logs) - Quick cleanup
-3. **MP-01** (Tests) - Foundation for future work
-4. **QW-04** (API warning) - User awareness
-5. **MP-03** (API proxy) - Proper security fix
-
-### Dependencies
-- MP-02 (ESLint) should wait for MP-01 (Tests) to avoid blocking
-- MP-04 (Encryption) is optional if MP-03 (API proxy) is implemented
-- FI-* tasks can be done in any order
-
----
-
-**Last Updated:** 2025-12-31
-**Next Review:** After completing Quick Wins
+*Generated from Audit Report (2026-01-02)*

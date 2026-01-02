@@ -544,3 +544,126 @@ export function restoreLockStates() {
         }
     });
 }
+
+// ============================================================================
+// PURE CALCULATION FUNCTIONS (for testing)
+// ============================================================================
+// These are pure functions with no DOM dependencies, exported for unit testing.
+
+/**
+ * Calculate total area from internal + balcony
+ * @param {number} internal - Internal area in sq ft
+ * @param {number} balcony - Balcony area in sq ft
+ * @returns {number} Total area
+ */
+export function calculateTotalArea(internal, balcony) {
+    const total = internal + balcony;
+    return total > 0 ? total : 0;
+}
+
+/**
+ * Calculate BUA (Built-Up Area) for villas
+ * @param {number} internal - Internal area
+ * @param {number} terrace - Terrace area
+ * @returns {number} BUA
+ */
+export function calculateBUA(internal, terrace) {
+    const total = internal + terrace;
+    return total > 0 ? total : 0;
+}
+
+/**
+ * Calculate refund amount based on amount paid or percentage
+ * @param {number} original - Original price
+ * @param {number} amountPaidPercent - Percentage paid
+ * @param {number} amountPaid - Direct amount paid (takes priority)
+ * @returns {number} Refund amount
+ */
+export function calculateRefund(original, amountPaidPercent, amountPaid) {
+    if (amountPaid > 0) {
+        return Math.round(amountPaid);
+    }
+    if (amountPaidPercent > 0 && original > 0) {
+        return Math.round(original * (amountPaidPercent / 100));
+    }
+    return 0;
+}
+
+/**
+ * Calculate balance resale clause
+ * @param {number} original - Original price
+ * @param {number} resaleClausePercent - Required percentage for resale
+ * @param {number} amountPaidPercent - Percentage already paid
+ * @param {number} amountPaid - Direct amount paid
+ * @returns {number} Balance amount
+ */
+export function calculateBalance(original, resaleClausePercent, amountPaidPercent, amountPaid) {
+    if (!original || !resaleClausePercent) return 0;
+
+    let effectivePaidPercent = amountPaidPercent;
+    if (amountPaid > 0 && original > 0) {
+        effectivePaidPercent = (amountPaid / original) * 100;
+    }
+
+    if (effectivePaidPercent < resaleClausePercent) {
+        const balancePercent = resaleClausePercent - effectivePaidPercent;
+        return Math.round(original * (balancePercent / 100));
+    }
+
+    return 0;
+}
+
+/**
+ * Calculate premium (selling - original)
+ * @param {number} selling - Selling price
+ * @param {number} original - Original price
+ * @returns {number} Premium (can be negative)
+ */
+export function calculatePremium(selling, original) {
+    return selling - original;
+}
+
+/**
+ * Calculate ADGM fee (2% of original price)
+ * @param {number} original - Original price
+ * @returns {number} ADGM fee
+ */
+export function calculateADGM(original) {
+    return Math.round(original * 0.02);
+}
+
+/**
+ * Calculate agency fees (2% + 5% VAT)
+ * @param {number} selling - Selling price
+ * @returns {number} Agency fees
+ */
+export function calculateAgencyFees(selling) {
+    const base = selling * 0.02;
+    return Math.round(base * 1.05);
+}
+
+/**
+ * Calculate total initial payment for off-plan
+ * @param {number} refund - Refund amount
+ * @param {number} balance - Balance amount
+ * @param {number} premium - Premium amount
+ * @param {number} admin - Admin fees
+ * @param {number} adgm - ADGM fee
+ * @param {number} agency - Agency fees
+ * @returns {number} Total
+ */
+export function calculateTotalOffPlan(refund, balance, premium, admin, adgm, agency) {
+    return refund + balance + premium + admin + adgm + agency;
+}
+
+/**
+ * Calculate total initial payment for ready property
+ * @param {number} selling - Selling price
+ * @param {number} admin - Admin fees
+ * @param {number} adgm - ADGM fee
+ * @param {number} agency - Agency fees
+ * @returns {number} Total
+ */
+export function calculateTotalReady(selling, admin, adgm, agency) {
+    return selling + admin + adgm + agency;
+}

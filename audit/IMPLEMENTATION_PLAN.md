@@ -1,88 +1,123 @@
 # Sales Offer Generator — Implementation Plan
 
-**Based on:** Audit Report (2025-12-31)
-**Current Score:** 77/100
+**Based on:** Audit Report (2026-01-02)
+**Current Score:** 74/100
 **Target Score:** 85/100
 
 ---
 
 ## Summary
 
-The application is in good health with ESLint working and zero security vulnerabilities. The main remaining improvement is test coverage - updating tests to import actual source files instead of mocks.
+The main gap is test coverage. Tests exist and pass (93 tests) but don't exercise the actual source modules due to how imports are structured. Fixing test imports and adding coverage for core modules will significantly improve the health score.
 
 ---
 
-## Completed Actions
+## Recommended Actions
 
-| Task | Status |
-|------|--------|
-| Fix ESLint configuration | Done |
-| Update dev dependencies (vitest 4.0.16) | Done |
-| Resolve security vulnerabilities | Done |
-
----
-
-## Remaining Actions
-
-| Priority | Task | Status |
-|----------|------|--------|
-| 1 | Improve test coverage | Pending |
-| 2 | Update jsdom (optional) | Pending |
-| 3 | Resolve TODO in storage.js | Pending |
-| 4 | Fix ESLint warnings | Pending |
+| Priority | Task | Relates To |
+|----------|------|------------|
+| 1 | Fix test imports to use actual source modules | Low test coverage |
+| 2 | Add tests for calculator.js module | Low test coverage |
+| 3 | Add tests for validator.js module | Low test coverage |
+| 4 | Fix ESLint warnings in paymentPlan.js | ESLint warnings |
+| 5 | Add tests for storage.js core functions | Low test coverage |
+| 6 | Increase helpers.js coverage to 60%+ | Low test coverage |
 
 ---
 
-## Phase 1: Test Coverage
+## Phase 1: Immediate Fixes
 
-### Improve Test Coverage
+**Fix ESLint Warnings**
 
-Current tests use mocks and don't import actual source files. Update tests to:
-
-1. Import real modules from `js/modules/*.js`
-2. Mock only external dependencies (localStorage, DOM)
-3. Target 60%+ coverage
-
-**Files to update:**
-- `tests/helpers.test.js` - Import from `js/utils/helpers.js`
-- `tests/calculator.test.js` - Import from `js/modules/calculator.js`
-- `tests/validator.test.js` - Import from `js/modules/validator.js`
-
----
-
-## Phase 2: Minor Cleanup
-
-### Update jsdom (Optional)
-
-```bash
-npm install jsdom@latest --save-dev
-```
-
-### Resolve TODO
-
-Location: `js/modules/storage.js:500`
+Three warnings in `js/modules/paymentPlan.js`:
 
 ```javascript
-// TODO: Real compression should be done when image is uploaded
+// Line 272: Change let to const
+const totalInitial = payments.reduce(...);
+
+// Line 278: Prefix unused param with underscore
+payments.forEach((payment, _index) => { ... });
+
+// Line 336: Prefix unused param with underscore
+exportCSV(_csv) { ... }
 ```
 
-**Action:** Move image compression to upload time instead of storage time.
+Run `npm run lint:fix` to auto-fix the `prefer-const` warning.
 
-### Fix ESLint Warnings
+**Verify Test Setup**
 
-Run `npm run lint:fix` to auto-fix 3 warnings, then manually remove unused imports.
+Check that tests import actual source modules, not mocks. Current test files:
+- `tests/calculator.test.js`
+- `tests/validator.test.js`
+- `tests/helpers.test.js`
+
+Each should import from the actual source:
+```javascript
+import { calculateADGM } from '../js/modules/calculator.js';
+import { validatePaymentPlan } from '../js/modules/validator.js';
+import { formatCurrency } from '../js/utils/helpers.js';
+```
+
+---
+
+## Phase 2: Improve Test Coverage
+
+**Priority Modules for Testing**
+
+1. **calculator.js** — Financial calculations (ADGM, fees, totals)
+2. **validator.js** — Form and payment plan validation
+3. **helpers.js** — Increase coverage from 26% to 60%+
+4. **storage.js** — Core save/load functionality
+
+**Test Structure Template**
+
+```javascript
+import { describe, it, expect, vi } from 'vitest';
+import { functionName } from '../js/modules/module.js';
+
+describe('ModuleName', () => {
+  describe('functionName', () => {
+    it('should handle normal input', () => {
+      expect(functionName(input)).toBe(expected);
+    });
+
+    it('should handle edge cases', () => {
+      expect(functionName(edgeCase)).toBe(expected);
+    });
+  });
+});
+```
+
+---
+
+## Phase 3: Optional Improvements
+
+**Review Console Statements**
+
+16 console statements exist. Most are appropriate for error handling. Consider:
+- Keeping `console.error` for debugging production issues
+- Replacing `console.warn` with user-visible notifications where appropriate
+- Adding a logging utility if more control is needed
+
+**Module Coverage Goals**
+
+| Module | Current | Target |
+|--------|---------|--------|
+| helpers.js | 26% | 60% |
+| calculator.js | 0% | 60% |
+| validator.js | 0% | 60% |
+| storage.js | 0% | 40% |
+| Others | 0% | As needed |
 
 ---
 
 ## Expected Outcome
 
-| Metric | Before | After |
-|--------|--------|-------|
-| Health Score | 77/100 | 85/100 |
-| ESLint | Working | Working |
-| Vulnerabilities | 0 | 0 |
-| Test Coverage | 30% | 60%+ |
-| Outdated packages | 1 | 0 |
+| Metric | Current | After Phase 1 | After Phase 2 |
+|--------|---------|---------------|---------------|
+| Health Score | 74 | 76 | 85+ |
+| Test Coverage | 2% | 2% | 40%+ |
+| ESLint Warnings | 3 | 0 | 0 |
 
 ---
 

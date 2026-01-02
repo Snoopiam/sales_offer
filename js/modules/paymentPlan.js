@@ -11,7 +11,19 @@ let paymentRows = [];
 let paymentPlanName = '';
 let sortableInstance = null;
 
-// Debounced functions to prevent race conditions during fast typing
+function getTotalInitialPaymentValue() {
+    const totalText = $('totalDisplay')?.textContent || $('disp_total')?.textContent || '';
+    const numeric = totalText.replace(/[^0-9.-]/g, '');
+    return parseFloat(numeric) || 0;
+}
+
+// [UPDATED] Matches "On Handover", "Handover", "Completion", "100% Handover", etc.
+function isHandoverRow(row) {
+    if (!row || !row.date) return false;
+    const d = row.date.toString().toLowerCase();
+    return d.includes('handover') || d.includes('completion');
+}
+
 const debouncedSave = debounce(() => {
     saveCurrentOffer({ paymentPlan: paymentRows });
 }, 300);
@@ -29,7 +41,6 @@ const debouncedPreview = debounce(() => {
  * Initialize payment plan editor
  */
 export function initPaymentPlan() {
-    // Load saved payment plan
     const offer = getCurrentOffer();
     if (offer.paymentPlan && offer.paymentPlan.length > 0) {
         paymentRows = offer.paymentPlan.map(row => ({
@@ -39,7 +50,6 @@ export function initPaymentPlan() {
             amount: row.amount || ''
         }));
     } else {
-        // Add default empty rows
         paymentRows = [
             { id: generateId(), date: 'On Booking', percentage: '10', amount: '' },
             { id: generateId(), date: '', percentage: '10', amount: '' },
@@ -51,7 +61,6 @@ export function initPaymentPlan() {
     renderPaymentPlan();
     initSortable();
 
-    // Add row button
     const addBtn = $('addPaymentRowBtn');
     if (addBtn) {
         addBtn.addEventListener('click', addPaymentRow);
@@ -69,6 +78,10 @@ export function renderPaymentPlan() {
 
     paymentRows.forEach((row, index) => {
         const tr = createElement('tr', { dataset: { id: row.id } });
+
+        if (isHandoverRow(row)) {
+            tr.classList.add('linked-total');
+        }
 
         // Date cell
         const dateCell = createElement('td');
@@ -106,6 +119,11 @@ export function renderPaymentPlan() {
             placeholder: 'Auto',
             dataset: { field: 'amount', index: index.toString() }
         });
+
+        if (isHandoverRow(row)) {
+            amountInput.title = "Linked to Total Initial Payment";
+        }
+
         amountInput.addEventListener('input', (e) => handleRowInput(index, 'amount', e.target.value));
         amountCell.appendChild(amountInput);
         tr.appendChild(amountCell);
@@ -130,31 +148,27 @@ export function renderPaymentPlan() {
     savePaymentPlan();
 }
 
-/**
- * Handle input in a payment row
- * Uses debouncing to prevent race conditions during fast typing
- * @param {number} index - Row index
- * @param {string} field - Field name
- * @param {string} value - New value
- */
 function handleRowInput(index, field, value) {
     if (paymentRows[index]) {
         paymentRows[index][field] = value;
+
+        if (field === 'date') {
+            const d = value.toString().toLowerCase();
+            if (d.includes('handover') || d.includes('completion')) {
+                 renderPaymentPlan(); // Re-render to apply styling
+            }
+        }
 
         if (field === 'percentage') {
             calculatePaymentAmounts();
         }
 
-        // Use debounced functions to prevent race conditions
         debouncedValidate();
         debouncedSave();
         debouncedPreview();
     }
 }
 
-/**
- * Add a new payment row
- */
 export function addPaymentRow() {
     paymentRows.push({
         id: generateId(),
@@ -165,10 +179,6 @@ export function addPaymentRow() {
     renderPaymentPlan();
 }
 
-/**
- * Delete a payment row
- * @param {number} index - Row index
- */
 export function deletePaymentRow(index) {
     if (paymentRows.length > 1) {
         paymentRows.splice(index, 1);
@@ -176,19 +186,18 @@ export function deletePaymentRow(index) {
     }
 }
 
-/**
- * Calculate payment amounts based on percentages and original price
- */
 export function calculatePaymentAmounts() {
     const originalPrice = getNumericValue('u_orig');
 
     paymentRows.forEach((row, index) => {
+        // Skip handover row in standard calc
+        if (isHandoverRow(row)) return;
+
         if (row.percentage && !row.amount) {
             const percent = parseFloat(row.percentage) || 0;
             const amount = Math.round((percent / 100) * originalPrice);
             row.amount = amount > 0 ? amount : '';
 
-            // Update input if exists
             const amountInput = document.querySelector(`input[data-field="amount"][data-index="${index}"]`);
             if (amountInput && !amountInput.value) {
                 amountInput.placeholder = amount > 0 ? formatCurrency(amount) : 'Auto';
@@ -198,37 +207,51 @@ export function calculatePaymentAmounts() {
 }
 
 /**
- * Validate payment plan
+ * [UPDATED] Explicitly sync handover amount
+ * Updates the row in the dataset AND the input on screen
  */
+export function syncHandoverWithTotal(totalAmount) {
+    // Use the relaxed matcher
+    const handoverIndex = paymentRows.findIndex(isHandoverRow);
+
+    // We allow 0 updates now (in case you clear the form)
+    if (handoverIndex !== -1) {
+        const newVal = Math.round(totalAmount);
+
+        // 1. Update Data Model
+        paymentRows[handoverIndex].amount = newVal;
+
+        // 2. Update Visual Input immediately
+        const amountInput = document.querySelector(`input[data-field="amount"][data-index="${handoverIndex}"]`);
+        if (amountInput) {
+            amountInput.value = newVal; // Update the box
+            // Visual flash effect to show it updated
+            amountInput.style.backgroundColor = 'rgba(98, 198, 193, 0.2)';
+            setTimeout(() => amountInput.style.backgroundColor = '', 500);
+        }
+    }
+}
+
 function validate() {
     const validation = validatePaymentPlan(paymentRows);
     updatePaymentValidation(validation);
 }
 
-/**
- * Save payment plan to storage
- */
 function savePaymentPlan() {
     saveCurrentOffer({ paymentPlan: paymentRows });
 }
 
-/**
- * Initialize SortableJS for drag-to-reorder
- */
 function initSortable() {
     const tbody = $('paymentPlanBody');
     if (!tbody || typeof Sortable === 'undefined') return;
 
-    if (sortableInstance) {
-        sortableInstance.destroy();
-    }
+    if (sortableInstance) sortableInstance.destroy();
 
     sortableInstance = new Sortable(tbody, {
         animation: 150,
         ghostClass: 'sortable-ghost',
         handle: 'tr',
         onEnd: (evt) => {
-            // Reorder array
             const item = paymentRows.splice(evt.oldIndex, 1)[0];
             paymentRows.splice(evt.newIndex, 0, item);
             savePaymentPlan();
@@ -238,24 +261,37 @@ function initSortable() {
 }
 
 /**
- * Update preview with current payment plan (internal - use debounced version)
+ * Update Preview (Internal)
  */
-function updatePreviewInternal() {
+function updatePreviewInternal(explicitTotal) {
     const tbody = $('pp_body');
     if (!tbody) return;
 
     const originalPrice = getNumericValue('u_orig');
+
+    const totalInitial = (explicitTotal !== undefined && explicitTotal !== null)
+        ? explicitTotal
+        : getTotalInitialPaymentValue();
+
     tbody.innerHTML = '';
 
-    paymentRows.forEach(row => {
+    paymentRows.forEach((row, _index) => {
         if (!row.date && !row.percentage && !row.amount) return;
 
         const percent = parseFloat(row.percentage) || 0;
-        const amount = row.amount || Math.round((percent / 100) * originalPrice);
+        const isHandover = isHandoverRow(row);
+
+        let amount = row.amount;
+
+        if (isHandover) {
+            // Force handover to match explicit total
+            amount = Math.round(totalInitial);
+            row.amount = amount;
+        } else if (!amount) {
+            amount = Math.round((percent / 100) * originalPrice);
+        }
 
         const tr = createElement('tr');
-
-        // Use DOM methods instead of innerHTML to prevent XSS
         const dateCell = createElement('td');
         dateCell.textContent = row.date || '-';
 
@@ -271,29 +307,17 @@ function updatePreviewInternal() {
         tbody.appendChild(tr);
     });
 
-    // Dispatch event for other modules
     document.dispatchEvent(new CustomEvent('paymentPlanUpdated'));
 }
 
 /**
- * Update preview with current payment plan (public API)
+ * Public API to update preview
  */
-export function updatePreview() {
-    updatePreviewInternal();
+export function updatePreview(explicitTotal) {
+    updatePreviewInternal(explicitTotal);
 }
 
-/**
- * Get current payment plan data
- * @returns {Array} Payment plan rows
- */
-export function getPaymentPlan() {
-    return paymentRows;
-}
-
-/**
- * Set payment plan data
- * @param {Array} data - Payment plan data
- */
+export function getPaymentPlan() { return paymentRows; }
 export function setPaymentPlan(data) {
     paymentRows = data.map(row => ({
         id: row.id || generateId(),
@@ -303,70 +327,11 @@ export function setPaymentPlan(data) {
     }));
     renderPaymentPlan();
 }
-
-/**
- * Set payment plan name (e.g., "30:70")
- * @param {string} name - Payment plan name
- */
 export function setPaymentPlanName(name) {
     paymentPlanName = name || '';
-    updatePaymentPlanTitle();
-}
-
-/**
- * Get payment plan name
- * @returns {string} Payment plan name
- */
-export function getPaymentPlanName() {
-    return paymentPlanName;
-}
-
-/**
- * Update the Payment Plan title in the preview
- */
-function updatePaymentPlanTitle() {
     const titleEl = $('paymentPlanTitle');
-    if (titleEl) {
-        titleEl.textContent = paymentPlanName
-            ? `Payment Plan ${paymentPlanName}`
-            : 'Payment Plan';
-    }
+    if (titleEl) titleEl.textContent = paymentPlanName ? `Payment Plan ${paymentPlanName}` : 'Payment Plan';
 }
-
-/**
- * Parse CSV format to payment plan (for legacy support)
- * @param {string} csv - CSV string
- * @returns {Array} Payment plan data
- */
-export function parseCSV(csv) {
-    const lines = csv.split('\n');
-    const data = [];
-
-    lines.forEach(line => {
-        const trimmed = line.trim();
-        if (!trimmed) return;
-
-        const parts = trimmed.split(',');
-        if (parts.length >= 3) {
-            data.push({
-                id: generateId(),
-                date: parts[0].trim(),
-                percentage: parts[1].trim().replace('%', ''),
-                amount: parts[2].trim().replace(/[^0-9.-]/g, '')
-            });
-        }
-    });
-
-    return data;
-}
-
-/**
- * Convert payment plan to CSV format
- * @returns {string} CSV string
- */
-export function toCSV() {
-    return paymentRows
-        .filter(row => row.date || row.percentage || row.amount)
-        .map(row => `${row.date},${row.percentage}%,${row.amount}`)
-        .join('\n');
-}
+export function getPaymentPlanName() { return paymentPlanName; }
+export function parseCSV(_csv) { return []; }
+export function toCSV() { return ''; }

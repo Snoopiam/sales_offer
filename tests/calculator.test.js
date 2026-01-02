@@ -34,107 +34,22 @@
 import { describe, it, expect } from 'vitest';
 
 // ============================================================================
-// PURE CALCULATION FUNCTIONS FOR TESTING
+// IMPORT PURE CALCULATION FUNCTIONS FROM SOURCE
 // ============================================================================
-// These functions are extracted from calculator.js for isolated unit testing.
+// These functions are exported from calculator.js for unit testing.
 // They have no dependencies on DOM, localStorage, or other modules.
 
-/**
- * Calculate total area from internal + balcony
- *
- * BUSINESS RULE:
- * Total Area = Internal Area + Balcony Area
- * Used for standard apartments (not villas/plots)
- *
- * @param {number} internal - Internal area in sq ft
- * @param {number} balcony - Balcony area in sq ft
- * @returns {number} Total area in sq ft, or 0 if both are zero
- */
-function calculateTotalArea(internal, balcony) {
-    const total = internal + balcony;
-    return total > 0 ? total : 0;
-}
-
-/**
- * Calculate BUA (Built-Up Area) for villas
- */
-function calculateBUA(internal, terrace) {
-    const total = internal + terrace;
-    return total > 0 ? total : 0;
-}
-
-/**
- * Calculate refund amount based on amount paid or percentage
- */
-function calculateRefund(original, amountPaidPercent, amountPaid) {
-    // If Amount Paid (AED) is provided, use it
-    if (amountPaid > 0) {
-        return Math.round(amountPaid);
-    }
-    // If Amount Paid % is provided, calculate from original price
-    if (amountPaidPercent > 0 && original > 0) {
-        return Math.round(original * (amountPaidPercent / 100));
-    }
-    return 0;
-}
-
-/**
- * Calculate balance resale clause
- * If paid less than resale clause %, balance = difference
- */
-function calculateBalance(original, resaleClausePercent, amountPaidPercent, amountPaid) {
-    if (!original || !resaleClausePercent) return 0;
-
-    // Calculate effective amount paid percentage
-    let effectivePaidPercent = amountPaidPercent;
-    if (amountPaid > 0 && original > 0) {
-        effectivePaidPercent = (amountPaid / original) * 100;
-    }
-
-    // If paid less than resale clause, balance = difference
-    if (effectivePaidPercent < resaleClausePercent) {
-        const balancePercent = resaleClausePercent - effectivePaidPercent;
-        return Math.round(original * (balancePercent / 100));
-    }
-
-    return 0;
-}
-
-/**
- * Calculate premium (selling - original)
- */
-function calculatePremium(selling, original) {
-    return selling - original;
-}
-
-/**
- * Calculate ADGM fee (2% of original price)
- */
-function calculateADGM(original) {
-    return Math.round(original * 0.02);
-}
-
-/**
- * Calculate agency fees (2% + 5% VAT)
- */
-function calculateAgencyFees(selling) {
-    const base = selling * 0.02;
-    return Math.round(base * 1.05);
-}
-
-/**
- * Calculate total initial payment for off-plan
- */
-function calculateTotalOffPlan(refund, balance, premium, admin, adgm, agency) {
-    return refund + balance + premium + admin + adgm + agency;
-}
-
-/**
- * Calculate total initial payment for ready property
- */
-function calculateTotalReady(selling, admin, adgm, agency) {
-    return selling + admin + adgm + agency;
-}
+import {
+    calculateTotalArea,
+    calculateBUA,
+    calculateRefund,
+    calculateBalance,
+    calculatePremium,
+    calculateADGM,
+    calculateAgencyFees,
+    calculateTotalOffPlan,
+    calculateTotalReady
+} from '../js/modules/calculator.js';
 
 describe('calculateTotalArea', () => {
     it('adds internal and balcony areas', () => {

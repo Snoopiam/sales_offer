@@ -3,7 +3,7 @@
  * @vitest-environment jsdom
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // Import actual functions from source
 import {
@@ -17,7 +17,19 @@ import {
     formatDate,
     excelDateToJS,
     getNumericValue,
-    debounce
+    debounce,
+    $,
+    $q,
+    $qa,
+    setValue,
+    getValue,
+    setText,
+    show,
+    hide,
+    toggle,
+    on,
+    encodeApiKey,
+    decodeApiKey
 } from '../js/utils/helpers.js';
 
 describe('formatCurrency', () => {
@@ -267,5 +279,382 @@ describe('debounce', () => {
         expect(fn).toHaveBeenCalledTimes(1);
 
         vi.useRealTimers();
+    });
+
+    it('uses default wait time of 300ms', async () => {
+        vi.useFakeTimers();
+        const fn = vi.fn();
+        const debounced = debounce(fn);
+
+        debounced();
+        vi.advanceTimersByTime(299);
+        expect(fn).not.toHaveBeenCalled();
+
+        vi.advanceTimersByTime(1);
+        expect(fn).toHaveBeenCalledTimes(1);
+
+        vi.useRealTimers();
+    });
+});
+
+// ============================================================================
+// DOM HELPER TESTS
+// ============================================================================
+
+describe('$ (getElementById)', () => {
+    beforeEach(() => {
+        document.body.innerHTML = '<div id="testDiv">Test Content</div><span id="testSpan">Span</span>';
+    });
+
+    it('returns element by ID', () => {
+        const el = $('testDiv');
+        expect(el).not.toBeNull();
+        expect(el.textContent).toBe('Test Content');
+    });
+
+    it('returns null for non-existent ID', () => {
+        expect($('nonexistent')).toBeNull();
+    });
+});
+
+describe('$q (querySelector)', () => {
+    beforeEach(() => {
+        document.body.innerHTML = `
+            <div class="container">
+                <span class="item">First</span>
+                <span class="item">Second</span>
+            </div>
+        `;
+    });
+
+    it('returns first matching element', () => {
+        const el = $q('.item');
+        expect(el.textContent).toBe('First');
+    });
+
+    it('returns null for no match', () => {
+        expect($q('.nonexistent')).toBeNull();
+    });
+
+    it('searches within parent element', () => {
+        const container = $q('.container');
+        const item = $q('.item', container);
+        expect(item.textContent).toBe('First');
+    });
+});
+
+describe('$qa (querySelectorAll)', () => {
+    beforeEach(() => {
+        document.body.innerHTML = `
+            <div class="container">
+                <span class="item">First</span>
+                <span class="item">Second</span>
+                <span class="item">Third</span>
+            </div>
+        `;
+    });
+
+    it('returns all matching elements', () => {
+        const items = $qa('.item');
+        expect(items.length).toBe(3);
+    });
+
+    it('returns empty NodeList for no match', () => {
+        const items = $qa('.nonexistent');
+        expect(items.length).toBe(0);
+    });
+
+    it('searches within parent element', () => {
+        const container = $q('.container');
+        const items = $qa('.item', container);
+        expect(items.length).toBe(3);
+    });
+});
+
+describe('setValue and getValue', () => {
+    beforeEach(() => {
+        document.body.innerHTML = `
+            <input id="textInput" type="text" value="">
+            <input id="numberInput" type="number" value="">
+            <select id="selectInput">
+                <option value="opt1">Option 1</option>
+                <option value="opt2">Option 2</option>
+                <option value="opt3">Option 3</option>
+            </select>
+        `;
+    });
+
+    it('sets and gets text input value', () => {
+        setValue('textInput', 'Hello World');
+        expect(getValue('textInput')).toBe('Hello World');
+    });
+
+    it('sets and gets number input value', () => {
+        setValue('numberInput', 12345);
+        expect(getValue('numberInput')).toBe('12345');
+    });
+
+    it('handles null value', () => {
+        setValue('textInput', null);
+        expect(getValue('textInput')).toBe('');
+    });
+
+    it('handles undefined value', () => {
+        setValue('textInput', undefined);
+        expect(getValue('textInput')).toBe('');
+    });
+
+    it('returns empty string for non-existent element', () => {
+        expect(getValue('nonexistent')).toBe('');
+    });
+
+    it('does nothing for non-existent element on setValue', () => {
+        setValue('nonexistent', 'value'); // Should not throw
+    });
+
+    it('sets select element value with exact match', () => {
+        setValue('selectInput', 'opt2');
+        expect(getValue('selectInput')).toBe('opt2');
+    });
+
+    it('handles select with case-insensitive match', () => {
+        setValue('selectInput', 'OPT1');
+        expect(getValue('selectInput')).toBe('opt1');
+    });
+});
+
+describe('setText', () => {
+    beforeEach(() => {
+        document.body.innerHTML = '<div id="display">Original</div>';
+    });
+
+    it('sets text content', () => {
+        setText('display', 'New Text');
+        expect($('display').textContent).toBe('New Text');
+    });
+
+    it('shows dash for empty text', () => {
+        setText('display', '');
+        expect($('display').textContent).toBe('-');
+    });
+
+    it('shows dash for null', () => {
+        setText('display', null);
+        expect($('display').textContent).toBe('-');
+    });
+
+    it('does nothing for non-existent element', () => {
+        setText('nonexistent', 'text'); // Should not throw
+    });
+});
+
+describe('show, hide, toggle', () => {
+    beforeEach(() => {
+        document.body.innerHTML = '<div id="testEl" class="hidden">Content</div>';
+    });
+
+    it('show removes hidden class', () => {
+        show('testEl');
+        expect($('testEl').classList.contains('hidden')).toBe(false);
+    });
+
+    it('hide adds hidden class', () => {
+        show('testEl'); // First remove hidden
+        hide('testEl');
+        expect($('testEl').classList.contains('hidden')).toBe(true);
+    });
+
+    it('toggle flips visibility', () => {
+        const el = $('testEl');
+        expect(el.classList.contains('hidden')).toBe(true);
+
+        toggle('testEl');
+        expect(el.classList.contains('hidden')).toBe(false);
+
+        toggle('testEl');
+        expect(el.classList.contains('hidden')).toBe(true);
+    });
+
+    it('toggle with true forces show', () => {
+        toggle('testEl', true);
+        expect($('testEl').classList.contains('hidden')).toBe(false);
+    });
+
+    it('toggle with false forces hide', () => {
+        show('testEl');
+        toggle('testEl', false);
+        expect($('testEl').classList.contains('hidden')).toBe(true);
+    });
+
+    it('accepts element reference instead of ID', () => {
+        const el = $('testEl');
+        show(el);
+        expect(el.classList.contains('hidden')).toBe(false);
+
+        hide(el);
+        expect(el.classList.contains('hidden')).toBe(true);
+    });
+
+    it('handles non-existent element gracefully', () => {
+        show('nonexistent'); // Should not throw
+        hide('nonexistent'); // Should not throw
+        toggle('nonexistent'); // Should not throw
+    });
+});
+
+describe('on (event listener)', () => {
+    beforeEach(() => {
+        document.body.innerHTML = '<button id="testBtn">Click</button>';
+    });
+
+    it('adds event listener by ID', () => {
+        const handler = vi.fn();
+        on('testBtn', 'click', handler);
+
+        $('testBtn').click();
+        expect(handler).toHaveBeenCalledTimes(1);
+    });
+
+    it('adds event listener by element', () => {
+        const handler = vi.fn();
+        const btn = $('testBtn');
+        on(btn, 'click', handler);
+
+        btn.click();
+        expect(handler).toHaveBeenCalledTimes(1);
+    });
+
+    it('handles non-existent element gracefully', () => {
+        const handler = vi.fn();
+        on('nonexistent', 'click', handler); // Should not throw
+    });
+});
+
+// ============================================================================
+// API KEY ENCODING TESTS
+// ============================================================================
+
+describe('encodeApiKey', () => {
+    it('encodes string to Base64', () => {
+        expect(encodeApiKey('hello')).toBe('aGVsbG8=');
+        expect(encodeApiKey('sk-abc123')).toBe('c2stYWJjMTIz');
+    });
+
+    it('encodes empty string', () => {
+        expect(encodeApiKey('')).toBe('');
+    });
+
+    it('encodes special characters', () => {
+        const encoded = encodeApiKey('test@123!');
+        expect(encoded).toBe('dGVzdEAxMjMh');
+    });
+});
+
+describe('decodeApiKey', () => {
+    it('decodes Base64 to string', () => {
+        expect(decodeApiKey('aGVsbG8=')).toBe('hello');
+        expect(decodeApiKey('c2stYWJjMTIz')).toBe('sk-abc123');
+    });
+
+    it('decodes empty string', () => {
+        expect(decodeApiKey('')).toBe('');
+    });
+
+    it('returns empty for invalid Base64', () => {
+        expect(decodeApiKey('!!!invalid!!!')).toBe('');
+    });
+
+    it('round-trips correctly', () => {
+        const original = 'my-secret-api-key-12345';
+        const encoded = encodeApiKey(original);
+        const decoded = decodeApiKey(encoded);
+        expect(decoded).toBe(original);
+    });
+});
+
+// ============================================================================
+// ADDITIONAL EDGE CASE TESTS
+// ============================================================================
+
+describe('formatNumber edge cases', () => {
+    it('handles empty string', () => {
+        expect(formatNumber('')).toBe('0');
+    });
+
+    it('handles NaN', () => {
+        expect(formatNumber(NaN)).toBe('0');
+    });
+
+    it('handles negative numbers', () => {
+        expect(formatNumber(-1234.56)).toBe('-1,234.56');
+    });
+
+    it('handles very large numbers', () => {
+        expect(formatNumber(1234567890.12)).toBe('1,234,567,890.12');
+    });
+
+    it('handles very small decimals', () => {
+        expect(formatNumber(0.123456, 4)).toBe('0.1235');
+    });
+});
+
+describe('parseCurrency edge cases', () => {
+    it('handles multiple commas', () => {
+        expect(parseCurrency('1,234,567,890')).toBe(1234567890);
+    });
+
+    it('handles currency symbols', () => {
+        expect(parseCurrency('€1,234.56')).toBe(1234.56);
+        expect(parseCurrency('£500')).toBe(500);
+    });
+
+    it('handles spaces', () => {
+        expect(parseCurrency('AED 1 000 000')).toBe(1000000);
+    });
+});
+
+describe('formatDate edge cases', () => {
+    it('formats timestamp', () => {
+        const timestamp = new Date('2024-06-15').getTime();
+        expect(formatDate(timestamp)).toBe('15 Jun 2024');
+    });
+
+    it('handles Date at month boundaries', () => {
+        expect(formatDate('2024-01-01')).toBe('01 Jan 2024');
+        expect(formatDate('2024-12-31')).toBe('31 Dec 2024');
+    });
+});
+
+describe('checkFileSize edge cases', () => {
+    it('uses default 50MB limit', () => {
+        const file = { size: 50 * 1024 * 1024 };
+        expect(checkFileSize(file)).toBe(true);
+
+        const largeFile = { size: 51 * 1024 * 1024 };
+        expect(checkFileSize(largeFile)).toBe(false);
+    });
+
+    it('handles zero size file', () => {
+        const file = { size: 0 };
+        expect(checkFileSize(file, 10)).toBe(true);
+    });
+});
+
+describe('sanitizeInput edge cases', () => {
+    it('handles multiple dangerous patterns', () => {
+        const input = '<script>javascript:onclick=alert(1)</script>';
+        const result = sanitizeInput(input);
+        expect(result).not.toContain('<');
+        expect(result).not.toContain('javascript:');
+        expect(result).not.toContain('onclick=');
+    });
+
+    it('handles case variations', () => {
+        expect(sanitizeInput('JAVASCRIPT:alert(1)')).not.toContain('javascript');
+        expect(sanitizeInput('OnClick=bad()')).not.toContain('onclick');
+    });
+
+    it('handles undefined', () => {
+        expect(sanitizeInput(undefined)).toBe('');
     });
 });

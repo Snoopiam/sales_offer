@@ -35,10 +35,14 @@
 
 import { describe, it, expect } from 'vitest';
 
+// Import actual validation function from source module
+import { validatePaymentPlan } from '../js/modules/validator.js';
+
 // ============================================================================
-// PURE VALIDATION LOGIC FOR TESTING
+// LOCAL VALIDATION LOGIC FOR TESTING
 // ============================================================================
-// Extracted from validator.js as pure functions (no DOM dependencies)
+// These are pure functions for testing field validation without DOM dependencies
+// The actual validateField() in validator.js requires DOM elements
 
 const validationRules = {
     inp_proj: {
@@ -58,7 +62,7 @@ const validationRules = {
 };
 
 /**
- * Validate a single field value against rules
+ * Validate a single field value against rules (pure function for testing)
  */
 function validateFieldValue(value, rules) {
     if (!rules) return { valid: true };
@@ -86,48 +90,6 @@ function validateFieldValue(value, rules) {
     }
 
     return { valid: true };
-}
-
-/**
- * Validate payment plan total percentage
- * Uses epsilon comparison for floating point precision
- */
-function validatePaymentPlan(paymentPlan) {
-    if (!paymentPlan || paymentPlan.length === 0) {
-        return { valid: true, totalPercent: 0, message: '' };
-    }
-
-    let totalPercent = 0;
-
-    paymentPlan.forEach(row => {
-        const percent = parseFloat(row.percentage) || 0;
-        totalPercent += percent;
-    });
-
-    // Round to 2 decimal places for display
-    const displayTotal = Math.round(totalPercent * 100) / 100;
-
-    // Use epsilon comparison to handle floating point issues
-    const EPSILON = 0.01;
-    const isValid = Math.abs(totalPercent - 100) < EPSILON;
-    const isOver = totalPercent > 100 + EPSILON;
-
-    if (isValid) {
-        return { valid: true, totalPercent: displayTotal, message: '' };
-    } else if (isOver) {
-        return {
-            valid: false,
-            totalPercent: displayTotal,
-            message: `Total exceeds 100% (${displayTotal}%)`
-        };
-    } else {
-        const remaining = Math.round((100 - displayTotal) * 100) / 100;
-        return {
-            valid: false,
-            totalPercent: displayTotal,
-            message: `Total is ${displayTotal}% (${remaining}% remaining)`
-        };
-    }
 }
 
 describe('validateFieldValue', () => {
