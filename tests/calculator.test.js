@@ -300,26 +300,27 @@ describe('DOM-dependent calculator functions', () => {
         });
 
         // Setup basic DOM structure
+        // IDs must match the humanized IDs used in calculator.js
         document.body.innerHTML = `
             <input id="input-total-area" type="text" />
-            <input id="u_built_up_area" type="text" />
+            <input id="input-built-up-area" type="text" />
             <input id="input-refund-amount" type="text" />
-            <input id="u_balance_resale" type="text" />
+            <input id="input-balance-resale" type="text" />
             <input id="input-premium-amount" type="text" />
-            <input id="u_adgm_transfer" type="text" />
+            <input id="input-adgm-transfer" type="text" />
             <input id="input-agency-fees" type="text" />
             <input id="input-internal-area" type="text" />
             <input id="input-balcony-area" type="text" />
-            <input id="u_villa_internal" type="text" />
-            <input id="u_villa_terrace" type="text" />
-            <input id="u_original_price" type="text" />
-            <input id="u_selling_price" type="text" />
-            <input id="u_resale_clause" type="text" />
-            <input id="u_amount_paid_percent" type="text" />
-            <input id="u_amount_paid" type="text" />
+            <input id="input-villa-internal" type="text" />
+            <input id="input-villa-terrace" type="text" />
+            <input id="input-original-price" type="text" />
+            <input id="input-selling-price" type="text" />
+            <input id="input-resale-clause" type="text" />
+            <input id="input-amount-paid-percent" type="text" />
+            <input id="input-amount-paid" type="text" />
             <input id="input-admin-fees" type="text" />
-            <input id="u_adgm_termination_fee" type="text" />
-            <input id="u_adgm_electronic_fee" type="text" />
+            <input id="input-adgm-termination-fee" type="text" />
+            <input id="input-adgm-electronic-fee" type="text" />
             <span id="display-total-payment"></span>
             <button class="lock-btn" data-target="input-refund-amount"></button>
             <button class="lock-btn" data-target="input-premium-amount"></button>
@@ -356,20 +357,20 @@ describe('DOM-dependent calculator functions', () => {
             expect(areaInput.value).toBe('1092.32 Sq.Ft');
         });
 
-        it('calculates u_built_up_area for villas', () => {
-            mockNumericValues['u_villa_internal'] = 2500;
-            mockNumericValues['u_villa_terrace'] = 500;
+        it('calculates input-built-up-area for villas', () => {
+            mockNumericValues['input-villa-internal'] = 2500;
+            mockNumericValues['input-villa-terrace'] = 500;
 
-            calculateField('u_built_up_area');
+            calculateField('input-built-up-area');
 
-            const buaInput = document.getElementById('u_built_up_area');
+            const buaInput = document.getElementById('input-built-up-area');
             expect(buaInput.value).toBe('3000.00 Sq.Ft');
         });
 
         it('calculates input-refund-amount from percentage', () => {
-            mockNumericValues['u_original_price'] = 2000000;
-            mockNumericValues['u_amount_paid_percent'] = 20;
-            mockNumericValues['u_amount_paid'] = 0;
+            mockNumericValues['input-original-price'] = 2000000;
+            mockNumericValues['input-amount-paid-percent'] = 20;
+            mockNumericValues['input-amount-paid'] = 0;
 
             calculateField('input-refund-amount');
 
@@ -378,9 +379,9 @@ describe('DOM-dependent calculator functions', () => {
         });
 
         it('calculates input-refund-amount from direct amount', () => {
-            mockNumericValues['u_original_price'] = 2000000;
-            mockNumericValues['u_amount_paid_percent'] = 20;
-            mockNumericValues['u_amount_paid'] = 500000;
+            mockNumericValues['input-original-price'] = 2000000;
+            mockNumericValues['input-amount-paid-percent'] = 20;
+            mockNumericValues['input-amount-paid'] = 500000;
 
             calculateField('input-refund-amount');
 
@@ -388,33 +389,33 @@ describe('DOM-dependent calculator functions', () => {
             expect(refundInput.value).toBe('500000');
         });
 
-        it('calculates u_balance_resale when paid less than clause', () => {
-            mockNumericValues['u_original_price'] = 2000000;
-            mockNumericValues['u_resale_clause'] = 40;
-            mockNumericValues['u_amount_paid_percent'] = 20;
-            mockNumericValues['u_amount_paid'] = 0;
+        it('calculates input-balance-resale when paid less than clause', () => {
+            mockNumericValues['input-original-price'] = 2000000;
+            mockNumericValues['input-resale-clause'] = 40;
+            mockNumericValues['input-amount-paid-percent'] = 20;
+            mockNumericValues['input-amount-paid'] = 0;
 
-            calculateField('u_balance_resale');
+            calculateField('input-balance-resale');
 
-            const balanceInput = document.getElementById('u_balance_resale');
+            const balanceInput = document.getElementById('input-balance-resale');
             expect(balanceInput.value).toBe('400000');
         });
 
-        it('sets u_balance_resale to empty when paid meets clause', () => {
-            mockNumericValues['u_original_price'] = 2000000;
-            mockNumericValues['u_resale_clause'] = 40;
-            mockNumericValues['u_amount_paid_percent'] = 40;
-            mockNumericValues['u_amount_paid'] = 0;
+        it('sets input-balance-resale to empty when paid meets clause', () => {
+            mockNumericValues['input-original-price'] = 2000000;
+            mockNumericValues['input-resale-clause'] = 40;
+            mockNumericValues['input-amount-paid-percent'] = 40;
+            mockNumericValues['input-amount-paid'] = 0;
 
-            calculateField('u_balance_resale');
+            calculateField('input-balance-resale');
 
-            const balanceInput = document.getElementById('u_balance_resale');
+            const balanceInput = document.getElementById('input-balance-resale');
             expect(balanceInput.value).toBe('');
         });
 
         it('calculates input-premium-amount', () => {
-            mockNumericValues['u_selling_price'] = 2500000;
-            mockNumericValues['u_original_price'] = 2000000;
+            mockNumericValues['input-selling-price'] = 2500000;
+            mockNumericValues['input-original-price'] = 2000000;
 
             calculateField('input-premium-amount');
 
@@ -422,17 +423,17 @@ describe('DOM-dependent calculator functions', () => {
             expect(premiumInput.value).toBe('500000');
         });
 
-        it('calculates u_adgm_transfer', () => {
-            mockNumericValues['u_original_price'] = 2500000;
+        it('calculates input-adgm-transfer', () => {
+            mockNumericValues['input-original-price'] = 2500000;
 
-            calculateField('u_adgm_transfer');
+            calculateField('input-adgm-transfer');
 
-            const adgmInput = document.getElementById('u_adgm_transfer');
+            const adgmInput = document.getElementById('input-adgm-transfer');
             expect(adgmInput.value).toBe('50000');
         });
 
         it('calculates input-agency-fees', () => {
-            mockNumericValues['u_selling_price'] = 2500000;
+            mockNumericValues['input-selling-price'] = 2500000;
 
             calculateField('input-agency-fees');
 
@@ -470,25 +471,25 @@ describe('DOM-dependent calculator functions', () => {
         it('calculates all fields', () => {
             mockNumericValues['input-internal-area'] = 918.38;
             mockNumericValues['input-balcony-area'] = 173.94;
-            mockNumericValues['u_villa_internal'] = 2500;
-            mockNumericValues['u_villa_terrace'] = 500;
-            mockNumericValues['u_original_price'] = 2000000;
-            mockNumericValues['u_selling_price'] = 2500000;
-            mockNumericValues['u_resale_clause'] = 40;
-            mockNumericValues['u_amount_paid_percent'] = 20;
-            mockNumericValues['u_amount_paid'] = 0;
+            mockNumericValues['input-villa-internal'] = 2500;
+            mockNumericValues['input-villa-terrace'] = 500;
+            mockNumericValues['input-original-price'] = 2000000;
+            mockNumericValues['input-selling-price'] = 2500000;
+            mockNumericValues['input-resale-clause'] = 40;
+            mockNumericValues['input-amount-paid-percent'] = 20;
+            mockNumericValues['input-amount-paid'] = 0;
             mockNumericValues['input-admin-fees'] = 5250;
-            mockNumericValues['u_adgm_termination_fee'] = 1000;
-            mockNumericValues['u_adgm_electronic_fee'] = 500;
+            mockNumericValues['input-adgm-termination-fee'] = 1000;
+            mockNumericValues['input-adgm-electronic-fee'] = 500;
 
             runAllCalculations();
 
             expect(document.getElementById('input-total-area').value).toBe('1092.32 Sq.Ft');
-            expect(document.getElementById('u_built_up_area').value).toBe('3000.00 Sq.Ft');
+            expect(document.getElementById('input-built-up-area').value).toBe('3000.00 Sq.Ft');
             expect(document.getElementById('input-refund-amount').value).toBe('400000');
-            expect(document.getElementById('u_balance_resale').value).toBe('400000');
+            expect(document.getElementById('input-balance-resale').value).toBe('400000');
             expect(document.getElementById('input-premium-amount').value).toBe('500000');
-            expect(document.getElementById('u_adgm_transfer').value).toBe('40000');
+            expect(document.getElementById('input-adgm-transfer').value).toBe('40000');
             expect(document.getElementById('input-agency-fees').value).toBe('52500');
         });
 
@@ -496,8 +497,8 @@ describe('DOM-dependent calculator functions', () => {
             mockLockedFields.add('input-premium-amount');
             document.getElementById('input-premium-amount').value = 'locked value';
 
-            mockNumericValues['u_selling_price'] = 2500000;
-            mockNumericValues['u_original_price'] = 2000000;
+            mockNumericValues['input-selling-price'] = 2500000;
+            mockNumericValues['input-original-price'] = 2000000;
 
             runAllCalculations();
 
@@ -506,12 +507,12 @@ describe('DOM-dependent calculator functions', () => {
 
         it('updates total display', () => {
             mockNumericValues['input-refund-amount'] = 400000;
-            mockNumericValues['u_balance_resale'] = 400000;
+            mockNumericValues['input-balance-resale'] = 400000;
             mockNumericValues['input-premium-amount'] = 500000;
             mockNumericValues['input-admin-fees'] = 5250;
-            mockNumericValues['u_adgm_transfer'] = 40000;
-            mockNumericValues['u_adgm_termination_fee'] = 1000;
-            mockNumericValues['u_adgm_electronic_fee'] = 500;
+            mockNumericValues['input-adgm-transfer'] = 40000;
+            mockNumericValues['input-adgm-termination-fee'] = 1000;
+            mockNumericValues['input-adgm-electronic-fee'] = 500;
             mockNumericValues['input-agency-fees'] = 52500;
 
             localStorage.setItem('propertyCategory', 'offplan');
@@ -527,12 +528,12 @@ describe('DOM-dependent calculator functions', () => {
             localStorage.setItem('propertyCategory', 'offplan');
 
             mockNumericValues['input-refund-amount'] = 400000;
-            mockNumericValues['u_balance_resale'] = 400000;
+            mockNumericValues['input-balance-resale'] = 400000;
             mockNumericValues['input-premium-amount'] = 500000;
             mockNumericValues['input-admin-fees'] = 5250;
-            mockNumericValues['u_adgm_transfer'] = 40000;
-            mockNumericValues['u_adgm_termination_fee'] = 1000;
-            mockNumericValues['u_adgm_electronic_fee'] = 500;
+            mockNumericValues['input-adgm-transfer'] = 40000;
+            mockNumericValues['input-adgm-termination-fee'] = 1000;
+            mockNumericValues['input-adgm-electronic-fee'] = 500;
             mockNumericValues['input-agency-fees'] = 52500;
 
             const total = calculateTotal();
@@ -544,11 +545,11 @@ describe('DOM-dependent calculator functions', () => {
         it('calculates ready property total', () => {
             localStorage.setItem('propertyCategory', 'ready');
 
-            mockNumericValues['u_selling_price'] = 2500000;
+            mockNumericValues['input-selling-price'] = 2500000;
             mockNumericValues['input-admin-fees'] = 5250;
-            mockNumericValues['u_adgm_transfer'] = 50000;
-            mockNumericValues['u_adgm_termination_fee'] = 1000;
-            mockNumericValues['u_adgm_electronic_fee'] = 500;
+            mockNumericValues['input-adgm-transfer'] = 50000;
+            mockNumericValues['input-adgm-termination-fee'] = 1000;
+            mockNumericValues['input-adgm-electronic-fee'] = 500;
             mockNumericValues['input-agency-fees'] = 52500;
 
             const total = calculateTotal();
@@ -560,12 +561,12 @@ describe('DOM-dependent calculator functions', () => {
         it('defaults to offplan when no category set', () => {
             // localStorage returns null for propertyCategory
             mockNumericValues['input-refund-amount'] = 100000;
-            mockNumericValues['u_balance_resale'] = 0;
+            mockNumericValues['input-balance-resale'] = 0;
             mockNumericValues['input-premium-amount'] = 50000;
             mockNumericValues['input-admin-fees'] = 0;
-            mockNumericValues['u_adgm_transfer'] = 0;
-            mockNumericValues['u_adgm_termination_fee'] = 0;
-            mockNumericValues['u_adgm_electronic_fee'] = 0;
+            mockNumericValues['input-adgm-transfer'] = 0;
+            mockNumericValues['input-adgm-termination-fee'] = 0;
+            mockNumericValues['input-adgm-electronic-fee'] = 0;
             mockNumericValues['input-agency-fees'] = 0;
 
             const total = calculateTotal();
@@ -576,11 +577,11 @@ describe('DOM-dependent calculator functions', () => {
 
         it('updates display-total-payment element', () => {
             localStorage.setItem('propertyCategory', 'ready');
-            mockNumericValues['u_selling_price'] = 1000000;
+            mockNumericValues['input-selling-price'] = 1000000;
             mockNumericValues['input-admin-fees'] = 0;
-            mockNumericValues['u_adgm_transfer'] = 0;
-            mockNumericValues['u_adgm_termination_fee'] = 0;
-            mockNumericValues['u_adgm_electronic_fee'] = 0;
+            mockNumericValues['input-adgm-transfer'] = 0;
+            mockNumericValues['input-adgm-termination-fee'] = 0;
+            mockNumericValues['input-adgm-electronic-fee'] = 0;
             mockNumericValues['input-agency-fees'] = 0;
 
             calculateTotal();
@@ -593,7 +594,7 @@ describe('DOM-dependent calculator functions', () => {
             document.getElementById('display-total-payment').remove();
 
             localStorage.setItem('propertyCategory', 'ready');
-            mockNumericValues['u_selling_price'] = 1000000;
+            mockNumericValues['input-selling-price'] = 1000000;
 
             // Should not throw
             const total = calculateTotal();
@@ -605,12 +606,12 @@ describe('DOM-dependent calculator functions', () => {
         it('adds input listeners to trigger fields', () => {
             initCalculator();
 
-            const originalPriceInput = document.getElementById('u_original_price');
+            const originalPriceInput = document.getElementById('input-original-price');
             const inputEvent = new Event('input');
 
             // Set values and trigger input
-            mockNumericValues['u_original_price'] = 2000000;
-            mockNumericValues['u_selling_price'] = 2500000;
+            mockNumericValues['input-original-price'] = 2000000;
+            mockNumericValues['input-selling-price'] = 2500000;
 
             originalPriceInput.dispatchEvent(inputEvent);
 
@@ -652,7 +653,7 @@ describe('DOM-dependent calculator functions', () => {
         });
 
         it('handles missing trigger field elements', () => {
-            document.getElementById('u_original_price').remove();
+            document.getElementById('input-original-price').remove();
 
             // Should not throw
             initCalculator();
@@ -763,9 +764,9 @@ describe('DOM-dependent calculator functions', () => {
             refundInput.value = '999999';
 
             // Set calculation values
-            mockNumericValues['u_original_price'] = 2000000;
-            mockNumericValues['u_amount_paid_percent'] = 20;
-            mockNumericValues['u_amount_paid'] = 0;
+            mockNumericValues['input-original-price'] = 2000000;
+            mockNumericValues['input-amount-paid-percent'] = 20;
+            mockNumericValues['input-amount-paid'] = 0;
 
             // Click to unlock (should recalculate)
             lockBtn.dispatchEvent(new Event('click'));
@@ -803,8 +804,8 @@ describe('DOM-dependent calculator functions', () => {
 
     describe('edge cases', () => {
         it('handles negative premium correctly', () => {
-            mockNumericValues['u_selling_price'] = 1800000;
-            mockNumericValues['u_original_price'] = 2000000;
+            mockNumericValues['input-selling-price'] = 1800000;
+            mockNumericValues['input-original-price'] = 2000000;
 
             calculateField('input-premium-amount');
 
@@ -813,33 +814,33 @@ describe('DOM-dependent calculator functions', () => {
         });
 
         it('handles balance when paid exceeds resale clause', () => {
-            mockNumericValues['u_original_price'] = 2000000;
-            mockNumericValues['u_resale_clause'] = 40;
-            mockNumericValues['u_amount_paid_percent'] = 50;
-            mockNumericValues['u_amount_paid'] = 0;
+            mockNumericValues['input-original-price'] = 2000000;
+            mockNumericValues['input-resale-clause'] = 40;
+            mockNumericValues['input-amount-paid-percent'] = 50;
+            mockNumericValues['input-amount-paid'] = 0;
 
-            calculateField('u_balance_resale');
+            calculateField('input-balance-resale');
 
-            const balanceInput = document.getElementById('u_balance_resale');
+            const balanceInput = document.getElementById('input-balance-resale');
             expect(balanceInput.value).toBe('');
         });
 
         it('handles direct amount overriding percentage for balance', () => {
-            mockNumericValues['u_original_price'] = 2000000;
-            mockNumericValues['u_resale_clause'] = 40;
-            mockNumericValues['u_amount_paid_percent'] = 0;
-            mockNumericValues['u_amount_paid'] = 400000; // 20% paid
+            mockNumericValues['input-original-price'] = 2000000;
+            mockNumericValues['input-resale-clause'] = 40;
+            mockNumericValues['input-amount-paid-percent'] = 0;
+            mockNumericValues['input-amount-paid'] = 400000; // 20% paid
 
-            calculateField('u_balance_resale');
+            calculateField('input-balance-resale');
 
-            const balanceInput = document.getElementById('u_balance_resale');
+            const balanceInput = document.getElementById('input-balance-resale');
             expect(balanceInput.value).toBe('400000'); // 20% balance needed
         });
 
         it('handles zero original price for refund', () => {
-            mockNumericValues['u_original_price'] = 0;
-            mockNumericValues['u_amount_paid_percent'] = 20;
-            mockNumericValues['u_amount_paid'] = 0;
+            mockNumericValues['input-original-price'] = 0;
+            mockNumericValues['input-amount-paid-percent'] = 20;
+            mockNumericValues['input-amount-paid'] = 0;
 
             calculateField('input-refund-amount');
 
@@ -851,12 +852,12 @@ describe('DOM-dependent calculator functions', () => {
             localStorage.setItem('propertyCategory', 'offplan');
 
             mockNumericValues['input-refund-amount'] = 0;
-            mockNumericValues['u_balance_resale'] = 0;
+            mockNumericValues['input-balance-resale'] = 0;
             mockNumericValues['input-premium-amount'] = 0;
             mockNumericValues['input-admin-fees'] = 0;
-            mockNumericValues['u_adgm_transfer'] = 0;
-            mockNumericValues['u_adgm_termination_fee'] = 0;
-            mockNumericValues['u_adgm_electronic_fee'] = 0;
+            mockNumericValues['input-adgm-transfer'] = 0;
+            mockNumericValues['input-adgm-termination-fee'] = 0;
+            mockNumericValues['input-adgm-electronic-fee'] = 0;
             mockNumericValues['input-agency-fees'] = 0;
 
             const total = calculateTotal();
@@ -865,12 +866,12 @@ describe('DOM-dependent calculator functions', () => {
         });
 
         it('handles BUA with zero values', () => {
-            mockNumericValues['u_villa_internal'] = 0;
-            mockNumericValues['u_villa_terrace'] = 0;
+            mockNumericValues['input-villa-internal'] = 0;
+            mockNumericValues['input-villa-terrace'] = 0;
 
-            calculateField('u_built_up_area');
+            calculateField('input-built-up-area');
 
-            const buaInput = document.getElementById('u_built_up_area');
+            const buaInput = document.getElementById('input-built-up-area');
             expect(buaInput.value).toBe('');
         });
     });
