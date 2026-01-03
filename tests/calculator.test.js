@@ -19,6 +19,7 @@
  * 5. Fee Calculations (ADGM, Agency fees)
  * 6. Total Calculations (Off-Plan vs Ready Property)
  * 7. Real-world Scenarios (complete calculations)
+ * 8. DOM-dependent Functions (calculateField, runAllCalculations, etc.)
  *
  * TESTING APPROACH:
  * - Test happy path (normal inputs → expected outputs)
@@ -31,7 +32,34 @@
  * ============================================================================
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
+// ============================================================================
+// MOCK DEPENDENCIES
+// ============================================================================
+
+// Mock values for getNumericValue
+const mockNumericValues = {};
+
+// Mock helpers module
+vi.mock('../js/utils/helpers.js', () => ({
+    getNumericValue: vi.fn((id) => mockNumericValues[id] || 0),
+    formatCurrency: vi.fn((value) => `AED ${value.toLocaleString()}`),
+    getById: vi.fn((id) => document.getElementById(id))
+}));
+
+// Mock storage module
+const mockLockedFields = new Set();
+vi.mock('../js/modules/storage.js', () => ({
+    isFieldLocked: vi.fn((fieldId) => mockLockedFields.has(fieldId)),
+    toggleFieldLock: vi.fn((fieldId) => {
+        if (mockLockedFields.has(fieldId)) {
+            mockLockedFields.delete(fieldId);
+        } else {
+            mockLockedFields.add(fieldId);
+        }
+    })
+}));
 
 // ============================================================================
 // IMPORT PURE CALCULATION FUNCTIONS FROM SOURCE
@@ -48,8 +76,16 @@ import {
     calculateADGM,
     calculateAgencyFees,
     calculateTotalOffPlan,
-    calculateTotalReady
+    calculateTotalReady,
+    calculateField,
+    runAllCalculations,
+    calculateTotal,
+    initCalculator,
+    restoreLockStates
 } from '../js/modules/calculator.js';
+
+import { getNumericValue, formatCurrency, getById } from '../js/utils/helpers.js';
+import { isFieldLocked, toggleFieldLock } from '../js/modules/storage.js';
 
 describe('calculateTotalArea', () => {
     it('adds internal and balcony areas', () => {
@@ -233,5 +269,609 @@ describe('Real-world calculation scenarios', () => {
 
         const total = calculateTotalReady(selling, adminFees, adgm, agency);
         expect(total).toBe(3124250); // Updated: ADGM now based on original price
+    });
+});
+
+// ============================================================================
+// DOM-DEPENDENT FUNCTION TESTS
+// ============================================================================
+// These tests cover the functions that interact with DOM elements and localStorage.
+// They require mocking document, localStorage, and imported helper functions.
+
+describe('DOM-dependent calculator functions', () => {
+    beforeEach(() => {
+        // Clear mocks between tests
+        vi.clearAllMocks();
+
+        // Clear mock data
+        Object.keys(mockNumericValues).forEach(key => delete mockNumericValues[key]);
+        mockLockedFields.clear();
+
+        // Setup localStorage mock
+        const localStorageData = {};
+        Object.defineProperty(window, 'localStorage', {
+            value: {
+                getItem: vi.fn((key) => localStorageData[key] || null),
+                setItem: vi.fn((key, value) => { localStorageData[key] = value; }),
+                removeItem: vi.fn((key) => { delete localStorageData[key]; }),
+                clear: vi.fn(() => { Object.keys(localStorageData).forEach(key => delete localStorageData[key]); })
+            },
+            writable: true
+        });
+
+        // Setup basic DOM structure
+        document.body.innerHTML = `
+            <input id="input-total-area" type="text" />
+            <input id="u_built_up_area" type="text" />
+            <input id="input-refund-amount" type="text" />
+            <input id="u_balance_resale" type="text" />
+            <input id="input-premium-amount" type="text" />
+            <input id="u_adgm_transfer" type="text" />
+            <input id="input-agency-fees" type="text" />
+            <input id="input-internal-area" type="text" />
+            <input id="input-balcony-area" type="text" />
+            <input id="u_villa_internal" type="text" />
+            <input id="u_villa_terrace" type="text" />
+            <input id="u_original_price" type="text" />
+            <input id="u_selling_price" type="text" />
+            <input id="u_resale_clause" type="text" />
+            <input id="u_amount_paid_percent" type="text" />
+            <input id="u_amount_paid" type="text" />
+            <input id="input-admin-fees" type="text" />
+            <input id="u_adgm_termination_fee" type="text" />
+            <input id="u_adgm_electronic_fee" type="text" />
+            <span id="display-total-payment"></span>
+            <button class="lock-btn" data-target="input-refund-amount"></button>
+            <button class="lock-btn" data-target="input-premium-amount"></button>
+            <button class="lock-btn" data-target="input-total-area"></button>
+        `;
+    });
+
+    afterEach(() => {
+        document.body.innerHTML = '';
+    });
+
+    describe('calculateField', () => {
+        it('skips calculation if field is locked', () => {
+            mockLockedFields.add('input-total-area');
+            mockNumericValues['input-internal-area'] = 500;
+            mockNumericValues['input-balcony-area'] = 100;
+
+            const areaInput = document.getElementById('input-total-area');
+            areaInput.value = 'manual value';
+
+            calculateField('input-total-area');
+
+            expect(areaInput.value).toBe('manual value'); // Unchanged
+            expect(isFieldLocked).toHaveBeenCalledWith('input-total-area');
+        });
+
+        it('calculates input-total-area when not locked', () => {
+            mockNumericValues['input-internal-area'] = 918.38;
+            mockNumericValues['input-balcony-area'] = 173.94;
+
+            calculateField('input-total-area');
+
+            const areaInput = document.getElementById('input-total-area');
+            expect(areaInput.value).toBe('1092.32 Sq.Ft');
+        });
+
+        it('calculates u_built_up_area for villas', () => {
+            mockNumericValues['u_villa_internal'] = 2500;
+            mockNumericValues['u_villa_terrace'] = 500;
+
+            calculateField('u_built_up_area');
+
+            const buaInput = document.getElementById('u_built_up_area');
+            expect(buaInput.value).toBe('3000.00 Sq.Ft');
+        });
+
+        it('calculates input-refund-amount from percentage', () => {
+            mockNumericValues['u_original_price'] = 2000000;
+            mockNumericValues['u_amount_paid_percent'] = 20;
+            mockNumericValues['u_amount_paid'] = 0;
+
+            calculateField('input-refund-amount');
+
+            const refundInput = document.getElementById('input-refund-amount');
+            expect(refundInput.value).toBe('400000');
+        });
+
+        it('calculates input-refund-amount from direct amount', () => {
+            mockNumericValues['u_original_price'] = 2000000;
+            mockNumericValues['u_amount_paid_percent'] = 20;
+            mockNumericValues['u_amount_paid'] = 500000;
+
+            calculateField('input-refund-amount');
+
+            const refundInput = document.getElementById('input-refund-amount');
+            expect(refundInput.value).toBe('500000');
+        });
+
+        it('calculates u_balance_resale when paid less than clause', () => {
+            mockNumericValues['u_original_price'] = 2000000;
+            mockNumericValues['u_resale_clause'] = 40;
+            mockNumericValues['u_amount_paid_percent'] = 20;
+            mockNumericValues['u_amount_paid'] = 0;
+
+            calculateField('u_balance_resale');
+
+            const balanceInput = document.getElementById('u_balance_resale');
+            expect(balanceInput.value).toBe('400000');
+        });
+
+        it('sets u_balance_resale to empty when paid meets clause', () => {
+            mockNumericValues['u_original_price'] = 2000000;
+            mockNumericValues['u_resale_clause'] = 40;
+            mockNumericValues['u_amount_paid_percent'] = 40;
+            mockNumericValues['u_amount_paid'] = 0;
+
+            calculateField('u_balance_resale');
+
+            const balanceInput = document.getElementById('u_balance_resale');
+            expect(balanceInput.value).toBe('');
+        });
+
+        it('calculates input-premium-amount', () => {
+            mockNumericValues['u_selling_price'] = 2500000;
+            mockNumericValues['u_original_price'] = 2000000;
+
+            calculateField('input-premium-amount');
+
+            const premiumInput = document.getElementById('input-premium-amount');
+            expect(premiumInput.value).toBe('500000');
+        });
+
+        it('calculates u_adgm_transfer', () => {
+            mockNumericValues['u_original_price'] = 2500000;
+
+            calculateField('u_adgm_transfer');
+
+            const adgmInput = document.getElementById('u_adgm_transfer');
+            expect(adgmInput.value).toBe('50000');
+        });
+
+        it('calculates input-agency-fees', () => {
+            mockNumericValues['u_selling_price'] = 2500000;
+
+            calculateField('input-agency-fees');
+
+            const agencyInput = document.getElementById('input-agency-fees');
+            expect(agencyInput.value).toBe('52500');
+        });
+
+        it('does nothing if calculation function not found', () => {
+            calculateField('nonexistent_field');
+            // Should not throw
+        });
+
+        it('does nothing if element not found', () => {
+            document.getElementById('input-total-area').remove();
+
+            mockNumericValues['input-internal-area'] = 500;
+            mockNumericValues['input-balcony-area'] = 100;
+
+            calculateField('input-total-area');
+            // Should not throw
+        });
+
+        it('sets area to empty when zero', () => {
+            mockNumericValues['input-internal-area'] = 0;
+            mockNumericValues['input-balcony-area'] = 0;
+
+            calculateField('input-total-area');
+
+            const areaInput = document.getElementById('input-total-area');
+            expect(areaInput.value).toBe('');
+        });
+    });
+
+    describe('runAllCalculations', () => {
+        it('calculates all fields', () => {
+            mockNumericValues['input-internal-area'] = 918.38;
+            mockNumericValues['input-balcony-area'] = 173.94;
+            mockNumericValues['u_villa_internal'] = 2500;
+            mockNumericValues['u_villa_terrace'] = 500;
+            mockNumericValues['u_original_price'] = 2000000;
+            mockNumericValues['u_selling_price'] = 2500000;
+            mockNumericValues['u_resale_clause'] = 40;
+            mockNumericValues['u_amount_paid_percent'] = 20;
+            mockNumericValues['u_amount_paid'] = 0;
+            mockNumericValues['input-admin-fees'] = 5250;
+            mockNumericValues['u_adgm_termination_fee'] = 1000;
+            mockNumericValues['u_adgm_electronic_fee'] = 500;
+
+            runAllCalculations();
+
+            expect(document.getElementById('input-total-area').value).toBe('1092.32 Sq.Ft');
+            expect(document.getElementById('u_built_up_area').value).toBe('3000.00 Sq.Ft');
+            expect(document.getElementById('input-refund-amount').value).toBe('400000');
+            expect(document.getElementById('u_balance_resale').value).toBe('400000');
+            expect(document.getElementById('input-premium-amount').value).toBe('500000');
+            expect(document.getElementById('u_adgm_transfer').value).toBe('40000');
+            expect(document.getElementById('input-agency-fees').value).toBe('52500');
+        });
+
+        it('skips locked fields', () => {
+            mockLockedFields.add('input-premium-amount');
+            document.getElementById('input-premium-amount').value = 'locked value';
+
+            mockNumericValues['u_selling_price'] = 2500000;
+            mockNumericValues['u_original_price'] = 2000000;
+
+            runAllCalculations();
+
+            expect(document.getElementById('input-premium-amount').value).toBe('locked value');
+        });
+
+        it('updates total display', () => {
+            mockNumericValues['input-refund-amount'] = 400000;
+            mockNumericValues['u_balance_resale'] = 400000;
+            mockNumericValues['input-premium-amount'] = 500000;
+            mockNumericValues['input-admin-fees'] = 5250;
+            mockNumericValues['u_adgm_transfer'] = 40000;
+            mockNumericValues['u_adgm_termination_fee'] = 1000;
+            mockNumericValues['u_adgm_electronic_fee'] = 500;
+            mockNumericValues['input-agency-fees'] = 52500;
+
+            localStorage.setItem('propertyCategory', 'offplan');
+
+            runAllCalculations();
+
+            expect(formatCurrency).toHaveBeenCalled();
+        });
+    });
+
+    describe('calculateTotal', () => {
+        it('calculates off-plan total', () => {
+            localStorage.setItem('propertyCategory', 'offplan');
+
+            mockNumericValues['input-refund-amount'] = 400000;
+            mockNumericValues['u_balance_resale'] = 400000;
+            mockNumericValues['input-premium-amount'] = 500000;
+            mockNumericValues['input-admin-fees'] = 5250;
+            mockNumericValues['u_adgm_transfer'] = 40000;
+            mockNumericValues['u_adgm_termination_fee'] = 1000;
+            mockNumericValues['u_adgm_electronic_fee'] = 500;
+            mockNumericValues['input-agency-fees'] = 52500;
+
+            const total = calculateTotal();
+
+            // 400000 + 400000 + 500000 + 5250 + 40000 + 1000 + 500 + 52500 = 1399250
+            expect(total).toBe(1399250);
+        });
+
+        it('calculates ready property total', () => {
+            localStorage.setItem('propertyCategory', 'ready');
+
+            mockNumericValues['u_selling_price'] = 2500000;
+            mockNumericValues['input-admin-fees'] = 5250;
+            mockNumericValues['u_adgm_transfer'] = 50000;
+            mockNumericValues['u_adgm_termination_fee'] = 1000;
+            mockNumericValues['u_adgm_electronic_fee'] = 500;
+            mockNumericValues['input-agency-fees'] = 52500;
+
+            const total = calculateTotal();
+
+            // 2500000 + 5250 + 50000 + 1000 + 500 + 52500 = 2609250
+            expect(total).toBe(2609250);
+        });
+
+        it('defaults to offplan when no category set', () => {
+            // localStorage returns null for propertyCategory
+            mockNumericValues['input-refund-amount'] = 100000;
+            mockNumericValues['u_balance_resale'] = 0;
+            mockNumericValues['input-premium-amount'] = 50000;
+            mockNumericValues['input-admin-fees'] = 0;
+            mockNumericValues['u_adgm_transfer'] = 0;
+            mockNumericValues['u_adgm_termination_fee'] = 0;
+            mockNumericValues['u_adgm_electronic_fee'] = 0;
+            mockNumericValues['input-agency-fees'] = 0;
+
+            const total = calculateTotal();
+
+            // Off-plan formula used: refund + balance + premium + fees
+            expect(total).toBe(150000);
+        });
+
+        it('updates display-total-payment element', () => {
+            localStorage.setItem('propertyCategory', 'ready');
+            mockNumericValues['u_selling_price'] = 1000000;
+            mockNumericValues['input-admin-fees'] = 0;
+            mockNumericValues['u_adgm_transfer'] = 0;
+            mockNumericValues['u_adgm_termination_fee'] = 0;
+            mockNumericValues['u_adgm_electronic_fee'] = 0;
+            mockNumericValues['input-agency-fees'] = 0;
+
+            calculateTotal();
+
+            const totalDisplayEl = document.getElementById('display-total-payment');
+            expect(totalDisplayEl.textContent).toBe('AED 1,000,000');
+        });
+
+        it('handles missing display-total-payment element', () => {
+            document.getElementById('display-total-payment').remove();
+
+            localStorage.setItem('propertyCategory', 'ready');
+            mockNumericValues['u_selling_price'] = 1000000;
+
+            // Should not throw
+            const total = calculateTotal();
+            expect(total).toBe(1000000);
+        });
+    });
+
+    describe('initCalculator', () => {
+        it('adds input listeners to trigger fields', () => {
+            initCalculator();
+
+            const originalPriceInput = document.getElementById('u_original_price');
+            const inputEvent = new Event('input');
+
+            // Set values and trigger input
+            mockNumericValues['u_original_price'] = 2000000;
+            mockNumericValues['u_selling_price'] = 2500000;
+
+            originalPriceInput.dispatchEvent(inputEvent);
+
+            // Premium should be recalculated
+            expect(getNumericValue).toHaveBeenCalled();
+        });
+
+        it('adds input listeners to fee fields', () => {
+            initCalculator();
+
+            const adminFeesInput = document.getElementById('input-admin-fees');
+            const inputEvent = new Event('input');
+
+            adminFeesInput.dispatchEvent(inputEvent);
+
+            // calculateTotal should have been called
+            expect(formatCurrency).toHaveBeenCalled();
+        });
+
+        it('adds click listeners to lock buttons', () => {
+            initCalculator();
+
+            const lockBtn = document.querySelector('.lock-btn[data-target="input-refund-amount"]');
+            const clickEvent = new Event('click');
+
+            lockBtn.dispatchEvent(clickEvent);
+
+            // Toggle should have been called
+            expect(toggleFieldLock).toHaveBeenCalledWith('input-refund-amount');
+        });
+
+        it('runs initial calculations', () => {
+            mockNumericValues['input-internal-area'] = 500;
+            mockNumericValues['input-balcony-area'] = 100;
+
+            initCalculator();
+
+            expect(document.getElementById('input-total-area').value).toBe('600.00 Sq.Ft');
+        });
+
+        it('handles missing trigger field elements', () => {
+            document.getElementById('u_original_price').remove();
+
+            // Should not throw
+            initCalculator();
+        });
+
+        it('handles missing fee field elements', () => {
+            document.getElementById('input-admin-fees').remove();
+
+            // Should not throw
+            initCalculator();
+        });
+    });
+
+    describe('restoreLockStates', () => {
+        it('restores locked state for locked fields', () => {
+            mockLockedFields.add('input-refund-amount');
+
+            restoreLockStates();
+
+            const lockBtn = document.querySelector('.lock-btn[data-target="input-refund-amount"]');
+            const refundInput = document.getElementById('input-refund-amount');
+
+            expect(lockBtn.classList.contains('locked')).toBe(true);
+            expect(refundInput.readOnly).toBe(false);
+            expect(refundInput.classList.contains('calculated')).toBe(false);
+            expect(lockBtn.innerHTML).toContain('svg');
+        });
+
+        it('does not modify unlocked fields', () => {
+            // input-premium-amount is not locked
+
+            restoreLockStates();
+
+            const lockBtn = document.querySelector('.lock-btn[data-target="input-premium-amount"]');
+
+            expect(lockBtn.classList.contains('locked')).toBe(false);
+        });
+
+        it('handles missing input element', () => {
+            mockLockedFields.add('input-total-area');
+            document.getElementById('input-total-area').remove();
+
+            // Should not throw
+            restoreLockStates();
+
+            const lockBtn = document.querySelector('.lock-btn[data-target="input-total-area"]');
+            expect(lockBtn.classList.contains('locked')).toBe(true);
+        });
+
+        it('restores multiple locked fields', () => {
+            mockLockedFields.add('input-refund-amount');
+            mockLockedFields.add('input-premium-amount');
+
+            restoreLockStates();
+
+            const refundBtn = document.querySelector('.lock-btn[data-target="input-refund-amount"]');
+            const premiumBtn = document.querySelector('.lock-btn[data-target="input-premium-amount"]');
+
+            expect(refundBtn.classList.contains('locked')).toBe(true);
+            expect(premiumBtn.classList.contains('locked')).toBe(true);
+        });
+    });
+
+    describe('lock toggle behavior', () => {
+        it('toggles from unlocked to locked state', () => {
+            initCalculator();
+
+            const lockBtn = document.querySelector('.lock-btn[data-target="input-refund-amount"]');
+            const refundInput = document.getElementById('input-refund-amount');
+
+            // Initial state - unlocked
+            expect(lockBtn.classList.contains('locked')).toBe(false);
+
+            // Click to lock
+            lockBtn.dispatchEvent(new Event('click'));
+
+            expect(lockBtn.classList.contains('locked')).toBe(true);
+            expect(refundInput.readOnly).toBe(false);
+            expect(refundInput.classList.contains('calculated')).toBe(false);
+        });
+
+        it('toggles from locked to unlocked state', () => {
+            initCalculator();
+
+            const lockBtn = document.querySelector('.lock-btn[data-target="input-refund-amount"]');
+            const refundInput = document.getElementById('input-refund-amount');
+
+            // Set initial locked state
+            lockBtn.classList.add('locked');
+            refundInput.readOnly = false;
+
+            // Click to unlock
+            lockBtn.dispatchEvent(new Event('click'));
+
+            expect(lockBtn.classList.contains('locked')).toBe(false);
+            expect(refundInput.readOnly).toBe(true);
+            expect(refundInput.classList.contains('calculated')).toBe(true);
+        });
+
+        it('recalculates field when unlocked', () => {
+            initCalculator();
+
+            const lockBtn = document.querySelector('.lock-btn[data-target="input-refund-amount"]');
+            const refundInput = document.getElementById('input-refund-amount');
+
+            // Set locked state with manual value
+            lockBtn.classList.add('locked');
+            refundInput.value = '999999';
+
+            // Set calculation values
+            mockNumericValues['u_original_price'] = 2000000;
+            mockNumericValues['u_amount_paid_percent'] = 20;
+            mockNumericValues['u_amount_paid'] = 0;
+
+            // Click to unlock (should recalculate)
+            lockBtn.dispatchEvent(new Event('click'));
+
+            // Field should be recalculated
+            expect(refundInput.value).toBe('400000');
+        });
+
+        it('focuses input when locked', () => {
+            initCalculator();
+
+            const lockBtn = document.querySelector('.lock-btn[data-target="input-refund-amount"]');
+            const refundInput = document.getElementById('input-refund-amount');
+
+            const focusSpy = vi.spyOn(refundInput, 'focus');
+
+            // Click to lock
+            lockBtn.dispatchEvent(new Event('click'));
+
+            expect(focusSpy).toHaveBeenCalled();
+        });
+
+        it('updates lock icon SVG when toggled', () => {
+            initCalculator();
+
+            const lockBtn = document.querySelector('.lock-btn[data-target="input-refund-amount"]');
+
+            // Click to lock
+            lockBtn.dispatchEvent(new Event('click'));
+
+            expect(lockBtn.innerHTML).toContain('lock-icon');
+            expect(lockBtn.innerHTML).toContain('svg');
+        });
+    });
+
+    describe('edge cases', () => {
+        it('handles negative premium correctly', () => {
+            mockNumericValues['u_selling_price'] = 1800000;
+            mockNumericValues['u_original_price'] = 2000000;
+
+            calculateField('input-premium-amount');
+
+            const premiumInput = document.getElementById('input-premium-amount');
+            expect(premiumInput.value).toBe('-200000');
+        });
+
+        it('handles balance when paid exceeds resale clause', () => {
+            mockNumericValues['u_original_price'] = 2000000;
+            mockNumericValues['u_resale_clause'] = 40;
+            mockNumericValues['u_amount_paid_percent'] = 50;
+            mockNumericValues['u_amount_paid'] = 0;
+
+            calculateField('u_balance_resale');
+
+            const balanceInput = document.getElementById('u_balance_resale');
+            expect(balanceInput.value).toBe('');
+        });
+
+        it('handles direct amount overriding percentage for balance', () => {
+            mockNumericValues['u_original_price'] = 2000000;
+            mockNumericValues['u_resale_clause'] = 40;
+            mockNumericValues['u_amount_paid_percent'] = 0;
+            mockNumericValues['u_amount_paid'] = 400000; // 20% paid
+
+            calculateField('u_balance_resale');
+
+            const balanceInput = document.getElementById('u_balance_resale');
+            expect(balanceInput.value).toBe('400000'); // 20% balance needed
+        });
+
+        it('handles zero original price for refund', () => {
+            mockNumericValues['u_original_price'] = 0;
+            mockNumericValues['u_amount_paid_percent'] = 20;
+            mockNumericValues['u_amount_paid'] = 0;
+
+            calculateField('input-refund-amount');
+
+            const refundInput = document.getElementById('input-refund-amount');
+            expect(refundInput.value).toBe('');
+        });
+
+        it('handles all fee fields being zero', () => {
+            localStorage.setItem('propertyCategory', 'offplan');
+
+            mockNumericValues['input-refund-amount'] = 0;
+            mockNumericValues['u_balance_resale'] = 0;
+            mockNumericValues['input-premium-amount'] = 0;
+            mockNumericValues['input-admin-fees'] = 0;
+            mockNumericValues['u_adgm_transfer'] = 0;
+            mockNumericValues['u_adgm_termination_fee'] = 0;
+            mockNumericValues['u_adgm_electronic_fee'] = 0;
+            mockNumericValues['input-agency-fees'] = 0;
+
+            const total = calculateTotal();
+
+            expect(total).toBe(0);
+        });
+
+        it('handles BUA with zero values', () => {
+            mockNumericValues['u_villa_internal'] = 0;
+            mockNumericValues['u_villa_terrace'] = 0;
+
+            calculateField('u_built_up_area');
+
+            const buaInput = document.getElementById('u_built_up_area');
+            expect(buaInput.value).toBe('');
+        });
     });
 });

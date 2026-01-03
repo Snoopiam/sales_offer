@@ -169,8 +169,8 @@ th {
 }
 
 /* Make columns full-width in portrait */
-#a4Page.template-portrait .col-left,
-#a4Page.template-portrait .col-right {
+#a4Page.template-portrait .column-left,
+#a4Page.template-portrait .column-right {
     width: 100% !important;                    /* Full width (not 45%/55%) */
 }
 

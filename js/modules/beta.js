@@ -3,7 +3,7 @@
  * Toggle and manage experimental features
  */
 
-import { $, $qa, toast, formatCurrency, getNumericValue, getValue, createElement } from '../utils/helpers.js';
+import { getById, queryAll, toast, formatCurrency, getNumericValue, getValue, createElement } from '../utils/helpers.js';
 import { loadState, saveState, getCurrentOffer, getTemplates, deleteTemplate } from './storage.js';
 
 // BETA feature flags
@@ -46,7 +46,7 @@ export function initBeta() {
  * Initialize BETA toggle switch (toggle is now in HTML, just add event listener)
  */
 function createBetaToggle() {
-    const toggle = $('betaToggle');
+    const toggle = getById('betaToggle');
     if (!toggle) return;
 
     // Set initial state from saved preference
@@ -113,20 +113,20 @@ function disableBetaFeatures() {
     document.body.classList.remove('beta-enabled');
 
     // Remove BETA UI elements
-    $qa('.beta-feature').forEach(el => el.remove());
-    $qa('.beta-enhanced').forEach(el => {
+    queryAll('.beta-feature').forEach(el => el.remove());
+    queryAll('.beta-enhanced').forEach(el => {
         el.classList.remove('beta-enhanced');
     });
 
     // Destroy flatpickr instances if they exist
-    $qa('.flatpickr-input').forEach(el => {
+    queryAll('.flatpickr-input').forEach(el => {
         if (el._flatpickr) {
             el._flatpickr.destroy();
         }
     });
 
     // Remove dynamically added stylesheets
-    $qa('link[href*="flatpickr"]').forEach(el => el.remove());
+    queryAll('link[href*="flatpickr"]').forEach(el => el.remove());
 
     // Note: We still reload to fully reset state, but the abort above
     // prevents memory leaks during the session before reload
@@ -175,12 +175,26 @@ function initDatePickers() {
 function applyDatePickers() {
     // Apply to payment plan date inputs
     setTimeout(() => {
-        const dateInputs = $qa('#paymentPlanBody input[data-field="date"]');
+        const dateInputs = queryAll('#paymentPlanBody input[data-field="date"]');
         dateInputs.forEach(input => {
             if (!input._flatpickr) {
+                const rawValue = (input.value || '').trim();
+                const hasAlpha = /[a-z]/i.test(rawValue);
+                const hasDigit = /\d/.test(rawValue);
+                if (hasAlpha && !hasDigit) {
+                    return;
+                }
+
                 flatpickr(input, {
                     dateFormat: 'd M Y',
                     allowInput: true,
+                    allowInvalidPreload: true,
+                    defaultDate: null,
+                    parseDate: (dateStr, format) => {
+                        if (!dateStr) return null;
+                        if (/^on\s/i.test(dateStr)) return null;
+                        return flatpickr.parseDate(dateStr, format);
+                    },
                     theme: 'dark'
                 });
             }
@@ -192,10 +206,10 @@ function applyDatePickers() {
 // BETA FEATURE: Currency Formatting
 // ============================================
 function initCurrencyFormatting() {
-    const currencyFields = ['u_orig', 'u_sell', 'u_paid', 'u_prem', 'u_adm', 'u_trans', 'u_broker', 'u_bal', 'u_amountpaid'];
+    const currencyFields = ['u_original_price', 'u_selling_price', 'input-refund-amount', 'input-premium-amount', 'input-admin-fees', 'u_adgm_transfer', 'input-agency-fees', 'u_balance_resale', 'u_amount_paid'];
 
     currencyFields.forEach(fieldId => {
-        const input = $(fieldId);
+        const input = getById(fieldId);
         if (!input || input.dataset.currencyFormatted) return;
 
         input.dataset.currencyFormatted = 'true';
@@ -237,7 +251,7 @@ function initCurrencyFormatting() {
 // ============================================
 function initDropdowns() {
     // Unit Type dropdown - with show/hide logic for area fields
-    const unitTypeInput = $('u_unittype');
+    const unitTypeInput = getById('u_unit_type');
     if (unitTypeInput && !unitTypeInput.dataset.dropdownAdded) {
         createSelectDropdown(unitTypeInput, 'unitTypeOptions', [
             'Apartment', 'Villa', 'Townhouse', 'Penthouse', 'Duplex',
@@ -249,7 +263,7 @@ function initDropdowns() {
     }
 
     // Views dropdown - skip if already a native select element
-    const viewsInput = $('u_views');
+    const viewsInput = getById('u_views');
     if (viewsInput && viewsInput.tagName !== 'SELECT' && !viewsInput.dataset.dropdownAdded) {
         createSelectDropdown(viewsInput, 'viewsOptions', [
             'Sea View', 'Marina View', 'Garden View', 'Pool View',
@@ -259,7 +273,7 @@ function initDropdowns() {
     }
 
     // Unit Model dropdown - skip if already a native select element
-    const bedroomsInput = $('u_bed');
+    const bedroomsInput = getById('u_unit_model');
     if (bedroomsInput && bedroomsInput.tagName !== 'SELECT' && !bedroomsInput.dataset.dropdownAdded) {
         // Load custom options from storage
         const state = loadState();
@@ -504,7 +518,7 @@ function showCustomOptionModal(input, listId) {
             }
 
             // Add to dropdown
-            const dropdown = $(`${listId}_dropdown`);
+            const dropdown = getById(`${listId}_dropdown`);
             if (dropdown) {
                 const customItem = dropdown.querySelector('.dropdown-custom');
                 const newItem = createElement('div', { className: 'dropdown-item', 'data-value': trimmed });
@@ -527,13 +541,13 @@ function showCustomOptionModal(input, listId) {
  * Handle Unit Type changes - show/hide relevant area field groups
  */
 function handleUnitTypeChange() {
-    const unitType = getValue('u_unittype').toLowerCase();
+    const unitType = getValue('u_unit_type').toLowerCase();
 
     // Get area groups
-    const standardAreaGroup = $('standardAreaGroup');
-    const villaAreaGroup = $('villaAreaGroup');
-    const plotAreaGroup = $('plotAreaGroup');
-    const totalAreaGroup = $('totalAreaGroup');
+    const standardAreaGroup = getById('standardAreaGroup');
+    const villaAreaGroup = getById('villaAreaGroup');
+    const plotAreaGroup = getById('plotAreaGroup');
+    const totalAreaGroup = getById('totalAreaGroup');
 
     // Hide all first
     if (standardAreaGroup) standardAreaGroup.style.display = 'none';
@@ -562,7 +576,7 @@ function handleUnitTypeChange() {
 // BETA FEATURE: Zoom Controls
 // ============================================
 function initZoomControls() {
-    const previewArea = $('previewArea');
+    const previewArea = getById('previewArea');
     if (!previewArea || document.querySelector('.zoom-controls')) return;
 
     const controls = createElement('div', { className: 'zoom-controls beta-feature' });
@@ -576,19 +590,19 @@ function initZoomControls() {
     previewArea.insertBefore(controls, previewArea.firstChild);
 
     let currentZoom = 100;
-    const page = $('a4Page');
+    const page = getById('a4Page');
 
-    $('zoomIn')?.addEventListener('click', () => {
+    getById('zoomIn')?.addEventListener('click', () => {
         currentZoom = Math.min(150, currentZoom + 10);
         applyZoom();
     });
 
-    $('zoomOut')?.addEventListener('click', () => {
+    getById('zoomOut')?.addEventListener('click', () => {
         currentZoom = Math.max(50, currentZoom - 10);
         applyZoom();
     });
 
-    $('zoomReset')?.addEventListener('click', () => {
+    getById('zoomReset')?.addEventListener('click', () => {
         currentZoom = 100;
         applyZoom();
     });
@@ -597,7 +611,7 @@ function initZoomControls() {
         if (page) {
             page.style.transform = `scale(${currentZoom / 100})`;
         }
-        const levelDisplay = $('zoomLevel');
+        const levelDisplay = getById('zoomLevel');
         if (levelDisplay) {
             levelDisplay.textContent = `${currentZoom}%`;
         }
@@ -632,7 +646,7 @@ function initOffersDashboard() {
 }
 
 function createDashboardModal() {
-    if ($('dashboardModal')) return;
+    if (getById('dashboardModal')) return;
 
     const modal = createElement('div', {
         id: 'dashboardModal',
@@ -663,8 +677,8 @@ function createDashboardModal() {
     // Event listeners
     modal.querySelector('.modal-close').addEventListener('click', () => modal.classList.add('hidden'));
     modal.querySelector('.modal-backdrop').addEventListener('click', () => modal.classList.add('hidden'));
-    $('dashboardSearch')?.addEventListener('input', (e) => filterDashboard(e.target.value));
-    $('newOfferBtn')?.addEventListener('click', () => {
+    getById('dashboardSearch')?.addEventListener('input', (e) => filterDashboard(e.target.value));
+    getById('newOfferBtn')?.addEventListener('click', () => {
         modal.classList.add('hidden');
         // Clear form for new offer
         document.dispatchEvent(new CustomEvent('clearForm'));
@@ -672,7 +686,7 @@ function createDashboardModal() {
 }
 
 function openDashboard() {
-    const modal = $('dashboardModal');
+    const modal = getById('dashboardModal');
     if (!modal) return;
 
     modal.classList.remove('hidden');
@@ -680,7 +694,7 @@ function openDashboard() {
 }
 
 function renderDashboardGrid() {
-    const grid = $('dashboardGrid');
+    const grid = getById('dashboardGrid');
     if (!grid) return;
 
     const templates = getTemplates();
@@ -741,7 +755,7 @@ function renderDashboardGrid() {
         loadBtn.textContent = 'Load';
         loadBtn.addEventListener('click', () => {
             document.dispatchEvent(new CustomEvent('loadTemplate', { detail: { id: template.id } }));
-            $('dashboardModal')?.classList.add('hidden');
+            getById('dashboardModal')?.classList.add('hidden');
         });
         actions.appendChild(loadBtn);
 
@@ -772,7 +786,7 @@ function renderDashboardGrid() {
 }
 
 function filterDashboard(query) {
-    const cards = $qa('.dashboard-card');
+    const cards = queryAll('.dashboard-card');
     const lowerQuery = query.toLowerCase();
 
     cards.forEach(card => {
@@ -813,7 +827,7 @@ function initWhatsAppShare() {
     `;
 
     // Insert after export button
-    const exportBtn = $('exportBtn');
+    const exportBtn = getById('exportBtn');
     if (exportBtn) {
         exportBtn.parentNode.insertBefore(whatsappBtn, exportBtn.nextSibling);
     }
@@ -863,7 +877,7 @@ _Created by Sanoop Syamalan - Associate Director - Kennedy Property Brokers LLC_
 // ============================================
 function initPricePerSqft() {
     // Add display after selling price
-    const sellInput = $('u_sell');
+    const sellInput = getById('u_selling_price');
     if (!sellInput || document.querySelector('#pricePerSqft')) return;
 
     const container = sellInput.closest('.input-group');
@@ -878,8 +892,8 @@ function initPricePerSqft() {
     container.appendChild(display);
 
     // Update on relevant field changes
-    ['u_sell', 'u_internal', 'u_balcony', 'u_area'].forEach(fieldId => {
-        $(fieldId)?.addEventListener('input', updatePricePerSqft);
+    ['u_selling_price', 'input-internal-area', 'input-balcony-area', 'input-total-area'].forEach(fieldId => {
+        getById(fieldId)?.addEventListener('input', updatePricePerSqft);
     });
 
     updatePricePerSqft();
@@ -889,9 +903,9 @@ function updatePricePerSqft() {
     const display = document.querySelector('#pricePerSqft .sqft-value');
     if (!display) return;
 
-    const sellingPrice = getNumericValue('u_sell');
-    const internal = getNumericValue('u_internal');
-    const balcony = getNumericValue('u_balcony');
+    const sellingPrice = getNumericValue('u_selling_price');
+    const internal = getNumericValue('input-internal-area');
+    const balcony = getNumericValue('input-balcony-area');
     const totalArea = internal + balcony;
 
     if (sellingPrice > 0 && totalArea > 0) {
@@ -941,19 +955,19 @@ function initCalculators() {
     }
 
     // Update calculators on field changes
-    ['u_orig', 'u_sell', 'u_paid'].forEach(fieldId => {
-        $(fieldId)?.addEventListener('input', updateCalculators);
+    ['u_original_price', 'u_selling_price', 'input-refund-amount'].forEach(fieldId => {
+        getById(fieldId)?.addEventListener('input', updateCalculators);
     });
 
     updateCalculators();
 }
 
 function updateCalculators() {
-    const original = getNumericValue('u_orig');
-    const selling = getNumericValue('u_sell');
+    const original = getNumericValue('u_original_price');
+    const selling = getNumericValue('u_selling_price');
 
     // ROI = (Selling - Original) / Original * 100
-    const roiEl = $('roiValue');
+    const roiEl = getById('roiValue');
     if (roiEl) {
         if (original > 0) {
             const roi = ((selling - original) / original) * 100;
@@ -965,7 +979,7 @@ function updateCalculators() {
     }
 
     // Commission = 2% of selling
-    const commEl = $('commissionValue');
+    const commEl = getById('commissionValue');
     if (commEl) {
         if (selling > 0) {
             commEl.textContent = formatCurrency(selling * 0.02);
@@ -975,7 +989,7 @@ function updateCalculators() {
     }
 
     // Profit = Selling - Original
-    const profitEl = $('profitValue');
+    const profitEl = getById('profitValue');
     if (profitEl) {
         const profit = selling - original;
         profitEl.textContent = formatCurrency(profit);
@@ -987,7 +1001,7 @@ function updateCalculators() {
 // BETA FEATURE: Enhanced Export
 // ============================================
 function initEnhancedExport() {
-    const exportModal = $('exportModal');
+    const exportModal = getById('exportModal');
     if (!exportModal) return;
 
     const exportOptions = exportModal.querySelector('.export-options');
@@ -1023,7 +1037,7 @@ function initEnhancedExport() {
     exportOptions.insertAdjacentHTML('beforeend', additionalOptions);
 
     // Handle new export types
-    const doExportBtn = $('doExportBtn');
+    const doExportBtn = getById('doExportBtn');
     if (doExportBtn && !doExportBtn.dataset.betaEnhanced) {
         doExportBtn.dataset.betaEnhanced = 'true';
 
@@ -1131,30 +1145,30 @@ Created by Sanoop Syamalan - Associate Director - Kennedy Property Brokers LLC`;
 // ============================================
 function initTooltips() {
     const tooltips = {
-        'inp_proj': 'The name of the development or project',
-        'u_unitno': 'Unit number or identifier (e.g., "A-101", "05 Layout")',
-        'u_unittype': 'Type of property (Apartment, Villa, etc.) - affects which area fields are shown',
-        'u_bed': 'Unit model/bedroom configuration',
+        'input-project-name': 'The name of the development or project',
+        'u_unit_number': 'Unit number or identifier (e.g., "A-101", "05 Layout")',
+        'u_unit_type': 'Type of property (Apartment, Villa, etc.) - affects which area fields are shown',
+        'u_unit_model': 'Unit model/bedroom configuration',
         'u_views': 'What the unit overlooks',
-        'u_internal': 'Indoor living area in square feet',
-        'u_balcony': 'Outdoor area (balcony/terrace) in square feet',
-        'u_plotsize': 'Plot size for Villa/Townhouse/Plot types',
-        'u_area': 'Total area (auto-calculated from internal + balcony or plot size)',
-        'u_orig': 'Developer\'s original list price',
-        'u_sell': 'Your selling/offer price',
-        'u_resaleclause': 'Minimum % that must be paid before resale is allowed',
-        'u_amountpaidpercent': 'Percentage of original price paid to developer',
-        'u_amountpaid': 'Amount in AED paid to developer',
-        'u_paid': 'Refund = Amount paid to developer',
-        'u_bal': 'Balance = (Resale Clause % - Amount Paid %) × Original Price',
-        'u_prem': 'Premium = Selling Price - Original Price',
-        'u_adm': 'Administrative fees (SAAS)',
-        'u_trans': 'ADGM registration fee (2% of selling price)',
-        'u_broker': 'Agency commission (2% + VAT)'
+        'input-internal-area': 'Indoor living area in square feet',
+        'input-balcony-area': 'Outdoor area (balcony/terrace) in square feet',
+        'u_plot_size': 'Plot size for Villa/Townhouse/Plot types',
+        'input-total-area': 'Total area (auto-calculated from internal + balcony or plot size)',
+        'u_original_price': 'Developer\'s original list price',
+        'u_selling_price': 'Your selling/offer price',
+        'u_resale_clause': 'Minimum % that must be paid before resale is allowed',
+        'u_amount_paid_percent': 'Percentage of original price paid to developer',
+        'u_amount_paid': 'Amount in AED paid to developer',
+        'input-refund-amount': 'Refund = Amount paid to developer',
+        'u_balance_resale': 'Balance = (Resale Clause % - Amount Paid %) × Original Price',
+        'input-premium-amount': 'Premium = Selling Price - Original Price',
+        'input-admin-fees': 'Administrative fees (SAAS)',
+        'u_adgm_transfer': 'ADGM registration fee (2% of selling price)',
+        'input-agency-fees': 'Agency commission (2% + VAT)'
     };
 
     Object.entries(tooltips).forEach(([fieldId, text]) => {
-        const input = $(fieldId);
+        const input = getById(fieldId);
         if (!input || input.dataset.tooltipAdded) return;
 
         input.dataset.tooltipAdded = 'true';

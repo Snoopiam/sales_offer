@@ -72,13 +72,13 @@ IDEAL FOR:
     gap: 20px;
 }
 
-.template-portrait .col-left {
+.template-portrait .column-left {
     width: 100%;
     order: 2;
     padding-bottom: 18mm;                      /* Space for footer */
 }
 
-.template-portrait .col-right {
+.template-portrait .column-right {
     width: 100%;
     order: 1;
     max-height: 100mm;
@@ -103,7 +103,7 @@ IDEAL FOR:
     padding: 4px 0;
 }
 
-.template-portrait .pp-table {
+.template-portrait .payment-plan-table {
     margin-top: 15px;
 }
 

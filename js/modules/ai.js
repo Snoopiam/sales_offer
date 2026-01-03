@@ -3,7 +3,7 @@
  * Gemini API integration for document parsing
  */
 
-import { $, show, hide, toast, setValue } from '../utils/helpers.js';
+import { getById, show, hide, toast, setValue } from '../utils/helpers.js';
 import { getApiKey, saveApiKey, clearApiKey as clearStoredApiKey } from './storage.js';
 import { setPaymentPlan } from './paymentPlan.js';
 import { runAllCalculations } from './calculator.js';
@@ -54,10 +54,10 @@ export function initAI() {
  * Set up AI Import modal functionality
  */
 function setupAIImportModal() {
-    const aiImportBtn = $('aiImportBtn');
-    const aiDropZone = $('aiDropZone');
-    const aiFileUpload = $('aiFileUpload');
-    const applyBtn = $('applyAiDataBtn');
+    const aiImportBtn = getById('aiImportBtn');
+    const aiDropZone = getById('aiDropZone');
+    const aiFileUpload = getById('aiFileUpload');
+    const applyBtn = getById('applyAiDataBtn');
 
     if (aiImportBtn) {
         aiImportBtn.addEventListener('click', () => {
@@ -110,9 +110,9 @@ function setupAIImportModal() {
  * Set up API settings
  */
 function setupAPISettings() {
-    const testBtn = $('testApiBtn');
-    const clearBtn = $('clearApiBtn');
-    const apiKeyInput = $('geminiApiKey');
+    const testBtn = getById('testApiBtn');
+    const clearBtn = getById('clearApiBtn');
+    const apiKeyInput = getById('geminiApiKey');
 
     // Load saved API key
     if (apiKeyInput) {
@@ -130,7 +130,7 @@ function setupAPISettings() {
         clearBtn.addEventListener('click', () => {
             clearStoredApiKey();
             if (apiKeyInput) apiKeyInput.value = '';
-            const status = $('apiStatus');
+            const status = getById('apiStatus');
             if (status) {
                 status.textContent = '';
                 status.className = 'api-status';
@@ -143,7 +143,7 @@ function setupAPISettings() {
  * Open AI Import modal
  */
 function openAIModal() {
-    const modal = $('aiImportModal');
+    const modal = getById('aiImportModal');
     if (modal) {
         modal.classList.remove('hidden');
         resetAIModal();
@@ -172,8 +172,8 @@ async function processAIFile(file) {
         return;
     }
 
-    if (file.size > 20 * 1024 * 1024) {
-        toast('File must be less than 20MB', 'error');
+    if (file.size > 100 * 1024 * 1024) {
+        toast('File must be less than 100MB', 'error');
         return;
     }
 
@@ -199,7 +199,6 @@ async function processAIFile(file) {
             throw new Error('No data extracted');
         }
     } catch (error) {
-        console.error('AI processing error:', error);
         toast(error.message || 'Failed to process document', 'error');
         resetAIModal();
     }
@@ -291,7 +290,6 @@ async function callGeminiAPI(base64Data, mimeType) {
         }
         return JSON.parse(jsonStr);
     } catch (e) {
-        console.error('JSON parse error:', e, text);
         throw new Error('Failed to parse AI response');
     }
 }
@@ -301,7 +299,7 @@ async function callGeminiAPI(base64Data, mimeType) {
  * @param {Object} data - Extracted data
  */
 function displayExtractedData(data) {
-    const container = $('aiExtractedData');
+    const container = getById('aiExtractedData');
     if (!container) return;
 
     const fields = [
@@ -395,16 +393,16 @@ function applyExtractedData() {
     }
 
     // Map extracted data to form fields
-    if (extractedData.projectName) setValue('inp_proj', extractedData.projectName);
-    if (extractedData.unitNo) setValue('u_unitno', extractedData.unitNo);
-    if (extractedData.unitType) setValue('u_unittype', extractedData.unitType);
-    if (extractedData.bedrooms) setValue('u_bed', extractedData.bedrooms);
+    if (extractedData.projectName) setValue('input-project-name', extractedData.projectName);
+    if (extractedData.unitNo) setValue('u_unit_number', extractedData.unitNo);
+    if (extractedData.unitType) setValue('u_unit_type', extractedData.unitType);
+    if (extractedData.bedrooms) setValue('u_unit_model', extractedData.bedrooms);
     if (extractedData.views) setValue('u_views', extractedData.views);
-    if (extractedData.internalArea) setValue('u_internal', extractedData.internalArea);
-    if (extractedData.balconyArea) setValue('u_balcony', extractedData.balconyArea);
-    if (extractedData.totalArea) setValue('u_area', extractedData.totalArea);
-    if (extractedData.originalPrice) setValue('u_orig', extractedData.originalPrice);
-    if (extractedData.sellingPrice) setValue('u_sell', extractedData.sellingPrice);
+    if (extractedData.internalArea) setValue('input-internal-area', extractedData.internalArea);
+    if (extractedData.balconyArea) setValue('input-balcony-area', extractedData.balconyArea);
+    if (extractedData.totalArea) setValue('input-total-area', extractedData.totalArea);
+    if (extractedData.originalPrice) setValue('u_original_price', extractedData.originalPrice);
+    if (extractedData.sellingPrice) setValue('u_selling_price', extractedData.sellingPrice);
 
     // Apply payment plan
     if (extractedData.paymentPlan && extractedData.paymentPlan.length > 0) {
@@ -426,7 +424,7 @@ function applyExtractedData() {
  * Close AI modal
  */
 function closeAIModal() {
-    const modal = $('aiImportModal');
+    const modal = getById('aiImportModal');
     if (modal) {
         modal.classList.add('hidden');
     }
@@ -436,8 +434,8 @@ function closeAIModal() {
  * Test API connection
  */
 async function testAPIConnection() {
-    const apiKeyInput = $('geminiApiKey');
-    const status = $('apiStatus');
+    const apiKeyInput = getById('geminiApiKey');
+    const status = getById('apiStatus');
     const apiKey = apiKeyInput?.value?.trim();
 
     if (!apiKey) {
@@ -484,7 +482,7 @@ async function testAPIConnection() {
  * Open settings modal (helper)
  */
 function openSettingsModal() {
-    const modal = $('settingsModal');
+    const modal = getById('settingsModal');
     if (modal) {
         modal.classList.remove('hidden');
         // Switch to API tab
@@ -497,7 +495,7 @@ function openSettingsModal() {
  * Save API key from settings
  */
 export function saveAPIKey() {
-    const apiKeyInput = $('geminiApiKey');
+    const apiKeyInput = getById('geminiApiKey');
     const apiKey = apiKeyInput?.value?.trim();
     if (apiKey) {
         saveApiKey(apiKey);

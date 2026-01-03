@@ -10,7 +10,7 @@
  * Supports Off-Plan Resale and Ready Property categories
  */
 
-import { $, setValue, toast, formatDate, excelDateToJS } from '../utils/helpers.js';
+import { getById, setValue, toast, formatDate, excelDateToJS } from '../utils/helpers.js';
 import { setPaymentPlan, setPaymentPlanName } from './paymentPlan.js';
 import { runAllCalculations } from './calculator.js';
 
@@ -19,45 +19,45 @@ import { runAllCalculations } from './calculator.js';
  * Keys are normalized (lowercase, trimmed)
  */
 const LABEL_TO_FIELD = {
-    'project name': 'inp_proj',
-    'unit no': 'u_unitno',
-    'unit type': 'u_unittype',
-    'unit model': 'u_bed',
+    'project name': 'input-project-name',
+    'unit no': 'u_unit_number',
+    'unit type': 'u_unit_type',
+    'unit model': 'u_unit_model',
     'views': 'u_views',
-    'internal area (sq.ft)': 'u_internal',
-    'balcony area (sq.ft)': 'u_balcony',
-    'total area (sq.ft)': 'u_area',
-    'original price': 'u_orig',
-    'selling price': 'u_sell',
-    'paid percentage': 'u_amountpaidpercent',
-    'resale clause': 'u_resaleclause',
-    'balance resale clause (aed)': 'u_bal',
-    'admin fees (saas)': 'u_adm',
-    'adgm (2% of original price)': 'u_trans',
-    'adgm termination fee': 'u_adgm_term',
-    'adgm electronic service fee': 'u_adgm_elec',
-    'agency fees (2% of selling price + vat)': 'u_broker'
+    'internal area (sq.ft)': 'input-internal-area',
+    'balcony area (sq.ft)': 'input-balcony-area',
+    'total area (sq.ft)': 'input-total-area',
+    'original price': 'u_original_price',
+    'selling price': 'u_selling_price',
+    'paid percentage': 'u_amount_paid_percent',
+    'resale clause': 'u_resale_clause',
+    'balance resale clause (aed)': 'u_balance_resale',
+    'admin fees (saas)': 'input-admin-fees',
+    'adgm (2% of original price)': 'u_adgm_transfer',
+    'adgm termination fee': 'u_adgm_termination_fee',
+    'adgm electronic service fee': 'u_adgm_electronic_fee',
+    'agency fees (2% of selling price + vat)': 'input-agency-fees'
 };
 
 /**
  * Fields that store percentages as decimals (0.3 = 30%)
  */
-const DECIMAL_PERCENT_FIELDS = ['u_amountpaidpercent', 'u_resaleclause'];
+const DECIMAL_PERCENT_FIELDS = ['u_amount_paid_percent', 'u_resale_clause'];
 
 /**
  * Numeric fields that should be parsed as numbers
  */
 const NUMERIC_FIELDS = [
-    'u_internal', 'u_balcony', 'u_area', 'u_orig', 'u_sell',
-    'u_amountpaidpercent', 'u_resaleclause', 'u_bal', 'u_adm',
-    'u_trans', 'u_adgm_term', 'u_adgm_elec', 'u_broker'
+    'input-internal-area', 'input-balcony-area', 'input-total-area', 'u_original_price', 'u_selling_price',
+    'u_amount_paid_percent', 'u_resale_clause', 'u_balance_resale', 'input-admin-fees',
+    'u_adgm_transfer', 'u_adgm_termination_fee', 'u_adgm_electronic_fee', 'input-agency-fees'
 ];
 
 /**
  * Initialize Excel import
  */
 export function initExcel() {
-    const uploadInput = $('excelUpload');
+    const uploadInput = getById('excelUpload');
     if (uploadInput) {
         uploadInput.addEventListener('change', handleExcelUpload);
     }
@@ -74,7 +74,6 @@ async function handleExcelUpload(e) {
     // Check if XLSX library is loaded
     if (typeof XLSX === 'undefined') {
         toast('Excel library not loaded. Please refresh the page and try again.', 'error');
-        console.error('XLSX library is not available. Make sure SheetJS is loaded.');
         return;
     }
 
@@ -125,13 +124,17 @@ async function handleExcelUpload(e) {
             const parseResult = parseExcelLabelValue(jsonData);
 
             if (parseResult.success) {
+                // [FIX] Run calculations FIRST to populate derived fields (Premium, Agency, etc.)
                 runAllCalculations();
+
+                // [FIX] THEN notify app.js to update preview and sync Handover row
+                document.dispatchEvent(new CustomEvent('dataImported'));
+
                 toast(`Imported from "${sheetUsedName}" sheet (${parseResult.fieldsFound} fields)`, 'success');
             } else {
                 toast('Could not parse Excel file. Check format.', 'error');
             }
-        } catch (err) {
-            console.error('Excel parsing error:', err);
+        } catch {
             toast('Error reading Excel file. Please check the format.', 'error');
         }
     };
@@ -143,13 +146,6 @@ async function handleExcelUpload(e) {
 
 /**
  * Parse Excel data in Label-Value format (Columns A-B)
- *
- * Format:
- * - Column A: Labels (Project Name, Unit no, etc.)
- * - Column B: Values
- * - Row with "Payment Plan" label marks end of property data
- * - Rows after that contain payment plan installments (columns A-D)
- *
  * @param {Array} jsonData - Array of rows from Excel
  * @returns {Object} { success: boolean, fieldsFound: number }
  */
@@ -193,15 +189,15 @@ function parseExcelLabelValue(jsonData) {
             unitModel = value ? String(value).trim() : '';
             continue;
         }
-        if (label === "maid's room" || label === 'maids room' || label === 'maid room') {
+        if (label.includes('maid')) {
             hasMaidsRoom = String(value).toLowerCase().trim() === 'yes';
             continue;
         }
-        if (label === 'laundry room') {
+        if (label.includes('laundry')) {
             hasLaundryRoom = String(value).toLowerCase().trim() === 'yes';
             continue;
         }
-        if (label === 'store room') {
+        if (label.includes('store')) {
             hasStoreRoom = String(value).toLowerCase().trim() === 'yes';
             continue;
         }
@@ -235,9 +231,8 @@ function parseExcelLabelValue(jsonData) {
             processedValue = numValue;
         }
 
-        // Normalize Views values (e.g., "Community Views" → "Community View")
+        // Normalize Views values
         if (fieldId === 'u_views' && typeof processedValue === 'string') {
-            // Remove trailing 's' from "Views" to match dropdown options
             processedValue = processedValue.replace(/\s+Views$/i, ' View');
         }
 
@@ -258,7 +253,7 @@ function parseExcelLabelValue(jsonData) {
             combinedModel = `${unitModel} + ${extras.join(' + ')}`;
         }
 
-        setValue('u_bed', combinedModel);
+        setValue('u_unit_model', combinedModel);
         fieldsFound++;
     }
 
@@ -275,24 +270,14 @@ function parseExcelLabelValue(jsonData) {
         }
     }
 
-    // Trigger update
-    document.dispatchEvent(new CustomEvent('dataImported'));
+    // [FIX] Removed dispatchEvent from here to prevent premature updates.
+    // It is now called in handleExcelUpload after calculations are complete.
 
     return { success: fieldsFound >= 3, fieldsFound };
 }
 
 /**
  * Parse Payment Plan section from Excel
- *
- * Format (rows after "Payment Plan" label):
- * - Column A: Installment number (1, 2, 3, 4...)
- * - Column B: Percentage as decimal (0.1, 0.3, 0.7...)
- * - Column C: Date (text like "On Booking", "On Handover", or Excel serial number)
- * - Column D: Amount in AED
- *
- * @param {Array} jsonData - Excel data
- * @param {number} startRow - Row index where payment plan data starts
- * @returns {Array} Payment plan data
  */
 function parsePaymentPlanSection(jsonData, startRow) {
     const paymentPlan = [];

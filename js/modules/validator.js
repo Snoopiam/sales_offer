@@ -3,20 +3,20 @@
  * Form validation and error display
  */
 
-import { $, $qa } from '../utils/helpers.js';
+import { getById, queryAll } from '../utils/helpers.js';
 
 // Validation rules
 const validationRules = {
-    inp_proj: {
+    'input-project-name': {
         required: true,
         message: 'Project name is required'
     },
-    u_orig: {
+    u_original_price: {
         required: true,
         min: 0,
         message: 'Original price must be a positive number'
     },
-    u_sell: {
+    u_selling_price: {
         required: true,
         min: 0,
         message: 'Selling price must be a positive number'
@@ -32,7 +32,7 @@ export function validateField(fieldId) {
     const rules = validationRules[fieldId];
     if (!rules) return { valid: true };
 
-    const el = $(fieldId);
+    const el = getById(fieldId);
     if (!el) return { valid: true };
 
     const value = el.value.trim();
@@ -86,7 +86,7 @@ export function validateAll() {
  * @param {string} message - Error message
  */
 export function showFieldError(fieldId, message) {
-    const el = $(fieldId);
+    const el = getById(fieldId);
     if (!el) return;
 
     el.classList.add('error');
@@ -108,7 +108,7 @@ export function showFieldError(fieldId, message) {
  * @param {string} fieldId - Field ID
  */
 export function clearFieldError(fieldId) {
-    const el = $(fieldId);
+    const el = getById(fieldId);
     if (!el) return;
 
     el.classList.remove('error');
@@ -121,10 +121,10 @@ export function clearFieldError(fieldId) {
  * Clear all validation errors
  */
 export function clearAllErrors() {
-    $qa('.input-field.error').forEach(el => {
+    queryAll('.input-field.error').forEach(el => {
         el.classList.remove('error');
     });
-    $qa('.field-error').forEach(el => {
+    queryAll('.field-error').forEach(el => {
         el.remove();
     });
 }
@@ -180,8 +180,8 @@ export function validatePaymentPlan(paymentPlan) {
  * @param {Object} validation - Validation result
  */
 export function updatePaymentValidation(validation) {
-    const percentTotal = $('paymentPercentTotal');
-    const validationMsg = $('paymentValidation');
+    const percentTotal = getById('paymentPercentTotal');
+    const validationMsg = getById('paymentValidation');
 
     if (percentTotal) {
         percentTotal.textContent = `${validation.totalPercent}%`;
@@ -206,7 +206,7 @@ export function updatePaymentValidation(validation) {
 export function initValidator() {
     // Add blur validation to required fields
     Object.keys(validationRules).forEach(fieldId => {
-        const el = $(fieldId);
+        const el = getById(fieldId);
         if (el) {
             el.addEventListener('blur', () => {
                 const result = validateField(fieldId);

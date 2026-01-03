@@ -18,9 +18,9 @@ import {
     excelDateToJS,
     getNumericValue,
     debounce,
-    $,
-    $q,
-    $qa,
+    getById,
+    queryOne,
+    queryAll,
     setValue,
     getValue,
     setText,
@@ -301,23 +301,23 @@ describe('debounce', () => {
 // DOM HELPER TESTS
 // ============================================================================
 
-describe('$ (getElementById)', () => {
+describe('getById (getElementById)', () => {
     beforeEach(() => {
         document.body.innerHTML = '<div id="testDiv">Test Content</div><span id="testSpan">Span</span>';
     });
 
     it('returns element by ID', () => {
-        const el = $('testDiv');
+        const el = getById('testDiv');
         expect(el).not.toBeNull();
         expect(el.textContent).toBe('Test Content');
     });
 
     it('returns null for non-existent ID', () => {
-        expect($('nonexistent')).toBeNull();
+        expect(getById('nonexistent')).toBeNull();
     });
 });
 
-describe('$q (querySelector)', () => {
+describe('queryOne (querySelector)', () => {
     beforeEach(() => {
         document.body.innerHTML = `
             <div class="container">
@@ -328,22 +328,22 @@ describe('$q (querySelector)', () => {
     });
 
     it('returns first matching element', () => {
-        const el = $q('.item');
+        const el = queryOne('.item');
         expect(el.textContent).toBe('First');
     });
 
     it('returns null for no match', () => {
-        expect($q('.nonexistent')).toBeNull();
+        expect(queryOne('.nonexistent')).toBeNull();
     });
 
     it('searches within parent element', () => {
-        const container = $q('.container');
-        const item = $q('.item', container);
+        const container = queryOne('.container');
+        const item = queryOne('.item', container);
         expect(item.textContent).toBe('First');
     });
 });
 
-describe('$qa (querySelectorAll)', () => {
+describe('queryAll (querySelectorAll)', () => {
     beforeEach(() => {
         document.body.innerHTML = `
             <div class="container">
@@ -355,18 +355,18 @@ describe('$qa (querySelectorAll)', () => {
     });
 
     it('returns all matching elements', () => {
-        const items = $qa('.item');
+        const items = queryAll('.item');
         expect(items.length).toBe(3);
     });
 
     it('returns empty NodeList for no match', () => {
-        const items = $qa('.nonexistent');
+        const items = queryAll('.nonexistent');
         expect(items.length).toBe(0);
     });
 
     it('searches within parent element', () => {
-        const container = $q('.container');
-        const items = $qa('.item', container);
+        const container = queryOne('.container');
+        const items = queryAll('.item', container);
         expect(items.length).toBe(3);
     });
 });
@@ -430,17 +430,17 @@ describe('setText', () => {
 
     it('sets text content', () => {
         setText('display', 'New Text');
-        expect($('display').textContent).toBe('New Text');
+        expect(getById('display').textContent).toBe('New Text');
     });
 
     it('shows dash for empty text', () => {
         setText('display', '');
-        expect($('display').textContent).toBe('-');
+        expect(getById('display').textContent).toBe('-');
     });
 
     it('shows dash for null', () => {
         setText('display', null);
-        expect($('display').textContent).toBe('-');
+        expect(getById('display').textContent).toBe('-');
     });
 
     it('does nothing for non-existent element', () => {
@@ -455,17 +455,17 @@ describe('show, hide, toggle', () => {
 
     it('show removes hidden class', () => {
         show('testEl');
-        expect($('testEl').classList.contains('hidden')).toBe(false);
+        expect(getById('testEl').classList.contains('hidden')).toBe(false);
     });
 
     it('hide adds hidden class', () => {
         show('testEl'); // First remove hidden
         hide('testEl');
-        expect($('testEl').classList.contains('hidden')).toBe(true);
+        expect(getById('testEl').classList.contains('hidden')).toBe(true);
     });
 
     it('toggle flips visibility', () => {
-        const el = $('testEl');
+        const el = getById('testEl');
         expect(el.classList.contains('hidden')).toBe(true);
 
         toggle('testEl');
@@ -477,17 +477,17 @@ describe('show, hide, toggle', () => {
 
     it('toggle with true forces show', () => {
         toggle('testEl', true);
-        expect($('testEl').classList.contains('hidden')).toBe(false);
+        expect(getById('testEl').classList.contains('hidden')).toBe(false);
     });
 
     it('toggle with false forces hide', () => {
         show('testEl');
         toggle('testEl', false);
-        expect($('testEl').classList.contains('hidden')).toBe(true);
+        expect(getById('testEl').classList.contains('hidden')).toBe(true);
     });
 
     it('accepts element reference instead of ID', () => {
-        const el = $('testEl');
+        const el = getById('testEl');
         show(el);
         expect(el.classList.contains('hidden')).toBe(false);
 
@@ -511,13 +511,13 @@ describe('on (event listener)', () => {
         const handler = vi.fn();
         on('testBtn', 'click', handler);
 
-        $('testBtn').click();
+        getById('testBtn').click();
         expect(handler).toHaveBeenCalledTimes(1);
     });
 
     it('adds event listener by element', () => {
         const handler = vi.fn();
-        const btn = $('testBtn');
+        const btn = getById('testBtn');
         on(btn, 'click', handler);
 
         btn.click();

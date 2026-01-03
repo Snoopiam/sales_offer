@@ -14,8 +14,9 @@
  *    - parseCurrency(str): Parse "AED 1,234" to number
  *
  * 2. DOM UTILITIES:
- *    - $(id): Shorthand for document.getElementById
- *    - $qa(selector): Shorthand for document.querySelectorAll
+ *    - getById(id): Get element by ID (document.getElementById)
+ *    - queryOne(selector): Get first matching element (querySelector)
+ *    - queryAll(selector): Get all matching elements (querySelectorAll)
  *    - setValue(id, value): Set input value by ID
  *    - getValue(id): Get input value by ID
  *    - getNumericValue(id): Get input value as number
@@ -229,49 +230,47 @@ export function debounce(func, wait = 300) {
    ============================================================================ */
 
 /**
- * $(id)
- * ======
- * Shorthand for document.getElementById().
+ * getById(id)
+ * ===========
+ * Gets an element by its ID. Shorthand for document.getElementById().
  *
- * WHY: "$(id)" is shorter than "document.getElementById(id)"
- *
- * NOTE: This is NOT jQuery. It's a simple helper function.
+ * WHY: "getById(id)" is clearer than "document.getElementById(id)"
  *
  * EXAMPLE:
- * const input = $('u_orig');  // Get the Original Price input
+ * const input = getById('u_orig');  // Get the Original Price input
  * input.value = '2500000';
  */
-export function $(id) {
+export function getById(id) {
     return document.getElementById(id);
 }
 
 /**
- * $q(selector, parent)
- * ====================
- * Shorthand for querySelector().
+ * queryOne(selector, parent)
+ * ==========================
+ * Queries for a single element. Shorthand for querySelector().
  * Returns the FIRST element matching the CSS selector.
  *
  * EXAMPLE:
- * const btn = $q('.btn-primary');           // First primary button
- * const input = $q('input', formElement);   // First input inside form
+ * const btn = queryOne('.btn-primary');           // First primary button
+ * const input = queryOne('input', formElement);   // First input inside form
  */
-export function $q(selector, parent = document) {
+export function queryOne(selector, parent = document) {
     return parent.querySelector(selector);
 }
 
 /**
- * $qa(selector, parent)
- * =====================
- * Shorthand for querySelectorAll().
+ * queryAll(selector, parent)
+ * ==========================
+ * Queries for all matching elements. Shorthand for querySelectorAll().
  * Returns ALL elements matching the CSS selector (as NodeList).
  *
  * EXAMPLE:
- * const allButtons = $qa('.btn');           // All buttons
- * const formInputs = $qa('input', form);    // All inputs in form
+ * const allButtons = queryAll('.btn');           // All buttons
+ * const formInputs = queryAll('input', form);    // All inputs in form
  *
- * NOTE: Returns NodeList, not Array. Use forEach() or convert with [...$qa()]
+ * NOTE: Returns NodeList, not Array. Use forEach() or convert with [...queryAll()]
  */
-export function $qa(selector, parent = document) {
+export function queryAll(selector, parent = document) {
     return parent.querySelectorAll(selector);
 }
 
@@ -291,7 +290,7 @@ export function $qa(selector, parent = document) {
  */
 export function on(el, event, handler) {
     // If el is a string, treat it as an ID and get the element
-    const element = typeof el === 'string' ? $(el) : el;
+    const element = typeof el === 'string' ? getById(el) : el;
 
     // Only add listener if element exists (prevents errors)
     if (element) {
@@ -315,7 +314,7 @@ export function on(el, event, handler) {
  * setText('disp_views', '');                   // Shows "-"
  */
 export function setText(id, text) {
-    const el = $(id);
+    const el = getById(id);
     if (el) {
         el.textContent = text || '-';  // Fallback to dash if empty
     }
@@ -342,7 +341,7 @@ export function setText(id, text) {
  * setValue('u_views', null);     // Sets Views to '' (empty)
  */
 export function setValue(id, value) {
-    const el = $(id);
+    const el = getById(id);
     if (!el) return;
 
     const val = value ?? '';
@@ -399,7 +398,7 @@ export function setValue(id, value) {
  * const price = getValue('u_orig');           // "2500000" (string, not number!)
  */
 export function getValue(id) {
-    const el = $(id);
+    const el = getById(id);
     return el ? el.value : '';  // Return empty string if element doesn't exist
 }
 
@@ -441,7 +440,7 @@ export function getNumericValue(id) {
  * show(paymentPlanElement);          // Using element reference
  */
 export function show(el) {
-    const element = typeof el === 'string' ? $(el) : el;
+    const element = typeof el === 'string' ? getById(el) : el;
     if (element) {
         element.classList.remove('hidden');
     }
@@ -456,7 +455,7 @@ export function show(el) {
  * hide('readyPropertySection');  // Hide Ready Property fields when in Off-Plan mode
  */
 export function hide(el) {
-    const element = typeof el === 'string' ? $(el) : el;
+    const element = typeof el === 'string' ? getById(el) : el;
     if (element) {
         element.classList.add('hidden');
     }
@@ -475,14 +474,14 @@ export function hide(el) {
  * toggle('modal');                 // Toggle modal visibility
  * toggle('modal', true);           // Force show
  * toggle('modal', false);          // Force hide
- * toggle('disp_row_orig', showOriginal);  // Show/hide based on condition
+ * toggle('disp_row_original_price', showOriginal);  // Show/hide based on condition
  *
  * WHY SECOND PARAMETER:
  * Often we want to show/hide based on a condition, not just toggle.
  * This avoids needing separate if/else with show() and hide().
  */
 export function toggle(el, visible) {
-    const element = typeof el === 'string' ? $(el) : el;
+    const element = typeof el === 'string' ? getById(el) : el;
     if (element) {
         if (visible === undefined) {
             // No second param: toggle current state

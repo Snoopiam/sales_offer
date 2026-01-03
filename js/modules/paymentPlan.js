@@ -3,7 +3,7 @@
  * Structured payment plan editor with add/remove/reorder
  */
 
-import { $, generateId, formatCurrency, getNumericValue, createElement, debounce } from '../utils/helpers.js';
+import { getById, generateId, formatCurrency, getNumericValue, createElement, debounce } from '../utils/helpers.js';
 import { validatePaymentPlan, updatePaymentValidation } from './validator.js';
 import { saveCurrentOffer, getCurrentOffer } from './storage.js';
 
@@ -12,7 +12,7 @@ let paymentPlanName = '';
 let sortableInstance = null;
 
 function getTotalInitialPaymentValue() {
-    const totalText = $('totalDisplay')?.textContent || $('disp_total')?.textContent || '';
+    const totalText = getById('display-total-payment')?.textContent || getById('disp_total')?.textContent || '';
     const numeric = totalText.replace(/[^0-9.-]/g, '');
     return parseFloat(numeric) || 0;
 }
@@ -61,7 +61,7 @@ export function initPaymentPlan() {
     renderPaymentPlan();
     initSortable();
 
-    const addBtn = $('addPaymentRowBtn');
+    const addBtn = getById('addPaymentRowBtn');
     if (addBtn) {
         addBtn.addEventListener('click', addPaymentRow);
     }
@@ -71,7 +71,7 @@ export function initPaymentPlan() {
  * Render payment plan table
  */
 export function renderPaymentPlan() {
-    const tbody = $('paymentPlanBody');
+    const tbody = getById('paymentPlanBody');
     if (!tbody) return;
 
     tbody.innerHTML = '';
@@ -187,7 +187,7 @@ export function deletePaymentRow(index) {
 }
 
 export function calculatePaymentAmounts() {
-    const originalPrice = getNumericValue('u_orig');
+    const originalPrice = getNumericValue('u_original_price');
 
     paymentRows.forEach((row, index) => {
         // Skip handover row in standard calc
@@ -242,7 +242,7 @@ function savePaymentPlan() {
 }
 
 function initSortable() {
-    const tbody = $('paymentPlanBody');
+    const tbody = getById('paymentPlanBody');
     if (!tbody || typeof Sortable === 'undefined') return;
 
     if (sortableInstance) sortableInstance.destroy();
@@ -264,10 +264,10 @@ function initSortable() {
  * Update Preview (Internal)
  */
 function updatePreviewInternal(explicitTotal) {
-    const tbody = $('pp_body');
+    const tbody = getById('payment_plan_tbody');
     if (!tbody) return;
 
-    const originalPrice = getNumericValue('u_orig');
+    const originalPrice = getNumericValue('u_original_price');
 
     const totalInitial = (explicitTotal !== undefined && explicitTotal !== null)
         ? explicitTotal
@@ -329,7 +329,7 @@ export function setPaymentPlan(data) {
 }
 export function setPaymentPlanName(name) {
     paymentPlanName = name || '';
-    const titleEl = $('paymentPlanTitle');
+    const titleEl = getById('paymentPlanTitle');
     if (titleEl) titleEl.textContent = paymentPlanName ? `Payment Plan ${paymentPlanName}` : 'Payment Plan';
 }
 export function getPaymentPlanName() { return paymentPlanName; }

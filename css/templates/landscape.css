@@ -2,197 +2,190 @@
 ================================================================================
 LANDSCAPE.CSS - A4 Landscape Template (Default)
 ================================================================================
-
-PURPOSE: Defines layout dimensions for A4 landscape orientation (297mm \u00d7 210mm).
-         This is the default template layout - wider than it is tall.
-
-DIMENSIONS:
-- Page: 297mm wide \u00d7 210mm tall
-- Padding: 10mm top/bottom, 15mm left/right
-- Left column (tables): 45% width
-- Right column (floor plan): 55% width
-
-LAYOUT STRATEGY:
-- Horizontal (side-by-side) layout for data tables and floor plan
-- Tables on left take less space (45%), floor plan gets more room (55%)
-- Flexbox layout with 30px gap between columns
-
-USAGE:
-Applied when user selects "Landscape" in Export modal.
-JavaScript adds .template-landscape class to #a4Page.
-
-================================================================================
 */
-
-/* Landscape Template - A4 Landscape (Default) */
 
 /* ============================================
    A4 PAGE - Landscape Dimensions
-   ============================================
-   Sets exact dimensions for A4 landscape paper.
-   Flex column layout for vertical stacking.
    ============================================ */
 #a4Page.template-landscape {
-    width: 297mm;                              /* A4 landscape width (wide) */
-    height: 210mm;                             /* A4 landscape height (short) */
-    padding: 10mm 15mm;                        /* Inner margins (printable area) */
-    display: flex;                             /* Flexbox for vertical layout */
-    flex-direction: column;                    /* Stack children vertically */
+    width: 297mm;                              /* A4 landscape width */
+    height: 210mm;                             /* A4 landscape height */
+    padding: 40px;                             /* Spec margins */
+    display: flex;                             /* Flexbox layout */
+    flex-direction: column;                    /* Stack vertically */
 }
 
-/* Header bar - colored stripe at top */
+/* Header bar */
 .template-landscape .header-bar {
-    height: 8mm;                               /* Fixed height for header */
+    height: 8mm;
 }
 
 /* ============================================
-   LOGO AREA - Top Right Corner
-   ============================================
-   Container for company logo.
-   Positioned absolute relative to #a4Page.
+   LOGO AREA
    ============================================ */
 .template-landscape .logo-area {
-    top: 12mm;                                 /* Below header bar + small gap */
-    right: 15mm;                               /* Inset from right edge */
-    width: 130px;                              /* Logo container width */
-    height: 65px;                              /* Logo container height */
-    display: flex;                             /* Flexbox for centering */
-    align-items: center;                       /* Vertical center */
-    justify-content: center;                   /* Horizontal center */
+    top: 12mm;
+    right: 15mm;
+    width: 130px;
+    height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* Logo image - scales to fit container */
 .template-landscape .logo-img {
-    max-height: 60px;                          /* Maximum logo height */
-    width: auto;                               /* Maintain aspect ratio */
+    max-height: 60px;
+    width: auto;
 }
 
 /* ============================================
-   DOCUMENT HEADER - Title Section
-   ============================================
-   Contains "FLOOR PLANS" label and main title.
-   Positioned below header bar.
+   DOCUMENT HEADER
    ============================================ */
 .template-landscape .document-header {
-    margin-top: 5mm;                           /* Space below header bar */
-    margin-bottom: 15px;                       /* Space before content */
+    margin-top: 5mm;
+    margin-bottom: 20px;
 }
 
-/* Main title size ("1 Bedroom", "2 Bedroom", etc.) */
 .template-landscape .main-title {
-    font-size: 36px;                           /* Large, prominent text */
+    font-size: 40px;
 }
 
 /* ============================================
-   CONTENT ROW - Two-Column Layout
-   ============================================
-   Main content area with side-by-side layout:
-   Left: Data tables (Property Details, Financial Breakdown)
-   Right: Floor plan image
-
-   STRATEGY:
-   - Flexbox horizontal layout (flex-direction: row)
-   - 30px gap between columns for breathing room
-   - flex: 1 takes remaining vertical space
-   - align-items: flex-start keeps columns at top
+   CONTENT ROW (Columns)
    ============================================ */
 .template-landscape .content-row {
-    display: flex;                             /* Horizontal layout */
-    flex-direction: row;                       /* Side-by-side columns */
-    gap: 30px;                                 /* Space between left and right */
-    flex: 1;                                   /* Take remaining vertical space */
-    align-items: flex-start;                   /* Align to top */
-    min-height: 0;                             /* Allow flex shrinking */
-    overflow: visible;                         /* Show all content */
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+    flex: 1;
+    align-items: flex-start;
+    min-height: 0;
+    overflow: visible;
 }
 
 /* ============================================
    LEFT COLUMN - Data Tables
-   ============================================
-   Contains Property Details and Financial Breakdown tables.
-   Takes up 45% of width (narrower than floor plan).
-
-   WHY 45%:
-   Tables are compact, floor plan needs more space.
    ============================================ */
-.template-landscape .col-left {
-    width: 45%;                                /* 45% of content area width */
-    min-height: 0;                             /* Allow flex shrinking */
-    padding-bottom: 25mm;                      /* Space for footer - increased to prevent overlap */
+.template-landscape .column-left {
+    width: 40%;
+
+    /* [UPDATED] EXTENDED BOUNDARY RULES */
+    /* Increased to 165mm to fit longer payment plans */
+    height: 165mm;
+
+    overflow: hidden; /* Safety switch: Cuts off text if it gets too long */
+    position: relative;
+
+    /* Visual Debugging (Remove if visible) */
+    /* border: 1px solid red; */
 }
 
 /* ============================================
    RIGHT COLUMN - Floor Plan Image
-   ============================================
-   Contains the uploaded floor plan image.
-   Takes up 55% of width (wider for image display).
-
-   DIMENSIONS:
-   Available space: ~136mm width × ~102mm height
-   (Calculated from 297mm - 30mm padding - 30px gap - 45% left column)
-
-   LAYOUT:
-   Flexbox centering ensures image is centered both ways.
    ============================================ */
-/* Floor plan container: ~136mm width × ~102mm height available */
-.template-landscape .col-right {
-    width: 55%;                                /* 55% of content area width */
-    display: flex;                             /* Flexbox for centering */
-    align-items: center;                       /* Vertical center */
-    justify-content: center;                   /* Horizontal center */
-    padding: 5px;                              /* Small padding around image */
-    box-sizing: border-box;                    /* Include padding in width */
-    min-height: 0;                             /* Allow flex shrinking */
+.template-landscape .column-right {
+    width: 60%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 20px;
+    padding-bottom: 40px;
+    box-sizing: border-box;
+    min-height: 0;
+}
+
+.template-landscape .floorplan-frame {
+    height: 140mm;
+    border: 1px solid #e5e7eb00;
+    background: #ffffff00;
+    border-radius: 4px;
+    padding: 6px;
 }
 
 /* ============================================
-   FLOOR PLAN IMAGE - Scaling Strategy
-   ============================================
-   Image scales to fit available space (100% of container).
-   Maintains aspect ratio (no stretching/cropping).
-
-   RESPONSIVE:
-   - max-width: 100% prevents overflow
-   - max-height: 100% prevents vertical overflow
-   - object-fit: contain scales without cropping
+   FLOOR PLAN IMAGE
    ============================================ */
-/* Floor plan image - uses 100% to respect flex container dimensions */
 .template-landscape #floorPlanImg {
-    max-width: 100%;                           /* Don't overflow container width */
-    max-height: 100%;                          /* Don't overflow container height */
-    width: auto;                               /* Maintain aspect ratio */
-    height: auto;                              /* Maintain aspect ratio */
-    object-fit: contain;                       /* Scale to fit without cropping */
+    max-width: 95%;
+    max-height: 95%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    filter: none;
+}
+
+.template-landscape .img-placeholder {
+    max-width: 95%;
+    max-height: 95%;
 }
 
 /* ============================================
-   FOOTER AREA - Bottom Right Corner
-   ============================================
-   Contains project name and "SALE OFFER" label.
-   Positioned absolute relative to #a4Page.
+   FOOTER AREA (Right Side)
    ============================================ */
 .template-landscape .footer-area {
-    bottom: 12mm;                              /* Distance from bottom */
-    right: 15mm;                               /* Distance from right edge */
+    bottom: 12mm;
+    right: 15mm;
+    text-align: right; /* Ensure text aligns right */
+}
+
+/* [UPDATED] LARGER FOOTER TEXT */
+.template-landscape .footer-proj {
+    font-size: 18px; /* Increased from 14px */
+}
+
+.template-landscape .footer-sub {
+    font-size: 12px; /* Increased from 10px */
+    margin-top: 4px;
 }
 
 /* ============================================
-   CREATED BY FOOTER - Bottom Center
-   ============================================
-   Agent credit line at very bottom of page.
-   Smaller font for landscape (less vertical space).
+   CREATED BY FOOTER (Center)
    ============================================ */
 .template-landscape .created-by-footer {
-    bottom: 4mm;                               /* Very bottom of page */
-    font-size: 7px;                            /* Very small text (tight spacing) */
+    bottom: 4mm;
+
+    /* [UPDATED] LARGER AGENT TEXT */
+    font-size: 9px;  /* Increased from 7px */
 }
 
 /* ============================================
-   FOOTNOTE - Disclaimer Text
-   ============================================
-   Small italic text below tables.
-   Max width 60% prevents stretching too wide.
+   FOOTNOTE
    ============================================ */
 .template-landscape .footnote {
-    max-width: 60%;                            /* Don't stretch full width */
+    max-width: 60%;
+}
+
+/* ============================================
+   LANDSCAPE SPACING TIGHTENERS (COMPACT MODE)
+   ============================================ */
+
+/* 1. Reduce the gap between tables */
+.template-landscape .data-table {
+    margin-bottom: 6px;
+}
+
+/* 2. Reduce the Title Spacing */
+.template-landscape .table-title {
+    font-size: 11px;
+    padding: 4px 0 2px;
+}
+
+/* 3. Reduce Font Size to fit 3 tables */
+.template-landscape .data-table,
+.template-landscape .payment-plan-table {
+    font-size: 10px;
+}
+
+/* 4. Tighten Row Padding (CRITICAL FOR PDF FIX) */
+.template-landscape .data-table th,
+.template-landscape .data-table td,
+.template-landscape .payment-plan-table th,
+.template-landscape .payment-plan-table td {
+    padding: 2px 0; /* Keeps rows tight so they don't hit footer */
+}
+
+/* 5. Push the footnote down */
+.template-landscape .footnote {
+    margin-top: 10px;
+    font-size: 8px;
 }

@@ -7,20 +7,20 @@
  *          Fields can be "locked" to override auto-calculation with manual values.
  *
  * CALCULATED FIELDS:
- * - u_area: Total Area = Internal + Balcony (apartments)
+ * - input-total-area: Total Area = Internal + Balcony (apartments)
  * - u_bua: Built-Up Area = Internal + Terrace (villas)
- * - u_paid: Refund = Amount Paid to Developer (from % or direct amount)
- * - u_bal: Balance = Resale Clause % - Amount Paid % (if paid < clause)
- * - u_prem: Premium = Selling Price - Original Price
- * - u_trans: ADGM Fee = 2% of Original Price
- * - u_broker: Agency Fees = 2% of Selling Price + 5% VAT
+ * - input-refund-amount: Refund = Amount Paid to Developer (from % or direct amount)
+ * - u_balance_resale: Balance = Resale Clause % - Amount Paid % (if paid < clause)
+ * - input-premium-amount: Premium = Selling Price - Original Price
+ * - u_adgm_transfer: ADGM Fee = 2% of Original Price
+ * - input-agency-fees: Agency Fees = 2% of Selling Price + 5% VAT
  *
  * TRIGGER FIELDS (changes to these trigger recalculation):
- * - u_orig (Original Price)
- * - u_sell (Selling Price)
- * - u_internal, u_balcony (Standard area fields)
+ * - u_original_price (Original Price)
+ * - u_selling_price (Selling Price)
+ * - input-internal-area, input-balcony-area (Standard area fields)
  * - u_villa_internal, u_villa_terrace (Villa area fields)
- * - u_resaleclause, u_amountpaidpercent, u_amountpaid
+ * - u_resale_clause, u_amount_paid_percent, u_amount_paid
  *
  * TOTAL CALCULATION:
  * - Off-Plan: Refund + Balance + Premium + Admin + ADGM + ADGM Fees + Agency
@@ -33,7 +33,7 @@
  * ============================================================================
  */
 
-import { getNumericValue, formatCurrency, $ } from '../utils/helpers.js';
+import { getNumericValue, formatCurrency, getById } from '../utils/helpers.js';
 import { isFieldLocked, toggleFieldLock } from './storage.js';
 
 /**
@@ -58,25 +58,25 @@ function getCurrentCategory() {
  * Each value is a function that computes the field's value.
  *
  * HOW IT WORKS:
- * 1. User changes a "trigger field" (e.g., u_orig)
+ * 1. User changes a "trigger field" (e.g., u_original_price)
  * 2. runAllCalculations() is called
  * 3. For each field in this object, we check if it's locked
  * 4. If not locked, we run the calculation and update the field
  *
  * FIELD ID NAMING CONVENTION:
  * - u_* = user input field
- * - u_area = Total Area (calculated)
- * - u_paid = Refund amount (calculated)
- * - u_bal = Balance (calculated)
- * - u_prem = Premium (calculated)
- * - u_trans = ADGM fee (calculated)
- * - u_broker = Agency fees (calculated)
+ * - input-total-area = Total Area (calculated)
+ * - input-refund-amount = Refund amount (calculated)
+ * - u_balance_resale = Balance (calculated)
+ * - input-premium-amount = Premium (calculated)
+ * - u_adgm_transfer = ADGM fee (calculated)
+ * - input-agency-fees = Agency fees (calculated)
  * ============================================================================
  */
 const calculations = {
 
     /**
-     * TOTAL AREA (u_area)
+     * TOTAL AREA (input-total-area)
      * For standard apartments only (not villas/plots).
      *
      * FORMULA: Internal Area + Balcony Area
@@ -88,16 +88,16 @@ const calculations = {
      *
      * RETURNS: String with "Sq.Ft" suffix, or empty string if zero
      */
-    u_area: () => {
-        const internal = getNumericValue('u_internal');  // Get Internal Area input value
-        const balcony = getNumericValue('u_balcony');    // Get Balcony Area input value
+    'input-total-area': () => {
+        const internal = getNumericValue('input-internal-area');  // Get Internal Area input value
+        const balcony = getNumericValue('input-balcony-area');    // Get Balcony Area input value
         const total = internal + balcony;
         // Return formatted string with 2 decimal places, or empty if zero
         return total > 0 ? `${total.toFixed(2)} Sq.Ft` : '';
     },
 
     /**
-     * BUA - Built-Up Area (u_bua)
+     * BUA - Built-Up Area (u_built_up_area)
      * For villas/townhouses only.
      *
      * FORMULA: Villa Internal Area + Terrace Area
@@ -106,7 +106,7 @@ const calculations = {
      * BUA typically includes internal + terrace.
      * GFA includes all enclosed areas.
      */
-    u_bua: () => {
+    u_built_up_area: () => {
         const internal = getNumericValue('u_villa_internal');  // Villa internal area
         const terrace = getNumericValue('u_villa_terrace');    // Terrace area
         const total = internal + terrace;
@@ -130,10 +130,10 @@ const calculations = {
      * - Amount Paid %: 20%
      * - Refund = 2,000,000 × 0.20 = AED 400,000
      */
-    u_paid: () => {
-        const original = getNumericValue('u_orig');              // Original purchase price
-        const amountPaidPercent = getNumericValue('u_amountpaidpercent');  // % paid to developer
-        const amountPaid = getNumericValue('u_amountpaid');      // Direct AED amount paid
+    'input-refund-amount': () => {
+        const original = getNumericValue('u_original_price');              // Original purchase price
+        const amountPaidPercent = getNumericValue('u_amount_paid_percent');  // % paid to developer
+        const amountPaid = getNumericValue('u_amount_paid');      // Direct AED amount paid
 
         // PRIORITY 1: If direct amount is provided, use it (user knows exact amount)
         if (amountPaid > 0) {
@@ -169,11 +169,11 @@ const calculations = {
      * - Amount Paid: 20%
      * - Balance = (40% - 20%) × 2,000,000 = AED 400,000
      */
-    u_bal: () => {
-        const original = getNumericValue('u_orig');
-        const resaleClausePercent = getNumericValue('u_resaleclause');
-        const amountPaidPercent = getNumericValue('u_amountpaidpercent');
-        const amountPaid = getNumericValue('u_amountpaid');
+    u_balance_resale: () => {
+        const original = getNumericValue('u_original_price');
+        const resaleClausePercent = getNumericValue('u_resale_clause');
+        const amountPaidPercent = getNumericValue('u_amount_paid_percent');
+        const amountPaid = getNumericValue('u_amount_paid');
 
         // Need both values to calculate
         if (!original || !resaleClausePercent) return 0;
@@ -207,9 +207,9 @@ const calculations = {
      * - Selling: AED 2,500,000
      * - Premium: AED 500,000
      */
-    u_prem: () => {
-        const selling = getNumericValue('u_sell');
-        const original = getNumericValue('u_orig');
+    'input-premium-amount': () => {
+        const selling = getNumericValue('u_selling_price');
+        const original = getNumericValue('u_original_price');
         return selling - original;  // Can be negative
     },
 
@@ -227,8 +227,8 @@ const calculations = {
      * - Original: AED 1,960,000
      * - ADGM: 1,960,000 × 0.02 = AED 39,200
      */
-    u_trans: () => {
-        const original = getNumericValue('u_orig');
+    u_adgm_transfer: () => {
+        const original = getNumericValue('u_original_price');
         return Math.round(original * 0.02);  // 2% of original price
     },
 
@@ -249,8 +249,8 @@ const calculations = {
      * - VAT (5%): 50,000 × 0.05 = AED 2,500
      * - Total: AED 52,500
      */
-    u_broker: () => {
-        const selling = getNumericValue('u_sell');
+    'input-agency-fees': () => {
+        const selling = getNumericValue('u_selling_price');
         const base = selling * 0.02;           // 2% agency commission
         return Math.round(base * 1.05);        // Add 5% VAT to the commission
     }
@@ -263,21 +263,21 @@ const calculations = {
  * all calculated fields to recalculate.
  *
  * WHY THESE FIELDS:
- * - u_orig, u_sell: Price changes affect Premium, ADGM, Agency Fees
- * - u_internal, u_balcony: Affect Total Area
+ * - u_original_price, u_selling_price: Price changes affect Premium, ADGM, Agency Fees
+ * - input-internal-area, input-balcony-area: Affect Total Area
  * - u_villa_internal, u_villa_terrace: Affect BUA
- * - u_resaleclause, u_amountpaidpercent, u_amountpaid: Affect Refund and Balance
+ * - u_resale_clause, u_amount_paid_percent, u_amount_paid: Affect Refund and Balance
  */
 const triggerFields = [
-    'u_orig',              // Original Price → ADGM, Premium, Refund, Balance
-    'u_sell',              // Selling Price → Premium, Agency Fees
-    'u_internal',          // Internal Area → Total Area
-    'u_balcony',           // Balcony Area → Total Area
+    'u_original_price',              // Original Price → ADGM, Premium, Refund, Balance
+    'u_selling_price',              // Selling Price → Premium, Agency Fees
+    'input-internal-area',          // Internal Area → Total Area
+    'input-balcony-area',           // Balcony Area → Total Area
     'u_villa_internal',    // Villa Internal → BUA
     'u_villa_terrace',     // Villa Terrace → BUA
-    'u_resaleclause',      // Resale Clause % → Balance
-    'u_amountpaidpercent', // Amount Paid % → Refund, Balance
-    'u_amountpaid'         // Amount Paid AED → Refund, Balance
+    'u_resale_clause',      // Resale Clause % → Balance
+    'u_amount_paid_percent', // Amount Paid % → Refund, Balance
+    'u_amount_paid'         // Amount Paid AED → Refund, Balance
 ];
 
 /**
@@ -298,7 +298,7 @@ const triggerFields = [
  * When locked, auto-calculation is disabled and user can enter manual value.
  * This is useful when the calculated value doesn't match actual paperwork.
  *
- * @param {string} fieldId - The input element ID (e.g., 'u_area', 'u_paid')
+ * @param {string} fieldId - The input element ID (e.g., 'input-total-area', 'input-refund-amount')
  */
 export function calculateField(fieldId) {
     // STEP 1: Check if field is locked by user
@@ -313,11 +313,11 @@ export function calculateField(fieldId) {
         const value = calculator();
 
         // STEP 4: Update the input element
-        const el = $(fieldId);  // $(id) is shorthand for getElementById
+        const el = getById(fieldId);  // getById(id) is shorthand for getElementById
         if (el) {
-            // Special case: u_area returns string with "Sq.Ft" suffix
+            // Special case: input-total-area returns string with "Sq.Ft" suffix
             // Other fields return numbers
-            if (fieldId === 'u_area') {
+            if (fieldId === 'input-total-area') {
                 el.value = value;  // e.g., "1092.32 Sq.Ft"
             } else {
                 el.value = value || '';  // Empty string if 0/null/undefined
@@ -382,11 +382,11 @@ export function calculateTotal() {
     const category = getCurrentCategory();  // 'offplan' or 'ready'
 
     // Get fee values (same for both categories)
-    const admin = getNumericValue('u_adm');              // Admin Fees (SAAS)
-    const adgm = getNumericValue('u_trans');             // ADGM 2% fee
-    const adgmTermination = getNumericValue('u_adgm_term');   // ADGM Termination Fee
-    const adgmElectronic = getNumericValue('u_adgm_elec');    // ADGM Electronic Fee
-    const agency = getNumericValue('u_broker');          // Agency commission + VAT
+    const admin = getNumericValue('input-admin-fees');              // Admin Fees (SAAS)
+    const adgm = getNumericValue('u_adgm_transfer');             // ADGM 2% fee
+    const adgmTermination = getNumericValue('u_adgm_termination_fee');   // ADGM Termination Fee
+    const adgmElectronic = getNumericValue('u_adgm_electronic_fee');    // ADGM Electronic Fee
+    const agency = getNumericValue('input-agency-fees');          // Agency commission + VAT
 
     let total;
 
@@ -395,23 +395,23 @@ export function calculateTotal() {
         // READY PROPERTY FORMULA
         // ========================================
         // Buyer pays: Full selling price + All fees
-        const selling = getNumericValue('u_sell');
+        const selling = getNumericValue('u_selling_price');
         total = selling + admin + adgm + adgmTermination + adgmElectronic + agency;
     } else {
         // ========================================
         // OFF-PLAN RESALE FORMULA
         // ========================================
         // Buyer pays: Amount to seller + Amount to developer + Premium + Fees
-        const refund = getNumericValue('u_paid');    // Goes to original buyer
-        const balance = getNumericValue('u_bal');    // Goes to developer
-        const premium = getNumericValue('u_prem');   // Profit for seller
+        const refund = getNumericValue('input-refund-amount');    // Goes to original buyer
+        const balance = getNumericValue('u_balance_resale');    // Goes to developer
+        const premium = getNumericValue('input-premium-amount');   // Profit for seller
         total = refund + balance + premium + admin + adgm + adgmTermination + adgmElectronic + agency;
     }
 
     // Update the total display in the input panel
-    const totalDisplay = $('totalDisplay');
-    if (totalDisplay) {
-        totalDisplay.textContent = formatCurrency(total);  // e.g., "AED 2,500,000"
+    const totalDisplayEl = getById('display-total-payment');
+    if (totalDisplayEl) {
+        totalDisplayEl.textContent = formatCurrency(total);  // e.g., "AED 2,500,000"
     }
 
     return total;
@@ -437,7 +437,7 @@ export function initCalculator() {
     // ========================================
     // When user changes these fields, recalculate everything
     triggerFields.forEach(fieldId => {
-        const el = $(fieldId);
+        const el = getById(fieldId);
         if (el) {
             el.addEventListener('input', () => {
                 runAllCalculations();
@@ -450,8 +450,8 @@ export function initCalculator() {
     // ========================================
     // These fields affect total but aren't auto-calculated
     // (user enters them manually)
-    ['u_adm', 'u_adgm_term', 'u_adgm_elec'].forEach(fieldId => {
-        const el = $(fieldId);
+    ['input-admin-fees', 'u_adgm_termination_fee', 'u_adgm_electronic_fee'].forEach(fieldId => {
+        const el = getById(fieldId);
         if (el) {
             el.addEventListener('input', calculateTotal);  // Only update total, not other fields
         }
@@ -480,7 +480,7 @@ export function initCalculator() {
  * @param {string} fieldId - Field ID
  */
 function toggleLock(btn, fieldId) {
-    const input = $(fieldId);
+    const input = getById(fieldId);
     if (!input) return;
 
     const isCurrentlyLocked = btn.classList.contains('locked');
@@ -529,7 +529,7 @@ export function restoreLockStates() {
     document.querySelectorAll('.lock-btn').forEach(btn => {
         const targetId = btn.dataset.target;
         if (isFieldLocked(targetId)) {
-            const input = $(targetId);
+            const input = getById(targetId);
             btn.classList.add('locked');
             if (input) {
                 input.readOnly = false;

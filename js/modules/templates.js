@@ -3,7 +3,7 @@
  * Template switching and CSS loading
  */
 
-import { $, toast } from '../utils/helpers.js';
+import { getById, toast } from '../utils/helpers.js';
 import { getSettings, saveSettings } from './storage.js';
 
 // Available templates
@@ -38,7 +38,7 @@ export function initTemplates() {
     currentTemplate = settings.currentTemplate || 'landscape';
 
     // Set up template selector
-    const selector = $('templateSelect');
+    const selector = getById('templateSelect');
     if (selector) {
         selector.value = currentTemplate;
         selector.addEventListener('change', (e) => {
@@ -77,13 +77,13 @@ function applyTemplate(templateId) {
     if (!template) return;
 
     // Update stylesheet link
-    const styleLink = $('templateStylesheet');
+    const styleLink = getById('templateStylesheet');
     if (styleLink) {
         styleLink.href = template.cssFile;
     }
 
     // Update page class
-    const page = $('a4Page');
+    const page = getById('a4Page');
     if (page) {
         // Remove all template classes
         Object.values(templates).forEach(t => {

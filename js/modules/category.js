@@ -3,7 +3,7 @@
  * Handles switching between Off-Plan Resale and Ready Property modes
  */
 
-import { $, $qa, getValue, setValue, setText, formatCurrency, formatDate } from '../utils/helpers.js';
+import { getById, queryAll, getValue, setValue, setText, formatCurrency, formatDate } from '../utils/helpers.js';
 
 // Current property category state
 let currentCategory = 'offplan'; // 'offplan' or 'ready'
@@ -58,7 +58,7 @@ export function initCategory() {
  * Set up category toggle buttons
  */
 function setupCategoryToggle() {
-    const categoryBtns = $qa('.category-btn');
+    const categoryBtns = queryAll('.category-btn');
     categoryBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const category = btn.dataset.category;
@@ -76,7 +76,7 @@ function setupCategoryToggle() {
  * Set up occupancy toggle buttons
  */
 function setupOccupancyToggle() {
-    const occupancyBtns = $qa('.occupancy-btn');
+    const occupancyBtns = queryAll('.occupancy-btn');
     occupancyBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const occupancy = btn.dataset.occupancy;
@@ -94,10 +94,10 @@ function setupOccupancyToggle() {
  * Set up Show Property Status toggle
  */
 function setupShowPropertyStatusToggle() {
-    const toggle = $('u_showpropertystatus');
+    const toggle = getById('u_showpropertystatus');
     if (toggle) {
         toggle.addEventListener('change', () => {
-            const label = $('showPropertyStatusLabel');
+            const label = getById('showPropertyStatusLabel');
             if (label) {
                 label.textContent = toggle.checked ? 'Show' : 'Hide';
             }
@@ -110,7 +110,7 @@ function setupShowPropertyStatusToggle() {
  * Set up individual row toggles
  */
 function setupRowToggles() {
-    const toggles = $qa('.row-toggle');
+    const toggles = queryAll('.row-toggle');
     toggles.forEach(toggle => {
         toggle.addEventListener('change', () => {
             updatePreviewForCategory();
@@ -122,17 +122,17 @@ function setupRowToggles() {
  * Set up Show Original Price toggle
  */
 function setupShowOriginalToggle() {
-    const toggle = $('u_showoriginal');
+    const toggle = getById('u_showoriginal');
     if (toggle) {
         toggle.addEventListener('change', () => {
-            const label = $('showOriginalLabel');
+            const label = getById('showOriginalLabel');
             if (label) {
                 label.textContent = toggle.checked ? 'Yes' : 'No';
             }
             updatePreviewForCategory();
 
             // Show/hide original price input field
-            const origGroup = $('originalPriceGroup');
+            const origGroup = getById('originalPriceGroup');
             if (origGroup) {
                 origGroup.style.display = toggle.checked ? '' : 'none';
             }
@@ -144,10 +144,10 @@ function setupShowOriginalToggle() {
  * Set up Rent Refund toggle
  */
 function setupRentRefundToggle() {
-    const toggle = $('u_rentrefund');
+    const toggle = getById('u_rentrefund');
     if (toggle) {
         toggle.addEventListener('change', () => {
-            const label = $('rentRefundLabel');
+            const label = getById('rentRefundLabel');
             if (label) {
                 label.textContent = toggle.checked ? 'Yes (Pro-rata)' : 'No';
             }
@@ -161,7 +161,7 @@ function setupRentRefundToggle() {
  */
 function setupHandoverDateListeners() {
     // Project handover type change (Month/Quarter)
-    const projectType = $('u_projecthandover_type');
+    const projectType = getById('u_projecthandover_type');
     if (projectType) {
         projectType.addEventListener('change', () => {
             updatePeriodOptions('u_projecthandover_period', projectType.value);
@@ -171,7 +171,7 @@ function setupHandoverDateListeners() {
     }
 
     // Unit handover type change (Month/Quarter)
-    const unitType = $('u_unithandover_type');
+    const unitType = getById('u_unithandover_type');
     if (unitType) {
         unitType.addEventListener('change', () => {
             updatePeriodOptions('u_unithandover_period', unitType.value);
@@ -182,7 +182,7 @@ function setupHandoverDateListeners() {
 
     // Period and year changes
     ['u_projecthandover_period', 'u_projecthandover_year', 'u_unithandover_period', 'u_unithandover_year'].forEach(id => {
-        const el = $(id);
+        const el = getById(id);
         if (el) {
             el.addEventListener('change', () => {
                 calculateAges();
@@ -200,7 +200,7 @@ function setupHandoverDateListeners() {
  * Update period dropdown options based on type (month/quarter)
  */
 function updatePeriodOptions(selectId, type) {
-    const select = $(selectId);
+    const select = getById(selectId);
     if (!select) return;
 
     const currentValue = select.value;
@@ -251,12 +251,12 @@ function calculateAges() {
             ? (parseInt(projectPeriod) - 1) * 3 + 2 // Middle month of quarter
             : parseInt(projectPeriod);
         const projectAge = calculateDuration(parseInt(projectYear), projectMonth, currentYear, currentMonth);
-        const projectAgeEl = $('u_projectage');
+        const projectAgeEl = getById('u_projectage');
         if (projectAgeEl) {
             projectAgeEl.value = projectAge;
         }
     } else {
-        const projectAgeEl = $('u_projectage');
+        const projectAgeEl = getById('u_projectage');
         if (projectAgeEl) projectAgeEl.value = '';
     }
 
@@ -270,12 +270,12 @@ function calculateAges() {
             ? (parseInt(unitPeriod) - 1) * 3 + 2
             : parseInt(unitPeriod);
         const unitOwnership = calculateDuration(parseInt(unitYear), unitMonth, currentYear, currentMonth);
-        const unitOwnershipEl = $('u_unitownership');
+        const unitOwnershipEl = getById('u_unitownership');
         if (unitOwnershipEl) {
             unitOwnershipEl.value = unitOwnership;
         }
     } else {
-        const unitOwnershipEl = $('u_unitownership');
+        const unitOwnershipEl = getById('u_unitownership');
         if (unitOwnershipEl) unitOwnershipEl.value = '';
     }
 }
@@ -325,7 +325,7 @@ export function setCategory(category) {
     localStorage.setItem('propertyCategory', category);
 
     // Update toggle buttons
-    const categoryBtns = $qa('.category-btn');
+    const categoryBtns = queryAll('.category-btn');
     categoryBtns.forEach(btn => {
         const isActive = btn.dataset.category === category;
         btn.classList.toggle('active', isActive);
@@ -346,7 +346,7 @@ export function setOccupancy(occupancy) {
     localStorage.setItem('occupancyStatus', occupancy);
 
     // Update toggle buttons
-    const occupancyBtns = $qa('.occupancy-btn');
+    const occupancyBtns = queryAll('.occupancy-btn');
     occupancyBtns.forEach(btn => {
         const isActive = btn.dataset.occupancy === occupancy;
         btn.classList.toggle('active', isActive);
@@ -354,7 +354,7 @@ export function setOccupancy(occupancy) {
     });
 
     // Show/hide lease details
-    const leaseSection = $('leaseDetailsSection');
+    const leaseSection = getById('leaseDetailsSection');
     if (leaseSection) {
         leaseSection.style.display = occupancy === 'leased' ? '' : 'none';
     }
@@ -370,28 +370,28 @@ function updateUIForCategory(category) {
     const isReady = category === 'ready';
 
     // Off-plan only fields
-    const offplanFields = $('offplanFieldsGroup');
+    const offplanFields = getById('offplanFieldsGroup');
     if (offplanFields) {
         offplanFields.style.display = isReady ? 'none' : '';
     }
 
     // Ready property section
-    const readySection = $('readyPropertySection');
+    const readySection = getById('readyPropertySection');
     if (readySection) {
         readySection.style.display = isReady ? '' : 'none';
     }
 
     // Show Original Price toggle (only for Ready)
-    const showOrigToggle = $('showOriginalPriceToggle');
+    const showOrigToggle = getById('showOriginalPriceToggle');
     if (showOrigToggle) {
         showOrigToggle.style.display = isReady ? '' : 'none';
     }
 
     // Original Price field
-    const origGroup = $('originalPriceGroup');
+    const origGroup = getById('originalPriceGroup');
     if (origGroup) {
         if (isReady) {
-            const showOrig = $('u_showoriginal');
+            const showOrig = getById('u_showoriginal');
             origGroup.style.display = showOrig && showOrig.checked ? '' : 'none';
         } else {
             origGroup.style.display = '';
@@ -399,8 +399,8 @@ function updateUIForCategory(category) {
     }
 
     // Payment Plan section - hide for Ready Property
-    const paymentPlanSection = $('paymentPlanSection');
-    const paymentPlanContainer = $('paymentPlanContainer');
+    const paymentPlanSection = getById('paymentPlanSection');
+    const paymentPlanContainer = getById('paymentPlanContainer');
     if (paymentPlanSection) {
         paymentPlanSection.style.display = isReady ? 'none' : '';
     }
@@ -416,19 +416,19 @@ export function updatePreviewForCategory() {
     const isReady = currentCategory === 'ready';
 
     // Off-plan specific rows in preview
-    const offplanRows = ['disp_row_paid', 'disp_row_bal', 'disp_row_prem', 'disp_divider_offplan'];
+    const offplanRows = ['disp_row_refund', 'disp_row_balance_resale', 'disp_row_premium', 'disp_divider_offplan'];
     offplanRows.forEach(id => {
-        const row = $(id);
+        const row = getById(id);
         if (row) {
             row.style.display = isReady ? 'none' : '';
         }
     });
 
     // Original price row
-    const origRow = $('disp_row_orig');
+    const origRow = getById('disp_row_original_price');
     if (origRow) {
         if (isReady) {
-            const showOrig = $('u_showoriginal');
+            const showOrig = getById('u_showoriginal');
             origRow.style.display = showOrig && showOrig.checked ? '' : 'none';
         } else {
             origRow.style.display = '';
@@ -436,20 +436,20 @@ export function updatePreviewForCategory() {
     }
 
     // Resale footnote
-    const footnote = $('resaleFootnote');
+    const footnote = getById('resaleFootnote');
     if (footnote) {
         footnote.style.display = isReady ? 'none' : '';
     }
 
     // Property status table (Ready only)
-    const statusTable = $('propertyStatusTable');
+    const statusTable = getById('propertyStatusTable');
     if (statusTable) {
-        const showStatus = $('u_showpropertystatus')?.checked !== false;
+        const showStatus = getById('u_showpropertystatus')?.checked !== false;
         statusTable.style.display = (isReady && showStatus) ? '' : 'none';
     }
 
     // Payment Plan table in preview (Off-Plan only)
-    const previewPaymentTable = $('previewPaymentPlanTable');
+    const previewPaymentTable = getById('previewPaymentPlanTable');
     if (previewPaymentTable) {
         previewPaymentTable.style.display = isReady ? 'none' : '';
     }
@@ -506,13 +506,13 @@ function updatePropertyStatusPreview() {
     ];
 
     standardRows.forEach(id => {
-        const row = $(id);
+        const row = getById(id);
         if (row) row.style.display = '';
     });
 
-    const rentRow = $('disp_row_currentrent');
-    const leaseRow = $('disp_row_leaseuntil');
-    const refundRow = $('disp_row_rentrefund');
+    const rentRow = getById('disp_row_currentrent');
+    const leaseRow = getById('disp_row_leaseuntil');
+    const refundRow = getById('disp_row_rentrefund');
 
     if (rentRow) rentRow.style.display = isLeased ? '' : 'none';
     if (leaseRow) leaseRow.style.display = isLeased ? '' : 'none';
@@ -521,7 +521,7 @@ function updatePropertyStatusPreview() {
     if (isLeased) {
         const rent = getValue('u_currentrent');
         const leaseUntil = getValue('u_leaseuntil');
-        const rentRefund = $('u_rentrefund')?.checked;
+        const rentRefund = getById('u_rentrefund')?.checked;
 
         setText('disp_currentrent', rent ? formatCurrency(rent) + '/year' : '-');
         setText('disp_leaseuntil', leaseUntil ? formatDate(new Date(leaseUntil)) : '-');
@@ -533,11 +533,11 @@ function updatePropertyStatusPreview() {
     setText('disp_servicecharge', serviceCharge ? formatCurrency(serviceCharge) + '/year' : '-');
 
     // Apply individual row toggles
-    const toggles = $qa('.row-toggle');
+    const toggles = queryAll('.row-toggle');
     toggles.forEach(toggle => {
         if (!toggle.checked) {
             const targetId = toggle.dataset.target;
-            const targetRow = $(targetId);
+            const targetRow = getById(targetId);
             if (targetRow) {
                 targetRow.style.display = 'none';
             }
@@ -567,15 +567,15 @@ export function getOccupancy() {
  */
 export function getReadyPropertyData() {
     const rowToggles = {};
-    $qa('.row-toggle').forEach(toggle => {
+    queryAll('.row-toggle').forEach(toggle => {
         rowToggles[toggle.dataset.target] = toggle.checked;
     });
 
     return {
         category: currentCategory,
         occupancy: currentOccupancy,
-        showOriginalPrice: $('u_showoriginal')?.checked || false,
-        showPropertyStatus: $('u_showpropertystatus')?.checked || false,
+        showOriginalPrice: getById('u_showoriginal')?.checked || false,
+        showPropertyStatus: getById('u_showpropertystatus')?.checked || false,
         rowToggles: rowToggles,
         // Handover dates
         projectHandoverType: getValue('u_projecthandover_type'),
@@ -587,7 +587,7 @@ export function getReadyPropertyData() {
         // Lease details
         currentRent: getValue('u_currentrent'),
         leaseUntil: getValue('u_leaseuntil'),
-        rentRefund: $('u_rentrefund')?.checked || false,
+        rentRefund: getById('u_rentrefund')?.checked || false,
         serviceCharge: getValue('u_servicecharge')
     };
 }
@@ -607,17 +607,17 @@ export function setReadyPropertyData(data) {
         setOccupancy(data.occupancy);
     }
 
-    const showOrigToggle = $('u_showoriginal');
+    const showOrigToggle = getById('u_showoriginal');
     if (showOrigToggle && data.showOriginalPrice !== undefined) {
         showOrigToggle.checked = data.showOriginalPrice;
-        const label = $('showOriginalLabel');
+        const label = getById('showOriginalLabel');
         if (label) label.textContent = data.showOriginalPrice ? 'Yes' : 'No';
     }
 
-    const showStatusToggle = $('u_showpropertystatus');
+    const showStatusToggle = getById('u_showpropertystatus');
     if (showStatusToggle && data.showPropertyStatus !== undefined) {
         showStatusToggle.checked = data.showPropertyStatus;
-        const label = $('showPropertyStatusLabel');
+        const label = getById('showPropertyStatusLabel');
         if (label) label.textContent = data.showPropertyStatus ? 'Show' : 'Hide';
     }
 
@@ -644,10 +644,10 @@ export function setReadyPropertyData(data) {
     if (data.currentRent) setValue('u_currentrent', data.currentRent);
     if (data.leaseUntil) setValue('u_leaseuntil', data.leaseUntil);
 
-    const rentRefundToggle = $('u_rentrefund');
+    const rentRefundToggle = getById('u_rentrefund');
     if (rentRefundToggle && data.rentRefund !== undefined) {
         rentRefundToggle.checked = data.rentRefund;
-        const label = $('rentRefundLabel');
+        const label = getById('rentRefundLabel');
         if (label) label.textContent = data.rentRefund ? 'Yes (Pro-rata)' : 'No';
     }
 

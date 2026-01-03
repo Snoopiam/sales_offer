@@ -3,7 +3,7 @@
  * Logo, color, and company customization
  */
 
-import { $, toast } from '../utils/helpers.js';
+import { getById, toast } from '../utils/helpers.js';
 import { getBranding, saveBranding, getLabels, saveLabels } from './storage.js';
 
 /**
@@ -24,10 +24,10 @@ export function loadBrandingSettings() {
     const labels = getLabels();
 
     // Branding tab
-    const companyName = $('brandCompanyName');
-    const primaryColor = $('brandPrimaryColor');
-    const primaryColorHex = $('brandPrimaryColorHex');
-    const footerText = $('brandFooterText');
+    const companyName = getById('brandCompanyName');
+    const primaryColor = getById('brandPrimaryColor');
+    const primaryColorHex = getById('brandPrimaryColorHex');
+    const footerText = getById('brandFooterText');
 
     if (companyName) companyName.value = branding.companyName || '';
     if (primaryColor) primaryColor.value = branding.primaryColor || '#62c6c1';
@@ -40,12 +40,12 @@ export function loadBrandingSettings() {
     }
 
     // Labels tab
-    const labelRefund = $('labelRefund');
-    const labelBalance = $('labelBalance');
-    const labelPremium = $('labelPremium');
-    const labelAdmin = $('labelAdmin');
-    const labelAdgm = $('labelAdgm');
-    const labelAgency = $('labelAgency');
+    const labelRefund = getById('labelRefund');
+    const labelBalance = getById('labelBalance');
+    const labelPremium = getById('labelPremium');
+    const labelAdmin = getById('labelAdmin');
+    const labelAdgm = getById('labelAdgm');
+    const labelAgency = getById('labelAgency');
 
     if (labelRefund) labelRefund.value = labels.refund || '';
     if (labelBalance) labelBalance.value = labels.balance || '';
@@ -59,8 +59,8 @@ export function loadBrandingSettings() {
  * Set up color picker synchronization
  */
 function setupColorPicker() {
-    const colorPicker = $('brandPrimaryColor');
-    const colorHex = $('brandPrimaryColorHex');
+    const colorPicker = getById('brandPrimaryColor');
+    const colorHex = getById('brandPrimaryColorHex');
 
     if (colorPicker && colorHex) {
         // Sync picker to hex input
@@ -95,8 +95,8 @@ function previewColor(color) {
  * Set up logo upload
  */
 function setupLogoUpload() {
-    const logoUpload = $('brandLogoUpload');
-    const logoFileName = $('logoFileName');
+    const logoUpload = getById('brandLogoUpload');
+    const logoFileName = getById('logoFileName');
 
     if (logoUpload) {
         logoUpload.addEventListener('change', (e) => {
@@ -131,7 +131,7 @@ function setupLogoUpload() {
  * @param {string} base64 - Base64 image data
  */
 function showLogoPreview(base64) {
-    const preview = $('logoPreview');
+    const preview = getById('logoPreview');
     if (preview) {
         preview.innerHTML = '';
         const img = document.createElement('img');
@@ -147,19 +147,19 @@ function showLogoPreview(base64) {
  */
 export function saveBrandingSettings() {
     const branding = {
-        companyName: $('brandCompanyName')?.value || 'Kennedy Property',
-        primaryColor: $('brandPrimaryColor')?.value || '#62c6c1',
-        logo: $('logoPreview')?.dataset.logo || '',
-        footerText: $('brandFooterText')?.value || 'SALE OFFER'
+        companyName: getById('brandCompanyName')?.value || 'Kennedy Property',
+        primaryColor: getById('brandPrimaryColor')?.value || '#62c6c1',
+        logo: getById('logoPreview')?.dataset.logo || '',
+        footerText: getById('brandFooterText')?.value || 'SALE OFFER'
     };
 
     const labels = {
-        refund: $('labelRefund')?.value || 'Refund (40% of Original Price)',
-        balance: $('labelBalance')?.value || 'Balance Resale Clause**',
-        premium: $('labelPremium')?.value || 'Premium (Selling Price - Original Price)',
-        admin: $('labelAdmin')?.value || 'Admin Fees (SAAS)',
-        adgm: $('labelAdgm')?.value || 'ADGM (2% of Original Price)',
-        agency: $('labelAgency')?.value || 'Agency Fees (2% of Selling Price + Vat)'
+        refund: getById('labelRefund')?.value || 'Refund (40% of Original Price)',
+        balance: getById('labelBalance')?.value || 'Balance Resale Clause**',
+        premium: getById('labelPremium')?.value || 'Premium (Selling Price - Original Price)',
+        admin: getById('labelAdmin')?.value || 'Admin Fees (SAAS)',
+        adgm: getById('labelAdgm')?.value || 'ADGM (2% of Original Price)',
+        agency: getById('labelAgency')?.value || 'Agency Fees (2% of Selling Price + Vat)'
     };
 
     saveBranding(branding);
@@ -180,7 +180,7 @@ export function applyBranding() {
     document.documentElement.style.setProperty('--primary-color', branding.primaryColor);
 
     // Apply logo
-    const logoImg = $('logoImg');
+    const logoImg = getById('logoImg');
     if (logoImg && branding.logo) {
         logoImg.src = branding.logo;
     }
@@ -193,16 +193,16 @@ export function applyBranding() {
 
     // Apply labels
     const labelElements = {
-        'label_paid': labels.refund,
-        'label_bal': labels.balance,
-        'label_prem': labels.premium,
-        'label_adm': labels.admin,
-        'label_trans': labels.adgm,
-        'label_broker': labels.agency
+        'label_refund_amount': labels.refund,
+        'label_balance_resale': labels.balance,
+        'label_premium_price': labels.premium,
+        'label_admin_fees': labels.admin,
+        'label_adgm_transfer': labels.adgm,
+        'label_agency_fees': labels.agency
     };
 
     Object.entries(labelElements).forEach(([id, text]) => {
-        const el = $(id);
+        const el = getById(id);
         if (el) el.textContent = text;
     });
 }
