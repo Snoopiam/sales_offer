@@ -46,7 +46,7 @@ IDEAL FOR:
     padding: 15mm 20mm;
     display: flex;
     flex-direction: column;
-    background: #ffffff;
+    background: var(--white);
 }
 
 /* Remove colored header bar */
@@ -79,7 +79,7 @@ IDEAL FOR:
 .template-minimal .main-title {
     font-size: 28px;
     font-weight: 800;
-    color: #1f2937;
+    color: var(--text-dark);
     letter-spacing: -0.03em;
 }
 
@@ -104,8 +104,8 @@ IDEAL FOR:
 .template-minimal .table-title {
     font-size: 0.625rem; /* 10px */
     letter-spacing: 0.15em;
-    color: #6b7280; /* Improved contrast: was #9ca3af (3.9:1), now 5.0:1 vs white */
-    border-bottom: 1px solid #e5e7eb;
+    color: var(--text-gray-medium); /* Improved contrast: 5.0:1 vs white */
+    border-bottom: 1px solid var(--border-light);
     padding-bottom: 6px;
     margin-bottom: 12px;
 }
@@ -116,7 +116,7 @@ IDEAL FOR:
 }
 
 .template-minimal .data-table th {
-    color: #6b7280; /* Improved contrast: was #9ca3af (3.9:1), now 5.0:1 vs white */
+    color: var(--text-gray-medium); /* Improved contrast: 5.0:1 vs white */
     font-size: 0.5625rem; /* 9px */
     text-transform: uppercase;
     letter-spacing: 0.1em;
@@ -124,16 +124,16 @@ IDEAL FOR:
 
 .template-minimal .data-table td {
     padding: 5px 0;
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 1px solid var(--border-lighter);
 }
 
 .template-minimal .row-label {
-    color: #6b7280;
+    color: var(--text-gray-medium);
     font-weight: 500;
 }
 
 .template-minimal .row-value {
-    color: #1f2937;
+    color: var(--text-dark);
     font-weight: 600;
 }
 
@@ -145,7 +145,7 @@ IDEAL FOR:
 }
 
 .template-minimal .total-row .row-label {
-    color: #1f2937;
+    color: var(--text-dark);
 }
 
 .template-minimal .total-row .row-value {
@@ -159,7 +159,7 @@ IDEAL FOR:
 
 .template-minimal .payment-plan-table th {
     font-size: 0.5625rem; /* 9px */
-    color: #6b7280; /* Improved contrast: was #9ca3af (3.9:1), now 5.0:1 vs white */
+    color: var(--text-gray-medium); /* Improved contrast: 5.0:1 vs white */
 }
 
 .template-minimal .payment-plan-table td {
@@ -173,7 +173,7 @@ IDEAL FOR:
 }
 
 .template-minimal .img-placeholder {
-    border-color: #e5e7eb;
+    border-color: var(--border-light);
     border-radius: 4px;
 }
 
@@ -185,19 +185,19 @@ IDEAL FOR:
 .template-minimal .footer-proj {
     font-size: 12px;
     font-weight: 700;
-    color: #6b7280;
+    color: var(--text-gray-medium);
     letter-spacing: 0.1em;
 }
 
 .template-minimal .footer-sub {
     font-size: 0.5625rem; /* 9px */
-    color: #6b7280; /* Improved contrast: was #9ca3af (3.9:1), now 5.0:1 vs white */
+    color: var(--text-gray-medium); /* Improved contrast: 5.0:1 vs white */
     letter-spacing: 0.15em;
 }
 
 .template-minimal .footnote {
     font-size: 8px;
-    color: #6b7280; /* Improved contrast: was #9ca3af (3.9:1), now 5.0:1 vs white */
+    color: var(--text-gray-medium); /* Improved contrast: 5.0:1 vs white */
     max-width: 50%;
     line-height: 1.4;
 }

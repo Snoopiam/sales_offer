@@ -41,13 +41,13 @@ TABLE CLASSES:
    because they differ per template.
    ============================================ */
 #a4Page {
-    background: #fafafa;                      /* Off-white paper color, easier on eyes than pure white */
+    background: var(--paper-bg);              /* Off-white paper color, easier on eyes than pure white */
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);  /* Drop shadow to make paper "float" above gray background */
     position: relative;                        /* Needed for absolute positioning of child elements */
     box-sizing: border-box;                    /* Include padding/border in width calculation */
     transform-origin: center top;              /* When scaling, scale from top-center (for zoom feature) */
     overflow: hidden;                          /* Clip anything that overflows the paper edge */
-    border: 1px solid #d1d5db;                 /* Light border to define paper edge */
+    border: 1px solid var(--text-secondary);   /* Light border to define paper edge */
 }
 
 /* Note: Width & height are in css/templates/*.css (landscape=297x210mm, portrait=210x297mm) */
@@ -111,7 +111,7 @@ TABLE CLASSES:
 /* "FLOOR PLANS" label - small uppercase text above main title */
 .section-label {
     font-size: 12px;                           /* Small text */
-    color: #1f2937;                            /* Dark gray (near black) */
+    color: var(--text-dark);                   /* Dark gray (near black) */
     letter-spacing: 0.15em;                    /* Wide letter spacing for uppercase text */
     text-transform: uppercase;                 /* Force uppercase */
     font-weight: 700;                          /* Bold */
@@ -121,7 +121,7 @@ TABLE CLASSES:
 /* Main title - Large text showing unit model (e.g., "1 Bedroom") */
 .main-title {
     font-size: 36px;                           /* Large, prominent text */
-    color: #1f2937;                            /* Dark gray */
+    color: var(--text-dark);                   /* Dark gray */
     font-weight: 900;                          /* Extra bold (black weight) */
     margin-bottom: 15px;                       /* Space before content */
     line-height: 1;                            /* Tight line height for large text */
@@ -189,7 +189,7 @@ TABLE CLASSES:
    ============================================ */
 .img-placeholder {
     text-align: center;                        /* Center the placeholder text */
-    border: 2px dashed #d1d5db;                /* Dashed border = "drop here" visual cue */
+    border: 2px dashed var(--text-secondary);  /* Dashed border = "drop here" visual cue */
     padding: 40px;                             /* Generous padding for visual balance */
     border-radius: 8px;                        /* Rounded corners */
     width: 100%;                               /* Fill container width */
@@ -199,14 +199,14 @@ TABLE CLASSES:
 .placeholder-title {
     font-weight: 700;                          /* Bold */
     font-size: 18px;
-    color: #6b7280;                            /* Medium gray - WCAG 5.0:1 contrast */
+    color: var(--text-gray-medium);            /* Medium gray - WCAG 5.0:1 contrast */
     margin-bottom: 8px;
 }
 
 /* Placeholder subtitle (e.g., "Upload from left panel") */
 .placeholder-sub {
     font-size: 12px;
-    color: #6b7280;                            /* Medium gray - WCAG 5.0:1 contrast */
+    color: var(--text-gray-medium);            /* Medium gray - WCAG 5.0:1 contrast */
 }
 
 /* ============================================
@@ -271,7 +271,7 @@ TABLE CLASSES:
     color: var(--primary-color, #62c6c1);      /* Brand teal */
     font-weight: 700;                          /* Bold */
     padding: 3px 0;                            /* SPACING: Same as td = 3px vertical */
-    border-bottom: 1px solid #e5e7eb;          /* Light gray divider line */
+    border-bottom: 1px solid var(--border-light);  /* Light gray divider line */
     background-color: transparent;             /* No background */
     text-transform: capitalize;                /* First Letter Caps */
 }
@@ -290,8 +290,8 @@ TABLE CLASSES:
    SPACING: Row height controlled by padding = 3px top + 3px bottom = 6px per row */
 .data-table td {
     padding: 3px 0;                            /* SPACING: 3px vertical = 6px row height */
-    border-bottom: 1px solid #f3f4f6;          /* Very light divider between rows */
-    color: #374151;                            /* Dark gray text */
+    border-bottom: 1px solid var(--border-lighter);  /* Very light divider between rows */
+    color: var(--border-color);                /* Dark gray text */
     vertical-align: middle;                    /* Center content vertically */
 }
 
@@ -316,7 +316,7 @@ TABLE CLASSES:
 .row-label {
     font-weight: 600;                          /* Semi-bold for labels */
     width: 65%;                                /* Label takes 65%, value gets 35% */
-    color: #4b5563;                            /* Medium-dark gray */
+    color: var(--text-gray);                   /* Medium-dark gray */
 }
 
 /* ============================================
@@ -328,13 +328,13 @@ TABLE CLASSES:
    ============================================ */
 .row-value {
     font-weight: 500;                          /* Medium weight */
-    color: #111827;                            /* Near-black for emphasis */
+    color: var(--text-emphasis);               /* Near-black for emphasis */
 }
 
 /* Bold row value - for emphasis on important fields like Total Area */
 .row-value-bold {
     font-weight: 700;                          /* Bold for emphasis */
-    color: #111827;
+    color: var(--text-emphasis);
 }
 
 /* ============================================
@@ -360,10 +360,10 @@ TABLE CLASSES:
    Visually distinct with top border and larger text.
    ============================================ */
 .total-row td {
-    border-top: 2px solid #e5e7eb;             /* Thicker top border as separator */
+    border-top: 2px solid var(--border-light); /* Thicker top border as separator */
     border-bottom: none;                       /* No bottom border (last row) */
     font-weight: 800;                          /* Extra bold for emphasis */
-    color: #1f2937;                            /* Dark text */
+    color: var(--text-dark);                   /* Dark text */
     padding-top: 8px;                          /* Extra space above for separation */
     padding-bottom: 0;                         /* No space below - tight to next table */
     font-size: 0.6875rem;                      /* 11px - Slightly larger than other rows */
@@ -424,7 +424,7 @@ TABLE CLASSES:
 .footnote {
     margin-top: 15px;                          /* Space above footnote */
     font-size: 0.5625rem;                      /* 9px - Very small text */
-    color: #4b5563;                            /* Medium gray - WCAG 7.2:1 contrast */
+    color: var(--text-gray);                   /* Medium gray - WCAG 7.2:1 contrast */
     font-style: italic;                        /* Italic for footnote convention */
     max-width: 60%;                            /* Don't stretch too wide */
 }
@@ -447,7 +447,7 @@ TABLE CLASSES:
 .footer-proj {
     font-weight: 900;                          /* Extra bold */
     font-size: 14px;
-    color: #1f2937;                            /* Dark gray */
+    color: var(--text-dark);                   /* Dark gray */
     text-transform: uppercase;                 /* PROJECT NAME */
     letter-spacing: 0.05em;                    /* Slight letter spacing */
 }
@@ -475,7 +475,7 @@ TABLE CLASSES:
     right: 15mm;
     text-align: center;                        /* Center the text */
     font-size: 8px;
-    color: #6b7280; /* Improved from #9ca3af for better contrast (5.0:1 vs #fafafa) */
+    color: var(--text-gray-medium); /* Improved from #9ca3af for better contrast (5.0:1 vs #fafafa) */
     text-transform: uppercase;
     letter-spacing: 0.03em;
     white-space: nowrap;

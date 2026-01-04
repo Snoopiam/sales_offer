@@ -99,8 +99,8 @@ TECHNOLOGIES:
 
 /* Checked state - purple gradient background */
 .beta-toggle input:checked + .beta-slider {
-    background: linear-gradient(135deg, #8b5cf6, #6366f1);  /* Purple → indigo gradient */
-    border-color: #8b5cf6;                     /* Purple border */
+    background: linear-gradient(135deg, var(--beta-color), var(--indigo-500));  /* Purple → indigo gradient */
+    border-color: var(--beta-color);           /* Purple border */
 }
 
 /* Checked state - knob slides right and turns white */
@@ -123,7 +123,7 @@ TECHNOLOGIES:
 
 /* Checked state - purple gradient badge */
 .beta-toggle input:checked ~ .beta-label {
-    background: linear-gradient(135deg, #8b5cf6, #6366f1);  /* Purple gradient */
+    background: linear-gradient(135deg, var(--beta-color), var(--indigo-500));  /* Purple gradient */
     color: white;                              /* White text */
 }
 
@@ -246,7 +246,7 @@ TECHNOLOGIES:
 .sqft-value {
     font-size: 13px;                           /* Medium text */
     font-weight: 700;                          /* Bold */
-    color: #8b5cf6;                            /* Purple color (beta branding) */
+    color: var(--beta-color);                  /* Purple color (beta branding) */
 }
 
 /* ============================================
@@ -340,14 +340,14 @@ TECHNOLOGIES:
    ============================================ */
 /* WhatsApp Button - uses .btn.btn-whatsapp for higher specificity */
 .btn.btn-whatsapp {
-    background: #25D366;                       /* WhatsApp brand green */
+    background: var(--whatsapp-color);         /* WhatsApp brand green */
     color: white;                              /* White text */
     border: none;                              /* No border */
 }
 
 /* Hover state - darker green */
 .btn.btn-whatsapp:hover {
-    background: #128C7E;                       /* Dark green (WhatsApp dark theme) */
+    background: var(--whatsapp-hover);         /* Dark green (WhatsApp dark theme) */
 }
 
 /* ============================================
@@ -399,7 +399,7 @@ TECHNOLOGIES:
 }
 
 .dashboard-card.current {
-    border-color: #8b5cf6;
+    border-color: var(--beta-color);
     background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(99, 102, 241, 0.1));
 }
 
@@ -407,7 +407,7 @@ TECHNOLOGIES:
     position: absolute;
     top: -8px;
     right: 12px;
-    background: #8b5cf6;
+    background: var(--beta-color);
     color: white;
     font-size: 0.5625rem; /* 9px */
     font-weight: 700;
@@ -666,7 +666,7 @@ body:not(.beta-enabled) .beta-feature {
    Additional Export Options Styling
    ============================================ */
 .export-option.beta-feature {
-    border-left: 3px solid #8b5cf6;
+    border-left: 3px solid var(--beta-color);
 }
 
 /* ============================================

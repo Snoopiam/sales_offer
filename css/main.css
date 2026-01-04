@@ -36,20 +36,53 @@ CSS VARIABLE NAMING:
    1. CSS VARIABLES - Color palette & theming
    ============================================ */
 :root {
+    /* Brand Colors */
     --primary-color: #62c6c1;
     --primary-hover: #4aa8a4;
+
+    /* Background Colors (Dark Theme) */
     --bg-dark: #111827;
     --bg-darker: #0d1117;
     --bg-input: #1f2937;
+    --bg-preview: #52525b;
+
+    /* Border Colors */
     --border-color: #374151;
+    --border-light: #e5e7eb;
+    --border-lighter: #f3f4f6;
+
+    /* Text Colors (Dark Theme) */
     --text-primary: #ffffff;
-    /* Improved contrast: was #9ca3af (2.8:1), now #d1d5db (7.1:1) */
-    --text-secondary: #d1d5db;
-    /* Improved contrast: was #6b7280 (3.2:1), now #9ca3af (4.6:1) */
-    --text-muted: #9ca3af;
+    --text-secondary: #d1d5db;              /* Improved contrast: 7.1:1 */
+    --text-muted: #9ca3af;                  /* Improved contrast: 4.6:1 */
+
+    /* Text Colors (Light/Document Theme) */
+    --text-dark: #1f2937;                   /* Near-black for document text */
+    --text-gray: #4b5563;                   /* Medium-dark gray */
+    --text-gray-medium: #6b7280;            /* Medium gray - WCAG 5.0:1 */
+    --text-emphasis: #111827;               /* Maximum emphasis */
+
+    /* Document/Paper Colors */
+    --paper-bg: #fafafa;                    /* Off-white paper background */
+    --white: #ffffff;
+
+    /* Status Colors */
     --danger-color: #ef4444;
+    --danger-hover: #dc2626;
     --success-color: #10b981;
     --warning-color: #f59e0b;
+
+    /* Beta/Accent Colors */
+    --beta-color: #8b5cf6;                  /* Purple for beta features */
+    --beta-hover: #7c3aed;                  /* Darker purple */
+    --indigo-500: #6366f1;                  /* Indigo for gradients */
+    --indigo-600: #4f46e5;                  /* Darker indigo */
+
+    /* Third-party Brand Colors */
+    --whatsapp-color: #25D366;
+    --whatsapp-hover: #128C7E;
+
+    /* Focus States */
     --focus-ring: 0 0 0 3px rgba(98, 198, 193, 0.5);
 }
 
@@ -62,7 +95,7 @@ CSS VARIABLE NAMING:
 
 body {
     font-family: 'Montserrat', sans-serif;
-    background-color: #e5e7eb;
+    background-color: var(--border-light);
     display: flex;
     height: 100vh;
     overflow: hidden;
@@ -410,12 +443,12 @@ select.input-field option {
 /* ACCENT BUTTON - Special features (AI Import)
    Purple gradient for "premium" or "new" features */
 .btn-accent {
-    background: linear-gradient(135deg, #8b5cf6, #6366f1);  /* Purple to indigo gradient */
+    background: linear-gradient(135deg, var(--beta-color), var(--indigo-500));  /* Purple to indigo gradient */
     color: white;                          /* White text for contrast */
 }
 
 .btn-accent:hover {
-    background: linear-gradient(135deg, #7c3aed, #4f46e5);  /* Darker gradient on hover */
+    background: linear-gradient(135deg, var(--beta-hover), var(--indigo-600));  /* Darker gradient on hover */
 }
 
 /* DANGER BUTTON - Destructive actions (Delete, Clear All)
@@ -426,7 +459,7 @@ select.input-field option {
 }
 
 .btn-danger:hover {
-    background: #dc2626;                   /* Darker red on hover */
+    background: var(--danger-hover);       /* Darker red on hover */
 }
 
 /* Import Buttons */
@@ -666,7 +699,7 @@ select.input-field option {
    ============================================ */
 #previewArea {
     flex-grow: 1;                          /* Take remaining width */
-    background: #52525b;                   /* Gray zinc background */
+    background: var(--bg-preview);         /* Gray zinc background */
     padding: 40px;                         /* Breathing room */
     display: flex;                         /* Flexbox for centering */
     justify-content: center;               /* Horizontal center */
