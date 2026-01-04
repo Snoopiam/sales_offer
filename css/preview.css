@@ -261,7 +261,7 @@ TABLE CLASSES:
     width: 100%;                               /* Full width of container */
     border-collapse: separate;                 /* Needed for border-spacing */
     border-spacing: 0;                         /* No gaps between cells */
-    font-size: 10px;                           /* Small text to fit more data */
+    font-size: 0.625rem;                       /* 10px - Small text to fit more data */
     margin-bottom: 10px;                       /* SPACING: Between tables = 10px */
 }
 
@@ -280,7 +280,7 @@ TABLE CLASSES:
 .table-header-row th {
     text-align: left;
     border-bottom: none;                       /* No border for this variant */
-    font-size: 11px;                           /* Slightly larger than body */
+    font-size: 0.6875rem;                      /* 11px - Slightly larger than body */
     padding: 3px 0;                            /* SPACING: Same as td = 3px vertical */
     color: var(--primary-color, #62c6c1);
     font-weight: 700;
@@ -366,7 +366,7 @@ TABLE CLASSES:
     color: #1f2937;                            /* Dark text */
     padding-top: 8px;                          /* Extra space above for separation */
     padding-bottom: 0;                         /* No space below - tight to next table */
-    font-size: 11px;                           /* Slightly larger than other rows */
+    font-size: 0.6875rem;                      /* 11px - Slightly larger than other rows */
 }
 
 /* ============================================
@@ -388,13 +388,19 @@ TABLE CLASSES:
 }
 
 .payment-plan-table th {
-    font-size: 11px;                           /* Slightly smaller than data-table */
+    font-size: 0.6875rem;                      /* 11px - Slightly smaller than data-table */
     padding: 3px 0;                            /* SPACING: Same as data-table rows */
     border-bottom: none;                       /* Remove bottom border */
 }
 
 .payment-plan-table td {
     padding: 3px 0;                            /* SPACING: Same as data-table = 3px vertical */
+}
+
+/* First column (Date) - left aligned */
+.payment-plan-table th:nth-child(1),
+.payment-plan-table td:nth-child(1) {
+    text-align: left;
 }
 
 /* Middle column (%) - centered */
@@ -404,6 +410,7 @@ TABLE CLASSES:
 }
 
 /* Last column (amounts) - right aligned for numbers */
+.payment-plan-table th:nth-child(3),
 .payment-plan-table td:nth-child(3) {
     text-align: right;
 }
@@ -416,7 +423,7 @@ TABLE CLASSES:
    ============================================ */
 .footnote {
     margin-top: 15px;                          /* Space above footnote */
-    font-size: 9px;                            /* Very small text */
+    font-size: 0.5625rem;                      /* 9px - Very small text */
     color: #4b5563;                            /* Medium gray - WCAG 7.2:1 contrast */
     font-style: italic;                        /* Italic for footnote convention */
     max-width: 60%;                            /* Don't stretch too wide */
@@ -447,7 +454,7 @@ TABLE CLASSES:
 
 /* "SALE OFFER" text in teal below project name */
 .footer-sub {
-    font-size: 10px;
+    font-size: 0.625rem; /* 10px */
     color: var(--primary-color, #62c6c1);      /* Brand teal color */
     letter-spacing: 0.2em;                     /* Wide letter spacing */
     text-transform: uppercase;
@@ -478,11 +485,11 @@ TABLE CLASSES:
 
 @media screen {
     .footnote {
-        font-size: 10px;
+        font-size: 0.625rem; /* 10px */
     }
 
     .created-by-footer {
-        font-size: 9px;
+        font-size: 0.5625rem; /* 9px */
     }
 }
 

@@ -66,6 +66,13 @@ TECHNOLOGIES:
     pointer-events: none;                      /* Clicks go to label */
 }
 
+/* Focus style on visible control */
+.beta-toggle input:focus-visible + .beta-slider {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+    box-shadow: var(--focus-ring);
+}
+
 /* Switch track (background) */
 .beta-slider {
     width: 40px;                               /* Track width */
@@ -104,7 +111,7 @@ TECHNOLOGIES:
 
 /* "BETA" label badge next to toggle */
 .beta-label {
-    font-size: 11px;                           /* Small text */
+    font-size: 0.6875rem;                      /* 11px - Small text */
     font-weight: 700;                          /* Bold */
     letter-spacing: 0.1em;                     /* Wide letter spacing */
     color: var(--text-secondary);              /* Gray text (unchecked) */
@@ -183,6 +190,12 @@ TECHNOLOGIES:
     color: var(--bg-dark);                     /* Dark text for contrast */
 }
 
+.zoom-btn:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+    box-shadow: var(--focus-ring);
+}
+
 /* Zoom level display ("100%" text) */
 .zoom-level {
     font-size: 12px;                           /* Small text */
@@ -224,7 +237,7 @@ TECHNOLOGIES:
 
 /* Label text ("PRICE PER SQ FT") */
 .sqft-label {
-    font-size: 10px;                           /* Small text */
+    font-size: 0.625rem;                       /* 10px - Small text */
     color: var(--text-secondary);              /* Gray text */
     text-transform: uppercase;                 /* ALL CAPS */
 }
@@ -281,7 +294,7 @@ TECHNOLOGIES:
 /* Card label ("PREMIUM %", "ADGM %", "AGENCY %") */
 .calc-label {
     display: block;                            /* Block for vertical stacking */
-    font-size: 9px;                            /* Very small text */
+    font-size: 0.625rem;                       /* 10px - Small text */
     color: var(--text-secondary);              /* Gray text */
     text-transform: uppercase;                 /* ALL CAPS */
     letter-spacing: 0.05em;                    /* Slight letter spacing */
@@ -340,7 +353,7 @@ TECHNOLOGIES:
 /* ============================================
    Dashboard Modal
    ============================================ */
-.modal-lg {
+.modal-large {
     max-width: 800px;
 }
 
@@ -379,6 +392,12 @@ TECHNOLOGIES:
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
+.dashboard-card:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+    box-shadow: var(--focus-ring);
+}
+
 .dashboard-card.current {
     border-color: #8b5cf6;
     background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(99, 102, 241, 0.1));
@@ -390,7 +409,7 @@ TECHNOLOGIES:
     right: 12px;
     background: #8b5cf6;
     color: white;
-    font-size: 9px;
+    font-size: 0.5625rem; /* 9px */
     font-weight: 700;
     padding: 2px 8px;
     border-radius: 10px;
@@ -420,7 +439,7 @@ TECHNOLOGIES:
 }
 
 .card-meta {
-    font-size: 10px;
+    font-size: 0.625rem; /* 10px */
     color: var(--text-muted);
 }
 
@@ -435,7 +454,7 @@ TECHNOLOGIES:
 .card-btn {
     flex: 1;
     padding: 6px 8px;
-    font-size: 11px;
+    font-size: 0.6875rem; /* 11px */
     background: var(--bg-dark);
     border: 1px solid var(--border-color);
     border-radius: 4px;
@@ -447,6 +466,12 @@ TECHNOLOGIES:
 .card-btn:hover {
     background: var(--border-color);
     color: var(--text-primary);
+}
+
+.card-btn:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+    box-shadow: var(--focus-ring);
 }
 
 .card-btn.delete-btn:hover {
@@ -561,6 +586,11 @@ input[list]::-webkit-calendar-picker-indicator {
 .dropdown-item:hover,
 .dropdown-item.highlighted {
     background: var(--bg-input);
+}
+
+.dropdown-item:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: -2px;
 }
 
 .dropdown-item.highlighted {

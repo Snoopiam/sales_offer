@@ -58,7 +58,7 @@ IDEAL FOR:
 }
 
 .template-portrait .section-label {
-    font-size: 11px;
+    font-size: 0.6875rem; /* 11px */
 }
 
 .template-portrait .main-title {
@@ -91,7 +91,7 @@ IDEAL FOR:
 }
 
 .template-portrait .data-table {
-    font-size: 11px;
+    font-size: 0.6875rem; /* 11px */
 }
 
 .template-portrait .table-title {
@@ -117,7 +117,7 @@ IDEAL FOR:
 }
 
 .template-portrait .footer-sub {
-    font-size: 11px;
+    font-size: 0.6875rem; /* 11px */
 }
 
 .template-portrait .footnote {

@@ -175,7 +175,7 @@ body {
 /* Field labels - uppercase, small, gray */
 .input-label {
     display: block;                            /* Full width, own line */
-    font-size: 11px;                           /* Small text */
+    font-size: 0.6875rem;                      /* 11px - Small text */
     color: var(--text-secondary);              /* Light gray */
     margin-bottom: 2px;                        /* Small gap before input */
     font-weight: 600;                          /* Semi-bold */
@@ -353,8 +353,8 @@ select.input-field option {
    .btn-whatsapp:  WhatsApp share - Green (BETA feature)
 
    SIZE VARIANTS:
-   .btn:    Default size (8px × 14px padding)
-   .btn-sm: Small size (6px × 12px padding, smaller font)
+   .btn:       Default size (8px × 14px padding)
+   .btn-small: Small size (6px × 12px padding, smaller font)
 
    ACCESSIBILITY:
    - Focus states use outline for keyboard navigation
@@ -379,7 +379,7 @@ select.input-field option {
 }
 
 /* Small button variant - for compact areas */
-.btn-sm {
+.btn-small {
     padding: 6px 12px;                     /* Reduced padding */
     font-size: 12px;                       /* Smaller text */
 }
@@ -492,7 +492,7 @@ select.input-field option {
 
 /* "Total Initial Payment" label */
 .total-label {
-    font-size: 11px;                       /* Small text */
+    font-size: 0.6875rem;                  /* 11px - Small text */
     font-weight: 600;                      /* Semi-bold */
     color: var(--text-secondary);          /* Light gray - less prominent than value */
     text-transform: uppercase;             /* ALL CAPS for label style */
@@ -544,7 +544,7 @@ select.input-field option {
     padding: 6px 8px;                      /* Cell padding */
     color: var(--text-secondary);          /* Gray text */
     font-weight: 600;                      /* Semi-bold */
-    font-size: 10px;                       /* Small text */
+    font-size: 0.625rem;                   /* 10px - Small text */
     text-transform: uppercase;             /* ALL CAPS labels */
     border-bottom: 1px solid var(--border-color); /* Header separator */
 }
@@ -617,7 +617,7 @@ select.input-field option {
 
 /* Validation messages (error/success) */
 .validation-msg {
-    font-size: 11px;                       /* Small text */
+    font-size: 0.6875rem;                  /* 11px - Small text */
 }
 
 .validation-msg.error {
@@ -670,7 +670,7 @@ select.input-field option {
     padding: 40px;                         /* Breathing room */
     display: flex;                         /* Flexbox for centering */
     justify-content: center;               /* Horizontal center */
-    align-items: center;                   /* Vertical center */
+    align-items: flex-start;               /* Top align to avoid clipping when content overflows */
     overflow: auto;                        /* Scroll if content overflows */
 }
 
@@ -695,7 +695,7 @@ select.input-field option {
 
    SIZE VARIANTS:
    - Default: max-width 500px
-   - .modal-sm: max-width 400px (for simple dialogs)
+   - .modal-small: max-width 400px (for simple dialogs)
 
    ACCESSIBILITY:
    - Focus trap (JavaScript handles)
@@ -746,7 +746,7 @@ select.input-field option {
 }
 
 /* Small modal variant - for simple dialogs */
-.modal-content.modal-sm {
+.modal-content.modal-small {
     max-width: 400px;                      /* Narrower width */
 }
 
@@ -1119,7 +1119,7 @@ select.input-field option {
 /* Hint text ("Supported: .xlsx, .xls") */
 .file-upload-zone small {
     margin-top: 8px;                       /* Space above */
-    font-size: 11px;                       /* Small text */
+    font-size: 0.6875rem;                  /* 11px - Small text */
     color: var(--text-muted);              /* Dim gray */
 }
 
@@ -1374,7 +1374,7 @@ select.input-field option {
 /* Field error styling */
 .field-error {
     color: var(--danger-color);
-    font-size: 11px;
+    font-size: 0.6875rem; /* 11px */
     margin-top: 4px;
 }
 
@@ -1543,7 +1543,7 @@ select.input-field option {
 
    SIZE VARIANTS:
    - Default: 44px × 24px (standard toggle)
-   - .xs: 28px × 16px (small toggle for labels)
+   - .extra-small: 28px × 16px (small toggle for labels)
 
    USAGE:
    Used for beta features toggle in Settings.
@@ -1554,6 +1554,11 @@ select.input-field option {
     display: flex;                         /* Horizontal layout */
     align-items: center;                   /* Vertical center */
     gap: 10px;                             /* Space between switch and label */
+}
+
+/* Small toggle switch group - reduced gap */
+.toggle-switch-group.small {
+    gap: 6px;                              /* Reduced gap for compact layouts */
 }
 
 /* Toggle switch track (44px × 24px) */
@@ -1662,7 +1667,7 @@ select.input-field option {
 }
 
 /* Small input variant - reduced padding */
-.input-field-sm {
+.input-field-small {
     padding: 6px 8px;                      /* Smaller padding */
     font-size: 12px;                       /* Smaller text */
 }
@@ -1705,24 +1710,24 @@ select.input-field option {
 }
 
 /* ============================================
-   EXTRA-SMALL TOGGLE SWITCH (.xs)
+   EXTRA-SMALL TOGGLE SWITCH (.extra-small)
    ============================================
    Smaller toggle variant for inline labels.
    28px × 16px (instead of 44px × 24px)
 
    USAGE:
-   Add .xs class to .toggle-switch element.
+   Add .extra-small class to .toggle-switch element.
    Used for compact areas where space is limited.
    ============================================ */
 
-/* XS Toggle Switch - smaller dimensions */
-.toggle-switch.xs {
+/* Extra-Small Toggle Switch - smaller dimensions */
+.toggle-switch.extra-small {
     width: 28px;                           /* Reduced width */
     height: 16px;                          /* Reduced height */
 }
 
-/* XS Slider knob - smaller circle */
-.toggle-switch.xs .toggle-slider:before {
+/* Extra-Small Slider knob - smaller circle */
+.toggle-switch.extra-small .toggle-slider:before {
     height: 12px;                          /* Reduced knob height */
     width: 12px;                           /* Reduced knob width */
     left: 2px;                             /* Maintain 2px padding */

@@ -145,7 +145,7 @@ LANDSCAPE.CSS - A4 Landscape Template (Default)
     bottom: 4mm;
 
     /* [UPDATED] LARGER AGENT TEXT */
-    font-size: 9px;  /* Increased from 7px */
+    font-size: 0.5625rem; /* 9px - Increased from 7px */
 }
 
 /* ============================================
@@ -166,14 +166,14 @@ LANDSCAPE.CSS - A4 Landscape Template (Default)
 
 /* 2. Reduce the Title Spacing */
 .template-landscape .table-title {
-    font-size: 11px;
+    font-size: 0.6875rem; /* 11px */
     padding: 4px 0 2px;
 }
 
 /* 3. Reduce Font Size to fit 3 tables */
 .template-landscape .data-table,
 .template-landscape .payment-plan-table {
-    font-size: 10px;
+    font-size: 0.625rem; /* 10px */
 }
 
 /* 4. Tighten Row Padding (CRITICAL FOR PDF FIX) */
