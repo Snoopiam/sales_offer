@@ -29,7 +29,7 @@
 
 1. **Option A - Direct Open**: Double-click `index.html` (limited functionality)
 2. **Option B - Local Server** (Recommended):
-   - Open terminal in the `Sales Offer` folder
+   - Open PowerShell or Command Prompt in the `Sales Offer` folder
    - Run: `python -m http.server 8000`
    - Open browser to `http://localhost:8000`
 
@@ -65,9 +65,13 @@ The app has two main areas:
 └─────────────────────────────────────────────────────────────┘
 ```
 
+![App Interface](images/1.default.png)
+
 ---
 
 ## Property Categories
+
+![Category Toggle](images/1.default.png)
 
 The app supports two property categories with different calculation methods:
 
@@ -145,6 +149,8 @@ Total = Refund + Balance + Premium + Admin Fees + ADGM + Agency Fees
 
 ## Payment Plan Editor
 
+![Payment Plan Editor](images/2.default-excel_ready.png)
+
 ### Adding Payment Milestones
 
 1. The payment plan starts with 4 default rows
@@ -197,6 +203,8 @@ Each auto-calculated field has a **lock button** (🔒):
 ---
 
 ## Importing Data
+
+![Excel Import](images/2.default-excel_ready.png)
 
 ### Excel Import
 
@@ -281,6 +289,8 @@ Each auto-calculated field has a **lock button** (🔒):
 
 Click the **Settings** button (gear icon) to open the settings modal.
 
+![Settings - Branding](images/1.default.png)
+
 ### Branding Tab
 
 | Setting | Description |
@@ -308,6 +318,8 @@ Click **Save Settings** to apply changes. Settings persist across sessions.
 ---
 
 ## Exporting Documents
+
+![PDF Export](images/3.default-export_ready.png)
 
 ### Export Options
 
@@ -388,7 +400,7 @@ Templates save:
 
 The application includes a comprehensive test suite:
 
-```bash
+```powershell
 # Install dependencies first
 npm install
 
@@ -406,7 +418,7 @@ npm run test:ui
 
 Check code quality with ESLint:
 
-```bash
+```powershell
 # Check for issues
 npm run lint
 

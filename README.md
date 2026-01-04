@@ -7,6 +7,8 @@ A professional real estate sales offer document generator with live preview, aut
 ![Tests](https://img.shields.io/badge/tests-430-brightgreen)
 ![Health](https://img.shields.io/badge/health-80%25-success)
 
+![App Overview](docs/images/1.default.png)
+
 ## Features
 
 - **Live A4 Document Preview** - See changes in real-time as you type
@@ -25,8 +27,8 @@ A professional real estate sales offer document generator with live preview, aut
 
 ### Step 1: Open a Terminal
 
-Navigate to the project folder:
-```bash
+Navigate to the project folder in PowerShell or Command Prompt:
+```powershell
 cd "Sales Offer"
 ```
 
@@ -35,13 +37,13 @@ cd "Sales Offer"
 Choose ONE of these options:
 
 **Option A: Node.js (Recommended)**
-```bash
+```powershell
 npm install        # First time only
 npm run serve:node
 ```
 
 **Option B: Python**
-```bash
+```powershell
 python -m http.server 8000
 ```
 
@@ -68,13 +70,13 @@ http://localhost:8000
 
 ### Install Dependencies
 
-```bash
+```powershell
 npm install
 ```
 
 ### Available Scripts
 
-```bash
+```powershell
 # Start local development server
 npm run serve          # Python server
 npm run serve:node     # Node.js server
@@ -98,7 +100,7 @@ The project uses [Vitest](https://vitest.dev/) for testing with 430+ tests cover
 - **validator.test.js** - Form and payment plan validation
 
 Run tests:
-```bash
+```powershell
 npm test
 ```
 

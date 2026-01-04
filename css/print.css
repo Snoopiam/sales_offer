@@ -6,6 +6,50 @@ PRINT.CSS - Print Media Query Styles
 PURPOSE: Styles applied ONLY when printing the document (File > Print).
          Optimizes layout for physical/PDF printing.
 
+FRONTEND PRINT WORKFLOW:
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ PRINT OPTIONS (User triggers via):                                          │
+│                                                                              │
+│ 1. #printBtn (sidebar) → Browser Print Dialog (Ctrl+P / Cmd+P)              │
+│    - Uses this print.css directly                                           │
+│    - User sees browser's print preview with "Save as PDF" option            │
+│                                                                              │
+│ 2. #exportBtn → #exportModal → [PDF Document] option                        │
+│    - Uses html2pdf.js library (screenshot-based)                            │
+│    - This CSS applies to the captured content                               │
+│                                                                              │
+│ 3. #exportBtn → #exportModal → [PDF Editable] (BETA)                        │
+│    - Uses jsPDF library (text-based)                                        │
+│    - Does NOT use this CSS (generates programmatically)                     │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+WHAT GETS PRINTED (Visual Map):
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ HIDDEN FROM PRINT:                │ VISIBLE IN PRINT:                       │
+│                                   │                                         │
+│ #inputPanel (entire left sidebar) │ #previewArea (full width)               │
+│ .modal (all overlay dialogs)      │   └── #a4Page (the document)            │
+│ .zoom-controls (beta feature)     │         ├── .header-bar (teal stripe)   │
+│ .btn-container (action buttons)   │         ├── .logo-area (#logoImg)       │
+│ .ui-controls (any UI elements)    │         ├── .document-header            │
+│ .leaflet-control-zoom (maps)      │         │     └── #disp_title           │
+│                                   │         ├── .content-row                │
+│                                   │         │     ├── .column-left          │
+│                                   │         │     │     ├── PROPERTY DETAILS│
+│                                   │         │     │     ├── FINANCIAL       │
+│                                   │         │     │     └── PAYMENT PLAN    │
+│                                   │         │     └── .column-right         │
+│                                   │         │           └── #floorPlanImg   │
+│                                   │         ├── .footer-area                │
+│                                   │         │     └── #disp_project_footer  │
+│                                   │         └── .footnote (disclaimer)      │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+TEMPLATE VARIANTS:
+- #a4Page (default): 297mm × 210mm landscape
+- #a4Page.template-portrait: 210mm × 297mm portrait (columns stack vertically)
+- #a4Page.template-minimal: 297mm × 210mm landscape (subtle styling)
+
 PRINT BEHAVIOR:
 - Hides input panel, shows only preview area
 - Removes all UI controls (modals, buttons, zoom controls)
@@ -62,9 +106,34 @@ body {
 /* ============================================
    A4 PAGE - Print Layout
    ============================================
-   Optimizes the document for clean printing.
-   Removes screen-only decorations (shadows, transforms).
-   Sets exact dimensions for A4 landscape.
+   FRONTEND: The white A4 document in preview area
+   HTML ID: #a4Page
+
+   PRINT ADJUSTMENTS:
+   - Removes box-shadow (screen decoration only)
+   - Removes transform (resets any zoom scaling)
+   - Sets exact A4 dimensions (297mm × 210mm landscape)
+   - Reduced padding (8mm × 12mm) for more printable area
+
+   CONTAINED ELEMENTS (all printed):
+   #a4Page
+     ├── .header-bar (teal stripe at top)
+     ├── .logo-area (#logoImg - company logo)
+     ├── .document-header
+     │     ├── .section-label ("UNIT MODEL")
+     │     └── .main-title (#disp_title - e.g., "2 BEDROOM + MAID")
+     ├── .content-row
+     │     ├── .column-left (40%)
+     │     │     ├── #propertyDetailsTable (PROPERTY DETAILS)
+     │     │     ├── #financialTable (FINANCIAL BREAKDOWN)
+     │     │     └── #previewPaymentPlanTable (PAYMENT PLAN - Off-Plan only)
+     │     └── .column-right (60%)
+     │           └── .floorplan-frame
+     │                 └── #floorPlanImg (uploaded floor plan)
+     ├── .footer-area
+     │     ├── .footer-proj (#disp_project_footer - project name)
+     │     └── .footer-sub ("SALE OFFER")
+     └── .footnote (disclaimer text)
    ============================================ */
 #a4Page {
     box-shadow: none !important;               /* Remove drop shadow (screen only) */

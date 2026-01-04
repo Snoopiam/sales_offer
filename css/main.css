@@ -6,6 +6,81 @@ MAIN.CSS - Input Panel & UI Component Styles
 PURPOSE: Styles for the left sidebar (input panel) and shared UI components.
          Does NOT include preview document styles (see preview.css).
 
+FRONTEND LAYOUT (Visual Map):
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  LEFT SIDEBAR (#inputPanel)     │  RIGHT PREVIEW (#previewArea)            │
+│  Width: 380px                   │  Flex-grow: 1                            │
+│  ┌───────────────────────────┐  │  ┌─────────────────────────────────────┐ │
+│  │ .panel-header             │  │  │                                     │ │
+│  │  ├── .app-title           │  │  │    A4 DOCUMENT PREVIEW              │ │
+│  │  ├── #betaToggle          │  │  │    (see preview.css)                │ │
+│  │  └── #templateSelect      │  │  │                                     │ │
+│  ├───────────────────────────┤  │  │    #a4Page                          │ │
+│  │ .category-toggle          │  │  │                                     │ │
+│  │  ├── [Off-Plan] [Ready]   │  │  └─────────────────────────────────────┘ │
+│  ├───────────────────────────┤  │                                          │
+│  │ PROPERTY DETAILS          │  │                                          │
+│  │  ├── #u_project           │  │                                          │
+│  │  ├── #u_unit_number       │  │                                          │
+│  │  ├── #u_unit_type         │  │                                          │
+│  │  ├── #u_unit_model        │  │                                          │
+│  │  ├── #u_views             │  │                                          │
+│  │  ├── #u_internal_area     │  │                                          │
+│  │  ├── #u_balcony_area      │  │                                          │
+│  │  └── #u_total_area        │  │                                          │
+│  ├───────────────────────────┤  │                                          │
+│  │ FINANCIAL BREAKDOWN       │  │                                          │
+│  │  ├── #u_original_price    │  │                                          │
+│  │  ├── #u_selling_price     │  │                                          │
+│  │  ├── #u_refund (+🔒)      │  │                                          │
+│  │  ├── #u_balance           │  │                                          │
+│  │  ├── #u_premium (+🔒)     │  │                                          │
+│  │  ├── #u_admin_fees        │  │                                          │
+│  │  ├── #u_adgm (+🔒)        │  │                                          │
+│  │  ├── #u_agency_fees (+🔒) │  │                                          │
+│  │  └── #totalDisplay        │  │                                          │
+│  ├───────────────────────────┤  │                                          │
+│  │ PAYMENT PLAN TABLE        │  │                                          │
+│  │  └── #paymentPlanTable    │  │                                          │
+│  │       └── tbody (rows)    │  │                                          │
+│  ├───────────────────────────┤  │                                          │
+│  │ FLOOR PLAN                │  │                                          │
+│  │  └── #floorPlanInput      │  │                                          │
+│  ├───────────────────────────┤  │                                          │
+│  │ ACTION BUTTONS            │  │                                          │
+│  │  ├── #saveTemplateBtn     │  │                                          │
+│  │  ├── #exportBtn           │  │                                          │
+│  │  └── #printBtn            │  │                                          │
+│  └───────────────────────────┘  │                                          │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+MODALS (Overlays triggered by buttons):
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ SETTINGS MODAL (#settingsModal)                                             │
+│  ├── Branding Tab: Logo upload, Primary Color, Company Name                │
+│  ├── Labels Tab: Custom field labels (Refund, Balance, Premium, etc.)      │
+│  ├── AI Settings Tab: Gemini API Key, Test Connection                      │
+│  └── About Tab: Version, Credits, Beta Toggle                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ EXPORT MODAL (#exportModal)                                                 │
+│  ├── PDF Export (via html2pdf or jsPDF)                                     │
+│  ├── PNG Export (screenshot of preview)                                     │
+│  └── JSON Export (data backup)                                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ AI IMPORT MODAL (#aiImportModal)                                            │
+│  ├── File Upload Zone (drag/drop)                                           │
+│  ├── Processing Indicator (spinner)                                         │
+│  └── Extracted Data Panel                                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ TEMPLATE MODAL (#templateModal)                                             │
+│  └── Saved Templates List                                                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+INPUT FIELD NAMING CONVENTION:
+  - #u_* : User input fields in sidebar (e.g., #u_project, #u_selling_price)
+  - #disp_* : Display elements in preview (e.g., #disp_project, #disp_selling_price)
+  - +🔒 indicates field has lock button for auto-calculation override
+
 SECTIONS IN THIS FILE:
 1. CSS Variables (:root)         - Color palette, spacing, focus states
 2. Base Styles                   - Body layout, box-sizing
@@ -106,8 +181,42 @@ body {
 /* ============================================
    3. INPUT PANEL - Left sidebar container
    ============================================
-   Fixed 380px width, dark theme, scrollable
-   Contains all form inputs and controls
+   FRONTEND: The dark left sidebar containing all form inputs
+   HTML ID: #inputPanel
+
+   STRUCTURE:
+   #inputPanel
+     ├── .panel-header
+     │     ├── .panel-header-row (.app-title + #betaToggle)
+     │     └── .template-selector (#templateSelect dropdown)
+     ├── .category-toggle ([Off-Plan Resale] [Ready Property])
+     ├── .section-block "Property Details"
+     │     ├── #u_project (→ #disp_project)
+     │     ├── #u_unit_number (→ #disp_unit_number)
+     │     ├── #u_unit_type (→ #disp_unit_type)
+     │     ├── #u_unit_model (→ #disp_title)
+     │     ├── #u_views (→ #disp_views)
+     │     ├── .grid-2 [#u_internal_area | #u_balcony_area]
+     │     └── #u_total_area (auto-calculated)
+     ├── .section-block "Financial Breakdown"
+     │     ├── #u_original_price (→ #disp_original_price)
+     │     ├── #u_selling_price (→ #disp_selling_price)
+     │     ├── #u_refund + #lockRefund (→ #disp_refund)
+     │     ├── #u_balance (→ #disp_balance)
+     │     ├── #u_premium + #lockPremium (→ #disp_premium)
+     │     ├── #u_admin_fees (→ #disp_admin_fees)
+     │     ├── #u_adgm + #lockAdgm (→ #disp_adgm)
+     │     ├── #u_agency_fees + #lockAgency (→ #disp_agency_fees)
+     │     └── .total-display (#totalValue)
+     ├── .section-block "Payment Plan" (Off-Plan only)
+     │     └── #paymentPlanTable → #previewPaymentPlanTable
+     ├── .section-block "Floor Plan"
+     │     └── #floorPlanInput → #floorPlanImg
+     └── .action-buttons
+           ├── #settingsBtn → #settingsModal
+           ├── #saveTemplateBtn → #templateModal
+           ├── #exportBtn → #exportModal
+           └── #printBtn (browser print dialog)
    ============================================ */
 #inputPanel {
     width: 380px;                              /* Fixed width - doesn't change with window resize */
@@ -541,8 +650,37 @@ select.input-field option {
 /* ============================================
    PAYMENT PLAN TABLE (.payment-table)
    ============================================
-   Dynamic table showing installment payments in both panels.
-   Users can add/delete rows and drag to reorder.
+   FRONTEND: Editable payment schedule in sidebar (Off-Plan only)
+   HTML ID: #paymentPlanTable (sidebar) → #previewPaymentPlanTable (preview)
+
+   SIDEBAR TABLE STRUCTURE (#paymentPlanTable):
+   ┌──────────────────────────────────────────────────────────────┐
+   │ DESCRIPTION     │ PERCENTAGE │ AMOUNT           │ ×         │
+   ├──────────────────────────────────────────────────────────────┤
+   │ [On Booking   ] │ [10%     ] │ [AED 250,000   ] │ [×]       │
+   │ [Dec 2024     ] │ [20%     ] │ [AED 500,000   ] │ [×]       │
+   │ [Handover     ] │ [70%     ] │ [AED 1,750,000 ] │ [×]       │
+   └──────────────────────────────────────────────────────────────┘
+   │ [+ Add Row]                                                  │
+   ├──────────────────────────────────────────────────────────────┤
+   │ .payment-summary: AED Paid: X | Balance: Y                   │
+   │ .validation-msg: ✓ 100% or ⚠ Does not equal 100%            │
+   └──────────────────────────────────────────────────────────────┘
+
+   TABLE COLUMNS:
+   - Column 1: .desc-input (Description: "On Booking", "Q1 2025", etc.)
+   - Column 2: .pct-input (Percentage: "10", "20", etc.)
+   - Column 3: .amt-input (Amount: auto-calculated from Original Price × %)
+   - Column 4: .delete-row-btn (× button to remove row)
+
+   ROW OPERATIONS:
+   - #addPaymentRowBtn: Adds new empty row to tbody
+   - .delete-row-btn: Removes that row from table
+   - Drag rows: SortableJS reorders tbody rows
+
+   PREVIEW SYNC:
+   Sidebar #paymentPlanTable → Preview #previewPaymentPlanTable
+   Changes sync via JavaScript event listeners
 
    FUNCTIONALITY:
    - SortableJS enables drag-and-drop row reordering
@@ -711,6 +849,46 @@ select.input-field option {
    MODAL SYSTEM (.modal)
    ============================================
    Full-screen overlay dialogs for settings, templates, export, etc.
+
+   FRONTEND MODALS:
+
+   #settingsModal - Settings (triggered by #settingsBtn / gear icon)
+     ├── .settings-tabs
+     │     ├── [Branding] → #brandingTab
+     │     │     ├── #brandLogoInput (file upload → .logo-preview)
+     │     │     ├── #brandPrimaryColor (color picker → --primary-color)
+     │     │     └── #brandCompanyName (text → #disp_company footer)
+     │     ├── [Labels] → #labelsTab
+     │     │     ├── #labelRefund (text → label in Financial table)
+     │     │     ├── #labelBalance, #labelPremium, #labelAdminFees...
+     │     │     └── Custom labels for each financial field
+     │     ├── [AI Settings] → #aiSettingsTab
+     │     │     ├── #geminiApiKey (API key input)
+     │     │     └── #testApiBtn (Test Connection button)
+     │     └── [About] → #aboutTab
+     │           ├── Version info, Credits
+     │           └── #betaToggle (Enable beta features)
+     └── .modal-footer [Save Settings] [Cancel]
+
+   #exportModal - Export Options (triggered by #exportBtn)
+     ├── .export-options (radio buttons)
+     │     ├── PDF Export → html2pdf / jsPDF
+     │     ├── PNG Export → html2canvas
+     │     └── JSON Export → data backup
+     └── .modal-footer [Export] [Cancel]
+
+   #aiImportModal - AI Document Import (triggered by AI Import btn)
+     ├── .file-upload-zone (drag & drop area)
+     │     └── #aiFileInput (hidden file input)
+     ├── .processing-indicator (.spinner + text)
+     ├── .extracted-data (parsed data display)
+     │     └── .extracted-data-row (field: value pairs)
+     └── .modal-footer [Apply Data] [Cancel]
+
+   #templateModal - Saved Templates (triggered by #saveTemplateBtn)
+     ├── .templates-list
+     │     └── .template-item (template name + actions)
+     └── .modal-footer [New Template] [Close]
 
    STRUCTURE:
    .modal
@@ -1486,9 +1664,36 @@ select.input-field option {
 /* ============================================
    PROPERTY CATEGORY TOGGLE
    ============================================
-   Button group toggles between property categories:
-   - Off Plan / Ready
-   - Occupied / Vacant (occupancy-toggle)
+   FRONTEND: Button group at top of sidebar for property type selection
+   HTML CLASS: .category-toggle (container) + .category-btn (buttons)
+
+   CATEGORY TOGGLE (#categoryToggle):
+   ┌─────────────────────────────────────────────────────────────┐
+   │ [Off-Plan Resale] │ [Ready Property]                       │
+   │     .active       │                                        │
+   └─────────────────────────────────────────────────────────────┘
+
+   BUTTON IDs:
+   - #btnOffPlan: Off-Plan Resale category
+   - #btnReady: Ready Property category
+
+   CATEGORY EFFECTS:
+   Off-Plan Resale:
+     - Shows: Resale Clause %, Amount Paid, Payment Plan Table
+     - Shows: #u_resale_clause, #u_amount_paid, #paymentPlanSection
+     - Hides: Property Status section
+
+   Ready Property:
+     - Shows: Property Status, Occupancy Status, Service Charge
+     - Shows: #propertyStatusSection, .occupancy-toggle
+     - Hides: Payment Plan Table
+
+   OCCUPANCY TOGGLE (Ready Property only):
+   ┌─────────────────────────────────────────────────────────────┐
+   │ [Owner Occupied] │ [Vacant] │ [Leased]                     │
+   └─────────────────────────────────────────────────────────────┘
+   - #btnOwnerOccupied, #btnVacant, #btnLeased
+   - Leased shows: #u_current_rent, #u_lease_until
 
    BEHAVIOR:
    - JavaScript adds .active class to selected button

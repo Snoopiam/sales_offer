@@ -6,14 +6,52 @@ BETA.CSS - Experimental Features Styles
 PURPOSE: Styles for experimental beta features that can be toggled on/off.
          All beta features are hidden by default until enabled in Settings.
 
-BETA FEATURES INCLUDED:
-1. Zoom Controls - Zoom in/out on A4 preview
-2. Price Per Sq Ft Calculator - Automatic calculation display
-3. Calculator Cards - Three-card summary (Premium %, ADGM %, Agency %)
-4. WhatsApp Button - Share document via WhatsApp (mobile)
-5. Dashboard Modal - Multi-document management system
-6. Enhanced Dropdowns - Autocomplete with custom options
-7. Flatpickr Date Picker - Modern calendar picker for dates
+FRONTEND ACTIVATION:
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ HOW TO ENABLE BETA FEATURES:                                                │
+│                                                                              │
+│ 1. Click #settingsBtn (gear icon in sidebar header)                         │
+│ 2. Go to [About] tab in #settingsModal                                      │
+│ 3. Toggle #betaToggle switch ON                                             │
+│ 4. Click [Save Settings]                                                    │
+│                                                                              │
+│ EFFECT: JavaScript adds .beta-enabled class to <body>                       │
+│         All .beta-feature elements become visible                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+BETA FEATURES MAP:
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ FEATURE                  │ HTML ID/CLASS           │ LOCATION              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ 1. Zoom Controls         │ .zoom-controls          │ #previewArea top-right│
+│    [−] [100%] [+]        │   #zoomOutBtn           │                       │
+│                          │   #zoomLevel            │                       │
+│                          │   #zoomInBtn            │                       │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ 2. Price Per Sq Ft       │ .price-per-sqft         │ Below #u_selling_price│
+│    Shows AED X / sq ft   │   .sqft-label           │                       │
+│                          │   .sqft-value           │                       │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ 3. Calculator Cards      │ .calculator-cards       │ Below Property Details│
+│    [Premium %]           │   .calc-card            │                       │
+│    [ADGM %]              │   .calc-label           │                       │
+│    [Agency %]            │   .calc-value           │                       │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ 4. WhatsApp Button       │ .btn.btn-whatsapp       │ #exportModal footer   │
+│    Share via WhatsApp    │                         │                       │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ 5. Dashboard Modal       │ #dashboardModal         │ Overlay modal         │
+│    Multi-document mgmt   │   .dashboard-grid       │                       │
+│                          │   .dashboard-card       │ One card per document │
+│                          │   #dashboardBtn         │ Trigger in sidebar    │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ 6. Enhanced Dropdowns    │ .dropdown-wrapper       │ #u_unit_model,        │
+│    Autocomplete + custom │   .custom-dropdown      │ #u_unit_type,         │
+│    Type or select        │   .dropdown-item        │ #u_views              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ 7. Flatpickr Date Picker │ .flatpickr-calendar     │ Payment plan dates    │
+│    Modern calendar UI    │                         │                       │
+└─────────────────────────────────────────────────────────────────────────────┘
 
 VISIBILITY TOGGLE:
 All elements with .beta-feature class are hidden unless body has .beta-enabled.
@@ -351,7 +389,41 @@ TECHNOLOGIES:
 }
 
 /* ============================================
-   Dashboard Modal
+   Dashboard Modal (#dashboardModal)
+   ============================================
+   FRONTEND: Multi-document management system (BETA feature)
+   HTML ID: #dashboardModal (triggered by #dashboardBtn in sidebar)
+
+   DASHBOARD STRUCTURE:
+   #dashboardModal
+     ├── .modal-content.modal-large (wider than default)
+     │     ├── .modal-header ("Document Dashboard")
+     │     ├── .modal-body
+     │     │     ├── .dashboard-toolbar
+     │     │     │     ├── [Search input] (filter documents)
+     │     │     │     └── [+ New Document] button
+     │     │     └── .dashboard-grid
+     │     │           ├── .dashboard-card (one per saved document)
+     │     │           │     ├── .card-badge ("CURRENT" for active doc)
+     │     │           │     ├── h4 (project name)
+     │     │           │     ├── .card-unit (unit number)
+     │     │           │     ├── .card-price (selling price)
+     │     │           │     ├── .card-meta (last modified date)
+     │     │           │     └── .card-actions
+     │     │           │           ├── [Load] .card-btn
+     │     │           │           ├── [Export] .card-btn
+     │     │           │           └── [Delete] .card-btn.delete-btn
+     │     │           └── .dashboard-empty (shown when no documents)
+     │     └── .modal-footer [Close]
+
+   CARD STATES:
+   - .dashboard-card: Default state (dark background)
+   - .dashboard-card.current: Currently active document (purple gradient)
+   - .dashboard-card:hover: Elevated with teal border
+
+   DATA STORAGE:
+   Documents stored in localStorage as JSON array.
+   Each document contains: project, unit, price, data, lastModified.
    ============================================ */
 .modal-large {
     max-width: 800px;
@@ -512,7 +584,46 @@ input[list]::-webkit-calendar-picker-indicator {
 }
 
 /* ============================================
-   Custom Dropdown Styles
+   Custom Dropdown Styles (BETA feature)
+   ============================================
+   FRONTEND: Enhanced dropdowns with autocomplete and custom options
+   Used on: #u_unit_model, #u_unit_type, #u_views fields
+
+   DROPDOWN STRUCTURE:
+   .dropdown-wrapper (container)
+     ├── .input-field (text input with autocomplete)
+     ├── .dropdown-arrow-btn (▼ button to open dropdown)
+     │     └── svg (chevron icon)
+     └── .custom-dropdown (floating option list)
+           ├── .dropdown-item (selectable option)
+           ├── .dropdown-item (selectable option)
+           ├── ...
+           └── .dropdown-item.dropdown-custom ("+ Add Custom")
+
+   BEHAVIOR:
+   1. User types → options filter to match
+   2. User clicks arrow → full option list appears
+   3. User selects option → value fills input
+   4. User clicks "+ Add Custom" → can enter custom value
+
+   EXAMPLE (Unit Model dropdown):
+   ┌─────────────────────────────────────────────────────────────┐
+   │ [Studio                                            ] [▼]   │
+   ├─────────────────────────────────────────────────────────────┤
+   │ Studio                                                      │
+   │ 1 Bedroom                                                   │
+   │ 2 Bedroom                                                   │
+   │ 2 Bedroom + Maid                                            │
+   │ 3 Bedroom                                                   │
+   │ 3 Bedroom + Maid                                            │
+   │ ─────────────────────────────────────────────               │
+   │ + Add Custom                                                │
+   └─────────────────────────────────────────────────────────────┘
+
+   STATES:
+   - .hidden: Dropdown list hidden
+   - .dropdown-item.highlighted: Keyboard navigation highlight
+   - :focus-within: Wrapper focused (arrow turns teal)
    ============================================ */
 .dropdown-wrapper {
     position: relative;

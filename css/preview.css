@@ -1,176 +1,257 @@
 /*
 ================================================================================
-PREVIEW.CSS - A4 Document Preview Styles
+PREVIEW.CSS - A4 Document Preview Styles (Base Styles)
 ================================================================================
 
-PURPOSE: Styles for the right panel document preview (#previewArea).
-         Creates a realistic A4 paper appearance with proper dimensions.
+PURPOSE:
+  Base styles for the A4 document preview panel on the right side of the screen.
+  Template-specific overrides (dimensions, spacing) are in css/templates/*.css
+
+FRONTEND LOCATION:
+  - Preview panel: Right side of main screen
+  - Container: #previewArea
+  - Document: #a4Page
+
+HOW TEMPLATES WORK:
+  1. This file defines BASE styles for all elements
+  2. Template files (landscape.css, portrait.css, minimal.css) OVERRIDE specific values
+  3. JavaScript adds template class to #a4Page (e.g., "template-landscape")
+  4. Template selector: Sidebar header dropdown (id="templateSelect")
 
 DOCUMENT STRUCTURE:
-- #a4Page: The paper container (white background, shadow)
-  - .header-bar: Colored stripe at top (brand color)
-  - .logo-area: Company logo (absolute positioned, top right)
-  - .document-header: Title section ("FLOOR PLANS" + Unit Model)
-  - .content-row: Two-column flexbox layout
-    - .column-left: Data tables (Property Details, Financial Breakdown)
-    - .column-right: Floor plan image
-  - .footer-area: Project name + "SALE OFFER"
-  - .created-by-footer: Agent credit line
+  #a4Page
+  ├── .header-bar                    (teal bar at top)
+  ├── .logo-area                     (company logo, top-right)
+  │   └── .logo-img
+  ├── .document-header               (title section)
+  │   ├── .section-label             ("FLOOR PLANS" text)
+  │   └── .main-title                (unit model, e.g., "2 BEDROOM")
+  ├── .content-row                   (two-column layout)
+  │   ├── .column-left               (40% - data tables)
+  │   │   ├── .data-table            (PROPERTY DETAILS)
+  │   │   ├── .data-table            (FINANCIAL BREAKDOWN)
+  │   │   └── .payment-plan-table    (PAYMENT PLAN)
+  │   └── .column-right              (60% - floor plan)
+  │       └── .floorplan-frame
+  │           └── #floorPlanImg
+  ├── .footer-area                   (project name, bottom-right)
+  │   ├── .footer-proj               (PROJECT NAME)
+  │   └── .footer-sub                (SALE OFFER)
+  └── .created-by-footer             (agent credit, bottom-center)
 
-TEMPLATE VARIATIONS:
-Dimensions are defined in css/templates/*.css:
-- landscape.css: 297mm x 210mm (A4 landscape)
-- portrait.css: 210mm x 297mm (A4 portrait)
-- minimal.css: Simplified layout
+TABLE STRUCTURE:
+  .data-table (Property Details, Financial Breakdown)
+  ├── caption.table-title            ("PROPERTY DETAILS")
+  └── tbody
+      └── tr
+          ├── td.row-label           (field name)
+          └── td.row-value           (field value)
 
-TABLE CLASSES:
-- .data-table: Two-column label/value table
-- .payment-plan-table: Payment plan table with headers
-- .row-label: Left column (gray text)
-- .row-value: Right column (dark text, values)
-- .total-row: Highlighted total row
+  .payment-plan-table
+  ├── caption.table-title            ("PAYMENT PLAN 30:70")
+  ├── thead
+  │   └── tr.table-header-row
+  │       ├── th                     (Date of Payment)
+  │       ├── th                     (%)
+  │       └── th                     (Amount AED)
+  └── tbody
+      └── tr (multiple rows)
 
 ================================================================================
 */
 
 /* ============================================
-   A4 PAGE CONTAINER (#a4Page)
+   A4 PAGE CONTAINER
    ============================================
-   This is the white "paper" that simulates an A4 document.
-   Width/height are set in template files (landscape.css, etc.)
-   because they differ per template.
-   ============================================ */
-#a4Page {
-    background: var(--paper-bg);              /* Off-white paper color, easier on eyes than pure white */
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);  /* Drop shadow to make paper "float" above gray background */
-    position: relative;                        /* Needed for absolute positioning of child elements */
-    box-sizing: border-box;                    /* Include padding/border in width calculation */
-    transform-origin: center top;              /* When scaling, scale from top-center (for zoom feature) */
-    overflow: hidden;                          /* Clip anything that overflows the paper edge */
-    border: 1px solid var(--text-secondary);   /* Light border to define paper edge */
-}
+   FRONTEND: The white "paper" document in the preview panel
+   HTML ID: #a4Page
+   LOCATION: Inside #previewArea (right side of screen)
 
-/* Note: Width & height are in css/templates/*.css (landscape=297x210mm, portrait=210x297mm) */
+   This is the root container for the entire sales offer document.
+   Width/height are set per template (landscape=297x210mm, portrait=210x297mm).
+*/
+#a4Page {
+    background: var(--paper-bg);               /* Off-white paper color (#fafafa) */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);   /* Shadow makes paper "float" */
+    position: relative;                        /* For absolute child positioning */
+    box-sizing: border-box;
+    transform-origin: center top;              /* Scale from top-center (zoom feature) */
+    overflow: hidden;                          /* Clip overflow content */
+    border: 1px solid var(--text-secondary);   /* Light border defines edge */
+}
+/* Note: Width & height set in css/templates/*.css */
 
 /* ============================================
-   HEADER BAR (.header-bar)
+   HEADER BAR
    ============================================
-   Colored stripe at very top of document.
-   Uses brand color (teal by default).
-   Positioned absolute so it sits at top edge.
-   ============================================ */
+   FRONTEND: Teal/brand-colored horizontal bar at very top of document
+   HTML CLASS: .header-bar
+   LOCATION: First visible element in #a4Page
+
+   Color set via: Settings modal → Branding tab → Primary Color
+   CSS variable: --primary-color (default #62c6c1)
+*/
 .header-bar {
-    width: 100%;                               /* Full width of paper */
-    height: 8mm;                               /* Fixed height - thin decorative bar */
-    background-color: var(--primary-color, #62c6c1);  /* Brand color, falls back to teal */
-    position: absolute;                        /* Remove from flow, position at top */
+    width: 100%;
+    height: 8mm;                               /* Default height, overridden per template */
+    background-color: var(--primary-color, #62c6c1);
+    position: absolute;
     top: 0;
     left: 0;
-    z-index: 1;                                /* Above paper but below logo */
+    z-index: 1;
 }
 
 /* ============================================
-   LOGO AREA (.logo-area)
+   LOGO AREA
    ============================================
-   Container for company logo in top-right corner.
-   Uses flexbox to center the logo within the area.
-   Positioned absolute to place precisely.
-   ============================================ */
+   FRONTEND: Company logo container in top-right corner
+   HTML CLASS: .logo-area
+   HTML ID (image): #logoImg
+   LOCATION: Absolute positioned, overlaps header bar
+
+   Set via: Settings modal → Branding tab → Upload Logo
+*/
 .logo-area {
-    position: absolute;                        /* Position independently of content flow */
-    top: 12mm;                                 /* Below the header bar (8mm) + small gap */
-    right: 15mm;                               /* Inset from right edge */
-    width: 120px;                              /* Fixed width container for logo */
-    height: 60px;                              /* Fixed height container */
-    display: flex;                             /* Flexbox to center logo */
-    align-items: center;                       /* Vertical center */
-    justify-content: center;                   /* Horizontal center */
+    position: absolute;
+    top: 12mm;                                 /* Below header bar */
+    right: 15mm;                               /* Inset from right */
+    width: 120px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     z-index: 2;                                /* Above header bar */
 }
 
-/* Logo image - scales down to fit container while maintaining aspect ratio */
+/* Logo image - scales to fit container */
 .logo-img {
-    max-height: 55px;                          /* Don't exceed container height minus padding */
-    max-width: 100%;                           /* Don't exceed container width */
-    width: auto;                               /* Maintain aspect ratio */
+    max-height: 55px;
+    max-width: 100%;
+    width: auto;
     object-fit: contain;
 }
 
 /* ============================================
-   DOCUMENT HEADER (.document-header)
+   DOCUMENT HEADER / MAIN TITLE
    ============================================
-   Contains the "FLOOR PLANS" label and the
-   main title (Unit Model, e.g., "1 Bedroom").
-   Positioned below header bar.
-   ============================================ */
+   FRONTEND: Title section showing unit model
+   HTML CLASS: .document-header
+   LOCATION: Below header bar, above content columns
+
+   Contains:
+   - .section-label: Small "FLOOR PLANS" text (optional)
+   - .main-title: Large unit model text (e.g., "2 BEDROOM + MAID")
+
+   Value comes from: Sidebar → Unit Model dropdown (id="select-unit-model")
+   Display element: #disp_title
+*/
 .document-header {
-    margin-bottom: 15px;                       /* Space before content starts */
-    margin-top: 5mm;                           /* Small gap below header bar */
+    margin-bottom: 15px;
+    margin-top: 5mm;
 }
 
-/* "FLOOR PLANS" label - small uppercase text above main title */
+/* Small label above title (e.g., "FLOOR PLANS") */
 .section-label {
-    font-size: 12px;                           /* Small text */
-    color: var(--text-dark);                   /* Dark gray (near black) */
-    letter-spacing: 0.15em;                    /* Wide letter spacing for uppercase text */
-    text-transform: uppercase;                 /* Force uppercase */
-    font-weight: 700;                          /* Bold */
-    margin-bottom: 4px;                        /* Small gap before main title */
+    font-size: 12px;
+    color: var(--text-dark);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 4px;
 }
 
-/* Main title - Large text showing unit model (e.g., "1 Bedroom") */
+/* Main title (e.g., "2 BEDROOM + MAID") */
 .main-title {
-    font-size: 36px;                           /* Large, prominent text */
-    color: var(--text-dark);                   /* Dark gray */
-    font-weight: 900;                          /* Extra bold (black weight) */
-    margin-bottom: 15px;                       /* Space before content */
-    line-height: 1;                            /* Tight line height for large text */
-    letter-spacing: -0.02em;                   /* Slightly tighter letter spacing */
+    font-size: 36px;                           /* Overridden per template */
+    color: var(--text-dark);
+    font-weight: 900;
+    margin-bottom: 15px;
+    line-height: 1;
+    letter-spacing: -0.02em;
 }
 
 /* ============================================
-   CONTENT LAYOUT (.content-row, .column-left, .column-right)
+   CONTENT ROW (Two-Column Layout Container)
    ============================================
-   Two-column layout using flexbox.
-   Left column: Data tables (Property Details, Financial Breakdown)
-   Right column: Floor plan image
-   Widths are set in template CSS files.
-   ============================================ */
+   FRONTEND: Container for left column (tables) and right column (floor plan)
+   HTML CLASS: .content-row
+   LOCATION: Main content area between header and footer
+
+   Default is horizontal flexbox. Portrait template overrides to column.
+*/
 .content-row {
-    display: flex;                             /* Horizontal layout */
-    gap: 30px;                                 /* Space between left and right columns */
+    display: flex;
+    gap: 30px;                                 /* Space between columns */
 }
 
-/* Left column - Contains data tables, stacked vertically */
+/* ============================================
+   LEFT COLUMN - Data Tables Container
+   ============================================
+   FRONTEND: Contains all data tables stacked vertically
+   HTML CLASS: .column-left
+   WIDTH: 40% (landscape), 100% (portrait)
+
+   CONTAINS (in order):
+   1. PROPERTY DETAILS table
+      - HTML ID: #propertyDetailsTable
+      - Fields: Unit No, Unit Type, Views, Internal Area, Balcony, Total Area
+      - Sidebar inputs: #u_unit_number, #u_unit_type, #u_views, etc.
+
+   2. FINANCIAL BREAKDOWN table
+      - HTML ID: #financialTable
+      - Fields: Original Price, Selling Price, Refund, Balance, Premium,
+                Admin Fees, ADGM, Agency Fees, Total Initial Payment
+      - Sidebar inputs: #u_original_price, #u_selling_price, etc.
+
+   3. PROPERTY STATUS table (Ready Property mode only)
+      - HTML ID: #propertyStatusTable
+      - Fields: Project Completion, Age, Ownership, Occupancy, Rent, etc.
+
+   4. PAYMENT PLAN table (Off-Plan mode only)
+      - HTML ID: #previewPaymentPlanTable
+      - Columns: Date of Payment, %, Amount (AED)
+      - Edited via: Sidebar → Payment Plan section
+*/
 .column-left {
-    display: flex;                             /* Stack children vertically */
+    display: flex;
     flex-direction: column;
-    justify-content: flex-start;               /* Align to top */
+    justify-content: flex-start;
 }
 
-/* Right column - Contains floor plan image, centered */
+/* ============================================
+   RIGHT COLUMN - Floor Plan Container
+   ============================================
+   FRONTEND: Contains the floor plan image frame
+   HTML CLASS: .column-right
+   WIDTH: 60% (landscape), 100% (portrait)
+
+   Contains .floorplan-frame which holds #floorPlanImg
+*/
 .column-right {
-    display: flex;                             /* Flexbox for centering */
-    align-items: center;                       /* Vertical center */
-    justify-content: center;                   /* Horizontal center */
-    position: relative;                        /* For absolute positioned children if needed */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
     box-sizing: border-box;
 }
 
 /* ============================================
-   FLOOR PLAN IMAGE (#floorPlanImg)
+   FLOOR PLAN IMAGE
    ============================================
-   The uploaded floor plan image.
-   Contained within col-right.
-   Has subtle shadow for depth.
-   ============================================ */
+   FRONTEND: The uploaded floor plan image
+   HTML ID: #floorPlanImg
+   LOCATION: Inside .floorplan-frame in .column-right
+
+   Uploaded via: Sidebar → Floor Plan section → Upload button
+   Stored as: base64 data URL in localStorage
+*/
 #floorPlanImg {
-    object-fit: contain;                       /* Scale image to fit, maintain aspect ratio */
-    display: block;                            /* Remove inline spacing */
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));  /* Subtle shadow for depth */
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));  /* Subtle shadow */
 }
 
-/* Fixed image frame for consistent layout */
+/* Floor plan frame container */
 .floorplan-frame {
     width: 100%;
     height: 100%;
@@ -182,300 +263,303 @@ TABLE CLASSES:
 }
 
 /* ============================================
-   IMAGE PLACEHOLDER (.img-placeholder)
+   IMAGE PLACEHOLDER
    ============================================
-   Shown when no floor plan image is uploaded.
-   Dashed border indicates "drop zone" for upload.
-   ============================================ */
+   FRONTEND: Shown when no floor plan image is uploaded
+   HTML CLASS: .img-placeholder
+   LOCATION: Inside .floorplan-frame when #floorPlanImg is hidden
+
+   Dashed border indicates "drop zone" / upload area.
+*/
 .img-placeholder {
-    text-align: center;                        /* Center the placeholder text */
-    border: 2px dashed var(--text-secondary);  /* Dashed border = "drop here" visual cue */
-    padding: 40px;                             /* Generous padding for visual balance */
-    border-radius: 8px;                        /* Rounded corners */
-    width: 100%;                               /* Fill container width */
+    text-align: center;
+    border: 2px dashed var(--text-secondary);
+    padding: 40px;
+    border-radius: 8px;
+    width: 100%;
 }
 
-/* Placeholder title text (e.g., "Floor Plan") */
 .placeholder-title {
-    font-weight: 700;                          /* Bold */
+    font-weight: 700;
     font-size: 18px;
-    color: var(--text-gray-medium);            /* Medium gray - WCAG 5.0:1 contrast */
+    color: var(--text-gray-medium);
     margin-bottom: 8px;
 }
 
-/* Placeholder subtitle (e.g., "Upload from left panel") */
 .placeholder-sub {
     font-size: 12px;
-    color: var(--text-gray-medium);            /* Medium gray - WCAG 5.0:1 contrast */
+    color: var(--text-gray-medium);
 }
 
 /* ============================================
-   TABLE TITLE (.table-title) - Now uses <caption>
+   TABLE TITLE (Section Headers)
    ============================================
-   Section header inside each table as <caption>.
-   Examples: "Property Details", "Financial Breakdown", "Payment Plan 30:70"
-   Uses brand color (teal).
+   FRONTEND: Section headers for each table
+   HTML ELEMENT: <caption class="table-title">
+   EXAMPLES: "PROPERTY DETAILS", "FINANCIAL BREAKDOWN", "PAYMENT PLAN 30:70"
 
-   SPACING PATTERN (all inside table):
-   ┌─────────────────────────────┐
-   │                             │ ← padding-top: 8px (breathing room)
-   │ <caption> Table Title       │
-   │                             │ ← padding-bottom: 6px (gap to first row)
-   ├─────────────────────────────┤
-   │ Row 1                       │ ← padding: 3px 0 (row spacing)
-   │ Row 2                       │
-   │ Row 3                       │
-   └─────────────────────────────┘
-                                   ← margin-bottom: 10px (between tables)
-
-   ============================================ */
+   Uses brand teal color by default.
+*/
 .table-title {
-    caption-side: top;                         /* Position caption at top of table */
-    text-align: left;                          /* Left-align like other content */
-    color: var(--primary-color, #62c6c1);      /* Brand teal color */
-    font-weight: 700;                          /* Bold */
-    font-size: 12px;                           /* Small but readable */
-    padding: 8px 0 6px 0;                      /* SPACING: 8px top breathing room, 6px to first row */
-    text-transform: uppercase;                 /* PROPERTY DETAILS */
+    caption-side: top;
+    text-align: left;
+    color: var(--primary-color, #62c6c1);
+    font-weight: 700;
+    font-size: 12px;
+    padding: 8px 0 6px 0;
+    text-transform: uppercase;
 }
 
-/* First table caption - no top padding needed */
+/* First table - no top padding needed */
 .data-table:first-of-type .table-title {
     padding-top: 0;
 }
 
 /* ============================================
-   DATA TABLES (.data-table)
+   DATA TABLES
    ============================================
-   Two-column tables for Property Details and
-   Financial Breakdown. Label on left, value on right.
+   FRONTEND: Two-column tables (label | value)
+   HTML CLASS: .data-table
+   HTML IDs: #propertyDetailsTable, #financialTable, #propertyStatusTable
 
-   Structure:
-   | row-label (65%)  | row-value (35%) |
-   | Project Name     | The Palms       |
-   | Unit No          | 1-2-301         |
-
-   SPACING: Table to next header = 12px (margin-bottom)
-   ============================================ */
+   Used for Property Details and Financial Breakdown sections.
+*/
 .data-table {
-    width: 100%;                               /* Full width of container */
-    border-collapse: separate;                 /* Needed for border-spacing */
-    border-spacing: 0;                         /* No gaps between cells */
-    font-size: 0.625rem;                       /* 10px - Small text to fit more data */
-    margin-bottom: 10px;                       /* SPACING: Between tables = 10px */
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.625rem;                       /* 10px */
+    margin-bottom: 10px;
 }
 
-/* Table header cells (th) - Used in Payment Plan table */
+/* Table header cells */
 .data-table th {
-    text-align: left;                          /* Left-align header text */
-    color: var(--primary-color, #62c6c1);      /* Brand teal */
-    font-weight: 700;                          /* Bold */
-    padding: 3px 0;                            /* SPACING: Same as td = 3px vertical */
-    border-bottom: 1px solid var(--border-light);  /* Light gray divider line */
-    background-color: transparent;             /* No background */
-    text-transform: capitalize;                /* First Letter Caps */
+    text-align: left;
+    color: var(--primary-color, #62c6c1);
+    font-weight: 700;
+    padding: 3px 0;
+    border-bottom: 1px solid var(--border-light);
+    background-color: transparent;
+    text-transform: capitalize;
 }
 
-/* Header row variant - for tables with header rows */
+/* Header row variant */
 .table-header-row th {
     text-align: left;
-    border-bottom: none;                       /* No border for this variant */
-    font-size: 0.6875rem;                      /* 11px - Slightly larger than body */
-    padding: 3px 0;                            /* SPACING: Same as td = 3px vertical */
+    border-bottom: none;
+    font-size: 0.6875rem;                      /* 11px */
+    padding: 3px 0;
     color: var(--primary-color, #62c6c1);
     font-weight: 700;
 }
 
-/* Table data cells (td) - Label and value cells
-   SPACING: Row height controlled by padding = 3px top + 3px bottom = 6px per row */
+/* Table data cells */
 .data-table td {
-    padding: 3px 0;                            /* SPACING: 3px vertical = 6px row height */
-    border-bottom: 1px solid var(--border-lighter);  /* Very light divider between rows */
-    color: var(--border-color);                /* Dark gray text */
-    vertical-align: middle;                    /* Center content vertically */
+    padding: 3px 0;
+    border-bottom: 1px solid var(--border-lighter);
+    color: var(--border-color);
+    vertical-align: middle;
 }
 
-/* First column (labels) - Add right padding for gap */
+/* First column - label cell */
 .data-table td:first-child {
-    padding-right: 10px;                       /* Gap between label and value */
+    padding-right: 10px;
 }
 
-/* Last column (values) - Right-aligned, add left padding */
+/* Last column - value cell (right-aligned) */
 .data-table td:last-child {
-    padding-left: 10px;                        /* Gap between label and value */
-    text-align: right;                         /* Right-align values (numbers) */
+    padding-left: 10px;
+    text-align: right;
 }
 
 /* ============================================
-   ROW LABEL (.row-label)
+   ROW LABEL
    ============================================
-   Left column of data tables.
-   Contains field names like "Project Name", "Unit No".
-   Takes up 65% of table width.
-   ============================================ */
+   FRONTEND: Left column of data tables - field names
+   HTML CLASS: .row-label
+   EXAMPLES: "Unit No", "Selling Price", "Agency Fees"
+
+   Display elements have IDs like: #disp_row_unit_number, #disp_row_selling_price
+*/
 .row-label {
-    font-weight: 600;                          /* Semi-bold for labels */
-    width: 65%;                                /* Label takes 65%, value gets 35% */
-    color: var(--text-gray);                   /* Medium-dark gray */
+    font-weight: 600;
+    width: 65%;
+    color: var(--text-gray);
 }
 
 /* ============================================
-   ROW VALUE (.row-value)
+   ROW VALUE
    ============================================
-   Right column of data tables.
-   Contains actual values like "The Palms", "AED 2,500,000".
-   Darker text for emphasis since these are the key data.
-   ============================================ */
+   FRONTEND: Right column of data tables - field values
+   HTML CLASS: .row-value, .row-value-bold
+   EXAMPLES: "AED 2,500,000", "1,092.32 Sq.Ft"
+
+   Display elements have IDs like: #disp_selling_price, #disp_total_area
+*/
 .row-value {
-    font-weight: 500;                          /* Medium weight */
-    color: var(--text-emphasis);               /* Near-black for emphasis */
+    font-weight: 500;
+    color: var(--text-emphasis);
 }
 
-/* Bold row value - for emphasis on important fields like Total Area */
 .row-value-bold {
-    font-weight: 700;                          /* Bold for emphasis */
+    font-weight: 700;
     color: var(--text-emphasis);
 }
 
 /* ============================================
-   DIVIDER ROW (.divider-row)
+   DIVIDER ROW
    ============================================
-   Empty row used to create visual separation
-   between groups of related fields.
-   Example: Between price fields and fee fields.
-
-   SPACING: More padding than regular rows to
-   create visual "reset" for the eye.
-   ============================================ */
+   FRONTEND: Empty row for visual separation between field groups
+   HTML CLASS: .divider-row
+   EXAMPLE: Between price fields and fee fields in Financial table
+*/
 .divider-row {
-    height: 12px;                              /* SPACING: Larger gap to reset visual rhythm */
-    border-bottom: none !important;            /* Remove default row border */
+    height: 12px;
+    border-bottom: none !important;
 }
 
 /* ============================================
-   TOTAL ROW (.total-row)
+   TOTAL ROW
    ============================================
-   The "Total Initial Payment" row at bottom of
-   Financial Breakdown table.
+   FRONTEND: "Total Initial Payment" row at bottom of Financial table
+   HTML CLASS: .total-row
+   HTML ID: #disp_row_total, value in #disp_total
+
    Visually distinct with top border and larger text.
-   ============================================ */
+*/
 .total-row td {
-    border-top: 2px solid var(--border-light); /* Thicker top border as separator */
-    border-bottom: none;                       /* No bottom border (last row) */
-    font-weight: 800;                          /* Extra bold for emphasis */
-    color: var(--text-dark);                   /* Dark text */
-    padding-top: 8px;                          /* Extra space above for separation */
-    padding-bottom: 0;                         /* No space below - tight to next table */
-    font-size: 0.6875rem;                      /* 11px - Slightly larger than other rows */
+    border-top: 2px solid var(--border-light);
+    border-bottom: none;
+    font-weight: 800;
+    color: var(--text-dark);
+    padding-top: 8px;
+    padding-bottom: 0;
+    font-size: 0.6875rem;                      /* 11px */
 }
 
 /* ============================================
-   PAYMENT PLAN TABLE (.payment-plan-table)
+   PAYMENT PLAN TABLE
    ============================================
-   Three-column table showing payment schedule.
-   Columns: Milestone | Date | Amount
-   Example:
-   | 20%   | On booking     | AED 500,000  |
-   | 40%   | 30 days        | AED 1,000,000|
+   FRONTEND: Payment milestones table (Off-Plan Resale mode only)
+   HTML CLASS: .payment-plan-table
+   HTML ID: #previewPaymentPlanTable
+   LOCATION: Below Financial table in .column-left
 
-   SPACING RULES (same as data-table):
-   - Header to rows: 4px (via .table-title margin-bottom)
-   - Row padding: 3px top + 3px bottom = 6px per row
-   - Table to next: 12px (via margin-bottom)
-   ============================================ */
+   Columns:
+   1. Date of Payment (left-aligned)
+   2. % (center-aligned)
+   3. Amount AED (right-aligned)
+
+   Edited via: Sidebar → Payment Plan section → Add/Edit rows
+   Rows are sortable (drag to reorder)
+*/
 .payment-plan-table {
-    margin-top: 0 !important;                  /* Override any default table margins */
+    margin-top: 0 !important;
 }
 
 .payment-plan-table th {
-    font-size: 0.6875rem;                      /* 11px - Slightly smaller than data-table */
-    padding: 3px 0;                            /* SPACING: Same as data-table rows */
-    border-bottom: none;                       /* Remove bottom border */
+    font-size: 0.6875rem;                      /* 11px */
+    padding: 3px 0;
+    border-bottom: none;
 }
 
 .payment-plan-table td {
-    padding: 3px 0;                            /* SPACING: Same as data-table = 3px vertical */
+    padding: 3px 0;
 }
 
-/* First column (Date) - left aligned */
+/* Column 1: Date of Payment - left aligned */
 .payment-plan-table th:nth-child(1),
 .payment-plan-table td:nth-child(1) {
     text-align: left;
 }
 
-/* Middle column (%) - centered */
+/* Column 2: Percentage - centered */
 .payment-plan-table th:nth-child(2),
 .payment-plan-table td:nth-child(2) {
     text-align: center;
 }
 
-/* Last column (amounts) - right aligned for numbers */
+/* Column 3: Amount - right aligned */
 .payment-plan-table th:nth-child(3),
 .payment-plan-table td:nth-child(3) {
     text-align: right;
 }
 
 /* ============================================
-   FOOTNOTE (.footnote)
+   FOOTNOTE / DISCLAIMER
    ============================================
-   Small italic text at bottom of document.
-   Used for disclaimers, notes, conditions.
-   ============================================ */
+   FRONTEND: Small disclaimer text at bottom of left column
+   HTML CLASS: .footnote
+   LOCATION: Below payment plan table
+
+   Optional text, usually for legal disclaimers.
+*/
 .footnote {
-    margin-top: 15px;                          /* Space above footnote */
-    font-size: 0.5625rem;                      /* 9px - Very small text */
-    color: var(--text-gray);                   /* Medium gray - WCAG 7.2:1 contrast */
-    font-style: italic;                        /* Italic for footnote convention */
-    max-width: 60%;                            /* Don't stretch too wide */
+    margin-top: 15px;
+    font-size: 0.5625rem;                      /* 9px */
+    color: var(--text-gray);
+    font-style: italic;
+    max-width: 60%;
 }
 
 /* ============================================
-   FOOTER AREA (.footer-area)
+   FOOTER AREA (Project Name & Sale Offer)
    ============================================
-   Bottom-right corner of document.
-   Shows project name and "SALE OFFER" label.
-   Positioned absolute relative to #a4Page.
-   ============================================ */
+   FRONTEND: Project name and "SALE OFFER" in bottom-right corner
+   HTML CLASS: .footer-area
+   LOCATION: Absolute positioned, bottom-right of #a4Page
+
+   Contains:
+   - .footer-proj: Project name (e.g., "REEM ELEVEN")
+     HTML ID: #disp_project_footer
+   - .footer-sub: "SALE OFFER" text
+
+   Project name from: Sidebar → Project Name input (id="input-project-name")
+*/
 .footer-area {
-    position: absolute;                        /* Position relative to #a4Page */
-    bottom: 12mm;                              /* Distance from bottom edge */
-    right: 15mm;                               /* Distance from right edge */
-    text-align: right;                         /* Right-align text */
+    position: absolute;
+    bottom: 12mm;
+    right: 15mm;
+    text-align: right;
 }
 
-/* Project name in footer - bold uppercase */
+/* Project name */
 .footer-proj {
-    font-weight: 900;                          /* Extra bold */
+    font-weight: 900;
     font-size: 14px;
-    color: var(--text-dark);                   /* Dark gray */
-    text-transform: uppercase;                 /* PROJECT NAME */
-    letter-spacing: 0.05em;                    /* Slight letter spacing */
+    color: var(--text-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
-/* "SALE OFFER" text in teal below project name */
+/* "SALE OFFER" subtitle */
 .footer-sub {
-    font-size: 0.625rem; /* 10px */
-    color: var(--primary-color, #62c6c1);      /* Brand teal color */
-    letter-spacing: 0.2em;                     /* Wide letter spacing */
+    font-size: 0.625rem;                       /* 10px */
+    color: var(--primary-color, #62c6c1);
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-    margin-top: 2px;                           /* Small gap above */
+    margin-top: 2px;
 }
 
 /* ============================================
-   CREATED BY FOOTER (.created-by-footer)
+   CREATED BY FOOTER (Agent Credit Line)
    ============================================
-   Bottom-center of document.
-   Shows agent name: "Created by [Agent Name]"
-   Centered horizontally, very bottom of page.
-   ============================================ */
+   FRONTEND: Small centered text at very bottom of document
+   HTML CLASS: .created-by-footer
+   HTML ID: #createdByText (the text content)
+   LOCATION: Absolute positioned, bottom-center of #a4Page
+
+   Shows: "Created by [Agent Name]"
+   Set via: Settings modal → Branding tab → Created By field
+*/
 .created-by-footer {
-    position: absolute;                        /* Position relative to #a4Page */
-    bottom: 5mm;                               /* Very bottom of page */
-    left: 15mm;                                /* Inset from both sides */
+    position: absolute;
+    bottom: 5mm;
+    left: 15mm;
     right: 15mm;
-    text-align: center;                        /* Center the text */
+    text-align: center;
     font-size: 8px;
-    color: var(--text-gray-medium); /* Improved from #9ca3af for better contrast (5.0:1 vs #fafafa) */
+    color: var(--text-gray-medium);
     text-transform: uppercase;
     letter-spacing: 0.03em;
     white-space: nowrap;
@@ -483,14 +567,18 @@ TABLE CLASSES:
     text-overflow: ellipsis;
 }
 
+/* ============================================
+   SCREEN MEDIA ADJUSTMENTS
+   ============================================
+   Slightly larger fonts for screen display.
+   Print uses the base sizes above.
+*/
 @media screen {
     .footnote {
-        font-size: 0.625rem; /* 10px */
+        font-size: 0.625rem;                   /* 10px on screen */
     }
 
     .created-by-footer {
-        font-size: 0.5625rem; /* 9px */
+        font-size: 0.5625rem;                  /* 9px on screen */
     }
 }
-
-/* NOTE: .pull-up-tight class removed - use consistent spacing instead */
