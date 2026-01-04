@@ -260,7 +260,7 @@ describe('Excel Import Module', () => {
 
                 expect(mockXLSX.read).toHaveBeenCalled();
                 expect(setValue).toHaveBeenCalledWith('input-project-name', 'Marina Heights');
-                expect(setValue).toHaveBeenCalledWith('u_unit_number', 'A-101');
+                expect(setValue).toHaveBeenCalledWith('input-unit-number', 'A-101');
                 expect(runAllCalculations).toHaveBeenCalled();
             });
 
@@ -396,14 +396,14 @@ describe('Excel Import Module', () => {
             expect(setValue).toHaveBeenCalledWith('input-project-name', 'Test Project');
         });
 
-        it('maps Unit No label to u_unit_number field', async () => {
+        it('maps Unit No label to input-unit-number field', async () => {
             await triggerFileLoad([
                 ['Project Name', 'Test'],
                 ['Unit No', 'A-101'],
                 ['Original Price', 1000000]
             ]);
 
-            expect(setValue).toHaveBeenCalledWith('u_unit_number', 'A-101');
+            expect(setValue).toHaveBeenCalledWith('input-unit-number', 'A-101');
         });
 
         it('parses numeric values correctly', async () => {
@@ -414,8 +414,8 @@ describe('Excel Import Module', () => {
                 ['Internal Area (sq.ft)', 1500.5]
             ]);
 
-            expect(setValue).toHaveBeenCalledWith('u_original_price', 2500000);
-            expect(setValue).toHaveBeenCalledWith('u_selling_price', 2800000);
+            expect(setValue).toHaveBeenCalledWith('input-original-price', 2500000);
+            expect(setValue).toHaveBeenCalledWith('input-selling-price', 2800000);
             expect(setValue).toHaveBeenCalledWith('input-internal-area', 1500.5);
         });
 
@@ -427,8 +427,8 @@ describe('Excel Import Module', () => {
                 ['Original Price', 1000000]
             ]);
 
-            expect(setValue).toHaveBeenCalledWith('u_amount_paid_percent', 30);
-            expect(setValue).toHaveBeenCalledWith('u_resale_clause', 5);
+            expect(setValue).toHaveBeenCalledWith('input-amount-paid-percent', 30);
+            expect(setValue).toHaveBeenCalledWith('input-resale-clause', 5);
         });
 
         it('does not convert already whole percentages', async () => {
@@ -438,7 +438,7 @@ describe('Excel Import Module', () => {
                 ['Original Price', 1000000]
             ]);
 
-            expect(setValue).toHaveBeenCalledWith('u_amount_paid_percent', 30);
+            expect(setValue).toHaveBeenCalledWith('input-amount-paid-percent', 30);
         });
 
         it('normalizes Views values', async () => {
@@ -448,7 +448,7 @@ describe('Excel Import Module', () => {
                 ['Original Price', 1000000]
             ]);
 
-            expect(setValue).toHaveBeenCalledWith('u_views', 'Sea View');
+            expect(setValue).toHaveBeenCalledWith('select-views', 'Sea View');
         });
 
         it('skips calculated fields (refund, premium, total initial)', async () => {
@@ -475,7 +475,7 @@ describe('Excel Import Module', () => {
                 ['Original Price', 1000000]
             ]);
 
-            expect(setValue).toHaveBeenCalledWith('u_unit_model', '2BR + Maid + Laundry');
+            expect(setValue).toHaveBeenCalledWith('select-unit-model', '2BR + Maid + Laundry');
         });
 
         it('handles Unit Model without extras', async () => {
@@ -486,7 +486,7 @@ describe('Excel Import Module', () => {
                 ['Original Price', 1000000]
             ]);
 
-            expect(setValue).toHaveBeenCalledWith('u_unit_model', 'Studio');
+            expect(setValue).toHaveBeenCalledWith('select-unit-model', 'Studio');
         });
 
         it('skips empty or null values', async () => {
@@ -497,8 +497,8 @@ describe('Excel Import Module', () => {
                 ['Original Price', 1000000]
             ]);
 
-            expect(setValue).not.toHaveBeenCalledWith('u_unit_number', '');
-            expect(setValue).not.toHaveBeenCalledWith('u_views', null);
+            expect(setValue).not.toHaveBeenCalledWith('input-unit-number', '');
+            expect(setValue).not.toHaveBeenCalledWith('select-views', null);
         });
 
         it('skips rows with empty labels', async () => {
@@ -790,21 +790,21 @@ describe('Excel Import Module', () => {
             ]);
 
             expect(setValue).toHaveBeenCalledWith('input-project-name', 'Marina Heights');
-            expect(setValue).toHaveBeenCalledWith('u_unit_number', 'A-101');
-            expect(setValue).toHaveBeenCalledWith('u_unit_type', 'Apartment');
-            expect(setValue).toHaveBeenCalledWith('u_views', 'Sea View');
+            expect(setValue).toHaveBeenCalledWith('input-unit-number', 'A-101');
+            expect(setValue).toHaveBeenCalledWith('input-unit-type', 'Apartment');
+            expect(setValue).toHaveBeenCalledWith('select-views', 'Sea View');
             expect(setValue).toHaveBeenCalledWith('input-internal-area', 1200);
             expect(setValue).toHaveBeenCalledWith('input-balcony-area', 100);
             expect(setValue).toHaveBeenCalledWith('input-total-area', 1300);
-            expect(setValue).toHaveBeenCalledWith('u_original_price', 2500000);
-            expect(setValue).toHaveBeenCalledWith('u_selling_price', 2800000);
-            expect(setValue).toHaveBeenCalledWith('u_amount_paid_percent', 30);
-            expect(setValue).toHaveBeenCalledWith('u_resale_clause', 5);
-            expect(setValue).toHaveBeenCalledWith('u_balance_resale', 50000);
+            expect(setValue).toHaveBeenCalledWith('input-original-price', 2500000);
+            expect(setValue).toHaveBeenCalledWith('input-selling-price', 2800000);
+            expect(setValue).toHaveBeenCalledWith('input-amount-paid-percent', 30);
+            expect(setValue).toHaveBeenCalledWith('input-resale-clause', 5);
+            expect(setValue).toHaveBeenCalledWith('input-balance-resale', 50000);
             expect(setValue).toHaveBeenCalledWith('input-admin-fees', 10000);
-            expect(setValue).toHaveBeenCalledWith('u_adgm_transfer', 50000);
-            expect(setValue).toHaveBeenCalledWith('u_adgm_termination_fee', 1500);
-            expect(setValue).toHaveBeenCalledWith('u_adgm_electronic_fee', 500);
+            expect(setValue).toHaveBeenCalledWith('input-adgm-transfer', 50000);
+            expect(setValue).toHaveBeenCalledWith('input-adgm-termination-fee', 1500);
+            expect(setValue).toHaveBeenCalledWith('input-adgm-electronic-fee', 500);
             expect(setValue).toHaveBeenCalledWith('input-agency-fees', 58800);
         });
 
@@ -816,8 +816,8 @@ describe('Excel Import Module', () => {
             ]);
 
             expect(setValue).toHaveBeenCalledWith('input-project-name', 'Test');
-            expect(setValue).toHaveBeenCalledWith('u_unit_number', 'B-202');
-            expect(setValue).toHaveBeenCalledWith('u_original_price', 1000000);
+            expect(setValue).toHaveBeenCalledWith('input-unit-number', 'B-202');
+            expect(setValue).toHaveBeenCalledWith('input-original-price', 1000000);
         });
 
         it('handles labels with extra whitespace', async () => {
@@ -828,8 +828,8 @@ describe('Excel Import Module', () => {
             ]);
 
             expect(setValue).toHaveBeenCalledWith('input-project-name', 'Test');
-            expect(setValue).toHaveBeenCalledWith('u_unit_number', 'C-303');
-            expect(setValue).toHaveBeenCalledWith('u_original_price', 1000000);
+            expect(setValue).toHaveBeenCalledWith('input-unit-number', 'C-303');
+            expect(setValue).toHaveBeenCalledWith('input-original-price', 1000000);
         });
     });
 });

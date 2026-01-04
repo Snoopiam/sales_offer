@@ -106,9 +106,9 @@ const calculations = {
      * BUA typically includes internal + terrace.
      * GFA includes all enclosed areas.
      */
-    u_built_up_area: () => {
-        const internal = getNumericValue('u_villa_internal');  // Villa internal area
-        const terrace = getNumericValue('u_villa_terrace');    // Terrace area
+    'input-built-up-area': () => {
+        const internal = getNumericValue('input-villa-internal');  // Villa internal area
+        const terrace = getNumericValue('input-villa-terrace');    // Terrace area
         const total = internal + terrace;
         return total > 0 ? `${total.toFixed(2)} Sq.Ft` : '';
     },
@@ -131,9 +131,9 @@ const calculations = {
      * - Refund = 2,000,000 × 0.20 = AED 400,000
      */
     'input-refund-amount': () => {
-        const original = getNumericValue('u_original_price');              // Original purchase price
-        const amountPaidPercent = getNumericValue('u_amount_paid_percent');  // % paid to developer
-        const amountPaid = getNumericValue('u_amount_paid');      // Direct AED amount paid
+        const original = getNumericValue('input-original-price');              // Original purchase price
+        const amountPaidPercent = getNumericValue('input-amount-paid-percent');  // % paid to developer
+        const amountPaid = getNumericValue('input-amount-paid');      // Direct AED amount paid
 
         // PRIORITY 1: If direct amount is provided, use it (user knows exact amount)
         if (amountPaid > 0) {
@@ -169,11 +169,11 @@ const calculations = {
      * - Amount Paid: 20%
      * - Balance = (40% - 20%) × 2,000,000 = AED 400,000
      */
-    u_balance_resale: () => {
-        const original = getNumericValue('u_original_price');
-        const resaleClausePercent = getNumericValue('u_resale_clause');
-        const amountPaidPercent = getNumericValue('u_amount_paid_percent');
-        const amountPaid = getNumericValue('u_amount_paid');
+    'input-balance-resale': () => {
+        const original = getNumericValue('input-original-price');
+        const resaleClausePercent = getNumericValue('input-resale-clause');
+        const amountPaidPercent = getNumericValue('input-amount-paid-percent');
+        const amountPaid = getNumericValue('input-amount-paid');
 
         // Need both values to calculate
         if (!original || !resaleClausePercent) return 0;
@@ -208,8 +208,8 @@ const calculations = {
      * - Premium: AED 500,000
      */
     'input-premium-amount': () => {
-        const selling = getNumericValue('u_selling_price');
-        const original = getNumericValue('u_original_price');
+        const selling = getNumericValue('input-selling-price');
+        const original = getNumericValue('input-original-price');
         return selling - original;  // Can be negative
     },
 
@@ -227,8 +227,8 @@ const calculations = {
      * - Original: AED 1,960,000
      * - ADGM: 1,960,000 × 0.02 = AED 39,200
      */
-    u_adgm_transfer: () => {
-        const original = getNumericValue('u_original_price');
+    'input-adgm-transfer': () => {
+        const original = getNumericValue('input-original-price');
         return Math.round(original * 0.02);  // 2% of original price
     },
 
@@ -250,7 +250,7 @@ const calculations = {
      * - Total: AED 52,500
      */
     'input-agency-fees': () => {
-        const selling = getNumericValue('u_selling_price');
+        const selling = getNumericValue('input-selling-price');
         const base = selling * 0.02;           // 2% agency commission
         return Math.round(base * 1.05);        // Add 5% VAT to the commission
     }
@@ -269,15 +269,15 @@ const calculations = {
  * - u_resale_clause, u_amount_paid_percent, u_amount_paid: Affect Refund and Balance
  */
 const triggerFields = [
-    'u_original_price',              // Original Price → ADGM, Premium, Refund, Balance
-    'u_selling_price',              // Selling Price → Premium, Agency Fees
+    'input-original-price',              // Original Price → ADGM, Premium, Refund, Balance
+    'input-selling-price',              // Selling Price → Premium, Agency Fees
     'input-internal-area',          // Internal Area → Total Area
     'input-balcony-area',           // Balcony Area → Total Area
-    'u_villa_internal',    // Villa Internal → BUA
-    'u_villa_terrace',     // Villa Terrace → BUA
-    'u_resale_clause',      // Resale Clause % → Balance
-    'u_amount_paid_percent', // Amount Paid % → Refund, Balance
-    'u_amount_paid'         // Amount Paid AED → Refund, Balance
+    'input-villa-internal',    // Villa Internal → BUA
+    'input-villa-terrace',     // Villa Terrace → BUA
+    'input-resale-clause',      // Resale Clause % → Balance
+    'input-amount-paid-percent', // Amount Paid % → Refund, Balance
+    'input-amount-paid'         // Amount Paid AED → Refund, Balance
 ];
 
 /**
@@ -383,9 +383,9 @@ export function calculateTotal() {
 
     // Get fee values (same for both categories)
     const admin = getNumericValue('input-admin-fees');              // Admin Fees (SAAS)
-    const adgm = getNumericValue('u_adgm_transfer');             // ADGM 2% fee
-    const adgmTermination = getNumericValue('u_adgm_termination_fee');   // ADGM Termination Fee
-    const adgmElectronic = getNumericValue('u_adgm_electronic_fee');    // ADGM Electronic Fee
+    const adgm = getNumericValue('input-adgm-transfer');             // ADGM 2% fee
+    const adgmTermination = getNumericValue('input-adgm-termination-fee');   // ADGM Termination Fee
+    const adgmElectronic = getNumericValue('input-adgm-electronic-fee');    // ADGM Electronic Fee
     const agency = getNumericValue('input-agency-fees');          // Agency commission + VAT
 
     let total;
@@ -395,7 +395,7 @@ export function calculateTotal() {
         // READY PROPERTY FORMULA
         // ========================================
         // Buyer pays: Full selling price + All fees
-        const selling = getNumericValue('u_selling_price');
+        const selling = getNumericValue('input-selling-price');
         total = selling + admin + adgm + adgmTermination + adgmElectronic + agency;
     } else {
         // ========================================
@@ -403,7 +403,7 @@ export function calculateTotal() {
         // ========================================
         // Buyer pays: Amount to seller + Amount to developer + Premium + Fees
         const refund = getNumericValue('input-refund-amount');    // Goes to original buyer
-        const balance = getNumericValue('u_balance_resale');    // Goes to developer
+        const balance = getNumericValue('input-balance-resale');    // Goes to developer
         const premium = getNumericValue('input-premium-amount');   // Profit for seller
         total = refund + balance + premium + admin + adgm + adgmTermination + adgmElectronic + agency;
     }
@@ -450,7 +450,7 @@ export function initCalculator() {
     // ========================================
     // These fields affect total but aren't auto-calculated
     // (user enters them manually)
-    ['input-admin-fees', 'u_adgm_termination_fee', 'u_adgm_electronic_fee'].forEach(fieldId => {
+    ['input-admin-fees', 'input-adgm-termination-fee', 'input-adgm-electronic-fee'].forEach(fieldId => {
         const el = getById(fieldId);
         if (el) {
             el.addEventListener('input', calculateTotal);  // Only update total, not other fields

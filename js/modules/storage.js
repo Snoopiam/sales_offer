@@ -181,7 +181,7 @@ const defaultState = {
         balance: 'Balance Resale Clause',
         premium: 'Premium (Selling Price - Original Price)',
         admin: 'Admin Fees (SAAS)',
-        adgm: 'ADGM (2% of Original Price)',
+        adgm: 'ADGM Reg. Fee (2% of Original Price)',
         agency: 'Agency Fees (2% of Selling Price + VAT)'
     },
 

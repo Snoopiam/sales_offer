@@ -56,7 +56,7 @@ describe('Category Module', () => {
             <input id="u_servicecharge" value="">
             <span id="showOriginalLabel"></span>
             <span id="showPropertyStatusLabel"></span>
-            <div id="disp_row_orig"></div>
+            <div id="disp_row_original_price"></div>
             <div id="disp_row_property_status"></div>
         `;
     });

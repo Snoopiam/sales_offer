@@ -16,6 +16,14 @@ vi.mock('../js/modules/templates.js', () => ({
     getCurrentTemplate: vi.fn()
 }));
 
+// Mock the fonts module
+vi.mock('../js/fonts/montserrat-fonts.js', () => ({
+    MontserratBlack: 'mock-black-font-base64',
+    MontserratBold: 'mock-bold-font-base64',
+    MontserratSemiBold: 'mock-semibold-font-base64',
+    MontserratRegular: 'mock-regular-font-base64'
+}));
+
 import { generateTextPDF } from '../js/modules/pdfGenerator.js';
 import { getById, getValue } from '../js/utils/helpers.js';
 import { getCurrentTemplate } from '../js/modules/templates.js';
@@ -41,7 +49,9 @@ describe('PDF Generator Module', () => {
             line: vi.fn(),
             text: vi.fn(),
             addImage: vi.fn(),
-            save: vi.fn()
+            save: vi.fn(),
+            addFileToVFS: vi.fn(),
+            addFont: vi.fn()
         };
 
         // Mock jsPDF as a class constructor
@@ -220,24 +230,24 @@ describe('PDF Generator Module', () => {
             expect(mockDoc.addImage).toHaveBeenCalledWith(
                 'data:image/png;base64,logo123',
                 'PNG',
-                expect.any(Number),
-                expect.any(Number),
-                35,
-                17,
+                expect.any(Number), // logoX
+                expect.any(Number), // logoY
+                34, // 130px ≈ 34mm
+                17, // 65px ≈ 17mm
                 undefined,
                 'FAST'
             );
         });
 
-        it('skips logo when src contains KP_blACK', async () => {
+        it('includes default logo (KP_blACK) to match live preview', async () => {
             mockElements.logoImg.src = 'path/to/KP_blACK_logo.png';
 
             await generateTextPDF('test');
 
-            // Logo addImage should not be called for the logo
+            // Logo should now be included to match live preview
             const addImageCalls = mockDoc.addImage.mock.calls;
             const logoCalls = addImageCalls.filter(call => call[0].includes('KP_blACK'));
-            expect(logoCalls.length).toBe(0);
+            expect(logoCalls.length).toBe(1);
         });
 
         it('skips logo when logoImg is not found', async () => {
@@ -267,7 +277,7 @@ describe('PDF Generator Module', () => {
     describe('drawMainTitle', () => {
         it('uses unit model value for title', async () => {
             getValue.mockImplementation((id) => {
-                if (id === 'u_unit_model') return '3BR + Maid + Laundry';
+                if (id === 'select-unit-model') return '3BR + Maid + Laundry';
                 return '';
             });
 
@@ -293,7 +303,7 @@ describe('PDF Generator Module', () => {
             );
         });
 
-        it('falls back to default when both are unavailable', async () => {
+        it('falls back to dash when both are unavailable', async () => {
             getValue.mockReturnValue('');
             getById.mockImplementation((id) => {
                 if (id === 'disp_title') return null;
@@ -303,7 +313,7 @@ describe('PDF Generator Module', () => {
             await generateTextPDF('test');
 
             expect(mockDoc.text).toHaveBeenCalledWith(
-                '1 BEDROOM',
+                '-',
                 expect.any(Number),
                 expect.any(Number)
             );
@@ -539,14 +549,15 @@ describe('PDF Generator Module', () => {
             );
         });
 
-        it('skips floor plan when src contains Asset', async () => {
+        it('includes placeholder floor plan (Asset) to match live preview', async () => {
             mockElements.floorPlanImg.src = 'path/to/Asset_placeholder.png';
 
             await generateTextPDF('test');
 
+            // Floor plan should now be included to match live preview
             const addImageCalls = mockDoc.addImage.mock.calls;
             const floorPlanCalls = addImageCalls.filter(call => call[0].includes('Asset'));
-            expect(floorPlanCalls.length).toBe(0);
+            expect(floorPlanCalls.length).toBe(1);
         });
 
         it('skips floor plan when floorPlanImg is not found', async () => {

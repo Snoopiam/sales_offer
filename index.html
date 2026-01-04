@@ -255,20 +255,20 @@ ACCESSIBILITY:
         <fieldset class="grid-2 fieldset-reset">
             <legend class="visually-hidden">Unit identification</legend>
             <div class="input-group">
-                <label class="input-label" for="u_unit_number">Unit No</label>
-                <input type="text" id="u_unit_number" class="input-field" data-field="unitNo" placeholder="e.g., 05 Layout">
+                <label class="input-label" for="input-unit-number">Unit No</label>
+                <input type="text" id="input-unit-number" class="input-field" data-field="unitNo" placeholder="e.g., 05 Layout">
             </div>
             <div class="input-group">
-                <label class="input-label" for="u_unit_type">Unit Type</label>
-                <input type="text" id="u_unit_type" class="input-field" data-field="unitType" placeholder="e.g., Apartment">
+                <label class="input-label" for="input-unit-type">Unit Type</label>
+                <input type="text" id="input-unit-type" class="input-field" data-field="unitType" placeholder="e.g., Apartment">
             </div>
         </fieldset>
 
         <fieldset class="grid-2 fieldset-reset">
             <legend class="visually-hidden">Unit details</legend>
             <div class="input-group">
-                <label class="input-label" for="u_unit_model">Unit Model</label>
-                <select id="u_unit_model" class="input-field" data-field="bedrooms">
+                <label class="input-label" for="select-unit-model">Unit Model</label>
+                <select id="select-unit-model" class="input-field" data-field="bedrooms">
                     <option value="">Select Unit Model</option>
                     <option value="Studio">Studio</option>
                     <option value="1 Bedroom">1 Bedroom</option>
@@ -291,8 +291,8 @@ ACCESSIBILITY:
                 </select>
             </div>
             <div class="input-group">
-                <label class="input-label" for="u_views">Views</label>
-                <select id="u_views" class="input-field" data-field="views">
+                <label class="input-label" for="select-views">Views</label>
+                <select id="select-views" class="input-field" data-field="views">
                     <option value="">Select Views</option>
                     <option value="Sea View">Sea View</option>
                     <option value="Partial Sea View">Partial Sea View</option>
@@ -332,31 +332,31 @@ ACCESSIBILITY:
             <div class="grid-2">
                 <div class="input-group">
                     <label class="input-label">Internal Area (Sq.Ft)</label>
-                    <input type="number" id="u_villa_internal" class="input-field" data-field="villaInternal" placeholder="e.g., 2500" step="0.01">
+                    <input type="number" id="input-villa-internal" class="input-field" data-field="villaInternal" placeholder="e.g., 2500" step="0.01">
                 </div>
                 <div class="input-group">
                     <label class="input-label">Balcony/Terrace (Sq.Ft)</label>
-                    <input type="number" id="u_villa_terrace" class="input-field" data-field="villaTerrace" placeholder="e.g., 500" step="0.01">
+                    <input type="number" id="input-villa-terrace" class="input-field" data-field="villaTerrace" placeholder="e.g., 500" step="0.01">
                 </div>
             </div>
             <div class="grid-2">
                 <div class="input-group">
                     <label class="input-label">BUA - Built-Up Area (Sq.Ft)</label>
-                    <input type="text" id="u_built_up_area" class="input-field calculated" data-field="builtUpArea" placeholder="Auto: Internal + Terrace" readonly>
+                    <input type="text" id="input-built-up-area" class="input-field calculated" data-field="builtUpArea" placeholder="Auto: Internal + Terrace" readonly>
                 </div>
                 <div class="input-group">
                     <label class="input-label">GFA - Gross Floor Area (Sq.Ft)</label>
-                    <input type="number" id="u_gross_floor_area" class="input-field" data-field="grossFloorArea" placeholder="e.g., 3500" step="0.01">
+                    <input type="number" id="input-gross-floor-area" class="input-field" data-field="grossFloorArea" placeholder="e.g., 3500" step="0.01">
                 </div>
             </div>
             <div class="grid-2">
                 <div class="input-group">
                     <label class="input-label">Total Area (Sq.Ft)</label>
-                    <input type="number" id="u_villa_total" class="input-field" data-field="villaTotal" placeholder="e.g., 4000" step="0.01">
+                    <input type="number" id="input-villa-total" class="input-field" data-field="villaTotal" placeholder="e.g., 4000" step="0.01">
                 </div>
                 <div class="input-group">
                     <label class="input-label">Plot Size (Sq.Ft)</label>
-                    <input type="number" id="u_plot_size" class="input-field" data-field="plotSize" placeholder="e.g., 8000" step="0.01">
+                    <input type="number" id="input-plot-size" class="input-field" data-field="plotSize" placeholder="e.g., 8000" step="0.01">
                 </div>
             </div>
         </div>
@@ -365,12 +365,12 @@ ACCESSIBILITY:
         <div id="plotAreaGroup" style="display: none;">
             <div class="grid-2">
                 <div class="input-group">
-                    <label class="input-label">Plot Size (Sq.Ft)</label>
-                    <input type="number" id="u_plot_size" class="input-field" data-field="plotSizeOnly" placeholder="e.g., 10000" step="0.01">
+                    <label class="input-label" for="input-plot-size-only">Plot Size (Sq.Ft)</label>
+                    <input type="number" id="input-plot-size-only" class="input-field" data-field="plotSizeOnly" placeholder="e.g., 10000" step="0.01">
                 </div>
                 <div class="input-group">
                     <label class="input-label">Allowed Build Area (Sq.Ft)</label>
-                    <input type="number" id="u_allowed_build" class="input-field" data-field="allowedBuild" placeholder="e.g., 6000" step="0.01">
+                    <input type="number" id="input-allowed-build" class="input-field" data-field="allowedBuild" placeholder="e.g., 6000" step="0.01">
                 </div>
             </div>
         </div>
@@ -398,7 +398,7 @@ ACCESSIBILITY:
             <label class="input-label">Show Original Price</label>
             <div class="toggle-switch-group">
                 <label class="toggle-switch">
-                    <input type="checkbox" id="u_showoriginal" data-field="showOriginalPrice">
+                    <input type="checkbox" id="checkbox-show-original" data-field="showOriginalPrice">
                     <span class="toggle-slider"></span>
                 </label>
                 <span class="toggle-label" id="showOriginalLabel">No</span>
@@ -408,12 +408,12 @@ ACCESSIBILITY:
         <fieldset class="grid-2 fieldset-reset" id="priceFieldsGroup">
             <legend class="visually-hidden">Price information</legend>
             <div class="input-group" id="originalPriceGroup">
-                <label class="input-label" for="u_original_price">Original Price</label>
-                <input type="number" id="u_original_price" class="input-field" data-field="originalPrice" placeholder="e.g., 2118940" aria-required="true">
+                <label class="input-label" for="input-original-price">Original Price</label>
+                <input type="number" id="input-original-price" class="input-field" data-field="originalPrice" placeholder="e.g., 2118940" aria-required="true">
             </div>
             <div class="input-group">
-                <label class="input-label" for="u_selling_price">Selling Price</label>
-                <input type="number" id="u_selling_price" class="input-field" data-field="sellingPrice" placeholder="e.g., 2500000" aria-required="true">
+                <label class="input-label" for="input-selling-price">Selling Price</label>
+                <input type="number" id="input-selling-price" class="input-field" data-field="sellingPrice" placeholder="e.g., 2500000" aria-required="true">
             </div>
         </fieldset>
 
@@ -422,20 +422,20 @@ ACCESSIBILITY:
             <div id="offplanFieldsGroup">
                 <!-- Resale Clause % -->
                 <div class="input-group">
-                    <label class="input-label" for="u_resale_clause">Resale Clause %</label>
-                    <input type="number" id="u_resale_clause" class="input-field" data-field="resaleClausePercent" placeholder="e.g., 40" step="1" min="0" max="100">
+                    <label class="input-label" for="input-resale-clause">Resale Clause %</label>
+                    <input type="number" id="input-resale-clause" class="input-field" data-field="resaleClausePercent" placeholder="e.g., 40" step="1" min="0" max="100">
                 </div>
 
                 <!-- Amount Paid to Developer -->
                 <fieldset class="grid-2 fieldset-reset">
                     <legend class="visually-hidden">Amount paid to developer</legend>
                     <div class="input-group">
-                        <label class="input-label" for="u_amount_paid_percent">Amount Paid %</label>
-                        <input type="number" id="u_amount_paid_percent" class="input-field" data-field="amountPaidPercent" placeholder="e.g., 20" step="0.01" min="0" max="100">
+                        <label class="input-label" for="input-amount-paid-percent">Amount Paid %</label>
+                        <input type="number" id="input-amount-paid-percent" class="input-field" data-field="amountPaidPercent" placeholder="e.g., 20" step="0.01" min="0" max="100">
                     </div>
                     <div class="input-group">
-                        <label class="input-label" for="u_amount_paid">Amount Paid (AED)</label>
-                        <input type="number" id="u_amount_paid" class="input-field" data-field="amountPaid" placeholder="e.g., 500000">
+                        <label class="input-label" for="input-amount-paid">Amount Paid (AED)</label>
+                        <input type="number" id="input-amount-paid" class="input-field" data-field="amountPaid" placeholder="e.g., 500000">
                     </div>
                 </fieldset>
 
@@ -453,10 +453,10 @@ ACCESSIBILITY:
                 </div>
 
                 <div class="input-group">
-                    <label class="input-label" for="u_balance_resale">Balance Resale Clause</label>
+                    <label class="input-label" for="input-balance-resale">Balance Resale Clause</label>
                     <div class="input-with-lock">
-                        <input type="number" id="u_balance_resale" class="input-field calculated" data-field="balanceResale" placeholder="Auto-calculated">
-                        <button class="lock-btn" data-target="u_balance_resale" type="button" aria-label="Toggle automatic calculation for balance" aria-pressed="false">
+                        <input type="number" id="input-balance-resale" class="input-field calculated" data-field="balanceResale" placeholder="Auto-calculated">
+                        <button class="lock-btn" data-target="input-balance-resale" type="button" aria-label="Toggle automatic calculation for balance" aria-pressed="false">
                             <svg class="lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
                                 <path d="M7 11V7a5 5 0 0110 0v4"/>
@@ -486,10 +486,10 @@ ACCESSIBILITY:
                     <input type="number" id="input-admin-fees" class="input-field" data-field="adminFees" placeholder="e.g., 5250">
                 </div>
                 <div class="input-group">
-                    <label class="input-label" for="u_adgm_transfer">ADGM (2% of Original)</label>
+                    <label class="input-label" for="input-adgm-transfer">ADGM Reg. Fee (2% of Original Price)</label>
                     <div class="input-with-lock">
-                        <input type="number" id="u_adgm_transfer" class="input-field calculated" data-field="adgmTransfer" placeholder="Auto-calculated">
-                        <button class="lock-btn" data-target="u_adgm_transfer" type="button" aria-label="Toggle automatic calculation for ADGM" aria-pressed="false">
+                        <input type="number" id="input-adgm-transfer" class="input-field calculated" data-field="adgmTransfer" placeholder="Auto-calculated">
+                        <button class="lock-btn" data-target="input-adgm-transfer" type="button" aria-label="Toggle automatic calculation for ADGM" aria-pressed="false">
                             <svg class="lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
                                 <path d="M7 11V7a5 5 0 0110 0v4"/>
@@ -498,12 +498,12 @@ ACCESSIBILITY:
                     </div>
                 </div>
                 <div class="input-group">
-                    <label class="input-label" for="u_adgm_termination_fee">ADGM Termination Fee</label>
-                    <input type="number" id="u_adgm_termination_fee" class="input-field" data-field="adgmTermination" placeholder="505" value="505">
+                    <label class="input-label" for="input-adgm-termination-fee">ADGM Termination Fee</label>
+                    <input type="number" id="input-adgm-termination-fee" class="input-field" data-field="adgmTermination" placeholder="e.g., 505">
                 </div>
                 <div class="input-group">
-                    <label class="input-label" for="u_adgm_electronic_fee">ADGM Electronic Service Fee</label>
-                    <input type="number" id="u_adgm_electronic_fee" class="input-field" data-field="adgmElectronic" placeholder="525" value="525">
+                    <label class="input-label" for="input-adgm-electronic-fee">ADGM Electronic Service Fee</label>
+                    <input type="number" id="input-adgm-electronic-fee" class="input-field" data-field="adgmElectronic" placeholder="e.g., 525">
                 </div>
             </fieldset>
 
@@ -523,7 +523,7 @@ ACCESSIBILITY:
 
         <div class="total-display" role="status" aria-live="polite">
             <span class="total-label">Total Initial Payment</span>
-            <span class="total-value" id="display-total-payment" aria-atomic="true">AED 0</span>
+            <span class="total-value" id="display-total-payment" aria-atomic="true">-</span>
         </div>
 
         <!-- Ready Property Section (hidden by default) -->
@@ -532,7 +532,7 @@ ACCESSIBILITY:
                 <h2 class="section-title">Property Status</h2>
                 <div class="toggle-switch-group small">
                     <label class="toggle-switch">
-                        <input type="checkbox" id="u_showpropertystatus" checked>
+                        <input type="checkbox" id="checkbox-show-property-status" checked>
                         <span class="toggle-slider"></span>
                     </label>
                     <span class="toggle-label" id="showPropertyStatusLabel">Show</span>
@@ -544,18 +544,18 @@ ACCESSIBILITY:
                 <legend class="visually-hidden">Handover dates</legend>
                 <div class="input-group">
                     <div class="label-with-toggle">
-                        <label class="input-label" for="u_projecthandover">Project Completion</label>
+                        <label class="input-label" for="select-project-handover-type">Project Completion</label>
                         <label class="toggle-switch extra-small" title="Show/Hide in preview">
                             <input type="checkbox" class="row-toggle" data-target="disp_row_projecthandover" checked>
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
                     <div class="date-format-group">
-                        <select id="u_projecthandover_type" class="input-field input-field-small" data-field="projectHandoverType">
+                        <select id="select-project-handover-type" class="input-field input-field-small" data-field="projectHandoverType">
                             <option value="month">Month</option>
                             <option value="quarter">Quarter</option>
                         </select>
-                        <select id="u_projecthandover_period" class="input-field input-field-small" data-field="projectHandoverPeriod">
+                        <select id="select-project-handover-period" class="input-field input-field-small" data-field="projectHandoverPeriod">
                             <option value="">--</option>
                             <option value="1">Jan</option>
                             <option value="2">Feb</option>
@@ -570,23 +570,23 @@ ACCESSIBILITY:
                             <option value="11">Nov</option>
                             <option value="12">Dec</option>
                         </select>
-                        <input type="number" id="u_projecthandover_year" class="input-field input-field-small" data-field="projectHandoverYear" placeholder="Year" min="2000" max="2050">
+                        <input type="number" id="input-project-handover-year" class="input-field input-field-small" data-field="projectHandoverYear" placeholder="Year" min="2000" max="2050">
                     </div>
                 </div>
                 <div class="input-group">
                     <div class="label-with-toggle">
-                        <label class="input-label" for="u_unithandover">Unit Received</label>
+                        <label class="input-label" for="select-unit-handover-type">Unit Received</label>
                         <label class="toggle-switch extra-small" title="Show/Hide in preview">
                             <input type="checkbox" class="row-toggle" data-target="disp_row_unithandover" checked>
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
                     <div class="date-format-group">
-                        <select id="u_unithandover_type" class="input-field input-field-small" data-field="unitHandoverType">
+                        <select id="select-unit-handover-type" class="input-field input-field-small" data-field="unitHandoverType">
                             <option value="month">Month</option>
                             <option value="quarter">Quarter</option>
                         </select>
-                        <select id="u_unithandover_period" class="input-field input-field-small" data-field="unitHandoverPeriod">
+                        <select id="select-unit-handover-period" class="input-field input-field-small" data-field="unitHandoverPeriod">
                             <option value="">--</option>
                             <option value="1">Jan</option>
                             <option value="2">Feb</option>
@@ -601,7 +601,7 @@ ACCESSIBILITY:
                             <option value="11">Nov</option>
                             <option value="12">Dec</option>
                         </select>
-                        <input type="number" id="u_unithandover_year" class="input-field input-field-small" data-field="unitHandoverYear" placeholder="Year" min="2000" max="2050">
+                        <input type="number" id="input-unit-handover-year" class="input-field input-field-small" data-field="unitHandoverYear" placeholder="Year" min="2000" max="2050">
                     </div>
                 </div>
             </fieldset>
@@ -617,7 +617,7 @@ ACCESSIBILITY:
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
-                    <input type="text" id="u_projectage" class="input-field calculated" readonly placeholder="Auto-calculated">
+                    <input type="text" id="display-project-age" class="input-field calculated" readonly placeholder="Auto-calculated">
                 </div>
                 <div class="input-group">
                     <div class="label-with-toggle">
@@ -627,7 +627,7 @@ ACCESSIBILITY:
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
-                    <input type="text" id="u_unitownership" class="input-field calculated" readonly placeholder="Auto-calculated">
+                    <input type="text" id="display-unit-ownership" class="input-field calculated" readonly placeholder="Auto-calculated">
                 </div>
             </fieldset>
 
@@ -660,23 +660,23 @@ ACCESSIBILITY:
                     <legend class="visually-hidden">Lease details</legend>
                     <div class="input-group">
                         <div class="label-with-toggle">
-                            <label class="input-label" for="u_currentrent">Current Rent (AED/year)</label>
+                            <label class="input-label" for="input-current-rent">Current Rent (AED/year)</label>
                             <label class="toggle-switch extra-small" title="Show/Hide in preview">
                                 <input type="checkbox" class="row-toggle" data-target="disp_row_currentrent" checked>
                                 <span class="toggle-slider"></span>
                             </label>
                         </div>
-                        <input type="number" id="u_currentrent" class="input-field" data-field="currentRent" placeholder="e.g., 85000">
+                        <input type="number" id="input-current-rent" class="input-field" data-field="currentRent" placeholder="e.g., 85000">
                     </div>
                     <div class="input-group">
                         <div class="label-with-toggle">
-                            <label class="input-label" for="u_leaseuntil">Lease Until</label>
+                            <label class="input-label" for="input-lease-until">Lease Until</label>
                             <label class="toggle-switch extra-small" title="Show/Hide in preview">
                                 <input type="checkbox" class="row-toggle" data-target="disp_row_leaseuntil" checked>
                                 <span class="toggle-slider"></span>
                             </label>
                         </div>
-                        <input type="date" id="u_leaseuntil" class="input-field" data-field="leaseUntil">
+                        <input type="date" id="input-lease-until" class="input-field" data-field="leaseUntil">
                     </div>
                 </fieldset>
 
@@ -690,7 +690,7 @@ ACCESSIBILITY:
                     </div>
                     <div class="toggle-switch-group">
                         <label class="toggle-switch">
-                            <input type="checkbox" id="u_rentrefund" data-field="rentRefund">
+                            <input type="checkbox" id="checkbox-rent-refund" data-field="rentRefund">
                             <span class="toggle-slider"></span>
                         </label>
                         <span class="toggle-label" id="rentRefundLabel">No</span>
@@ -700,13 +700,13 @@ ACCESSIBILITY:
 
             <div class="input-group">
                 <div class="label-with-toggle">
-                    <label class="input-label" for="u_servicecharge">Service Charge (AED/year)</label>
+                    <label class="input-label" for="input-service-charge">Service Charge (AED/year)</label>
                     <label class="toggle-switch extra-small" title="Show/Hide in preview">
                         <input type="checkbox" class="row-toggle" data-target="disp_row_servicecharge" checked>
                         <span class="toggle-slider"></span>
                     </label>
                 </div>
-                <input type="number" id="u_servicecharge" class="input-field" data-field="serviceCharge" placeholder="e.g., 15000">
+                <input type="number" id="input-service-charge" class="input-field" data-field="serviceCharge" placeholder="e.g., 15000">
             </div>
 
             <hr class="section-divider">
@@ -810,12 +810,12 @@ ACCESSIBILITY:
 
             <!-- Company logo (uploaded via Settings > Branding) -->
             <div class="logo-area">
-                <img src="KP_blACK.png" alt="Company Logo" class="logo-img" id="logoImg">
+                <img src="assets/logos/KP_blACK.png" alt="Company Logo" class="logo-img" id="logoImg">
             </div>
 
             <!-- Document title section -->
             <div class="document-header">
-                <div class="main-title" id="disp_title">1 Bedroom</div>
+                <div class="main-title" id="disp_title">-</div>
             </div>
 
             <!-- Main content: Two-column layout -->
@@ -862,11 +862,11 @@ ACCESSIBILITY:
                         <tbody>
                             <tr id="disp_row_original_price">
                                 <td class="row-label">Original Price</td>
-                                <td class="row-value" id="disp_original_price">AED 0</td>
+                                <td class="row-value" id="disp_original_price">-</td>
                             </tr>
                             <tr>
                                 <td class="row-label">Selling Price</td>
-                                <td class="row-value" id="disp_selling_price">AED 0</td>
+                                <td class="row-value" id="disp_selling_price">-</td>
                             </tr>
                             <tr id="disp_divider_offplan">
                                 <td colspan="2" class="divider-row"></td>
@@ -874,40 +874,40 @@ ACCESSIBILITY:
                             <!-- Off-Plan Resale Rows -->
                             <tr id="disp_row_refund">
                                 <td class="row-label" id="label_refund_amount">Refund (Amount Paid to Developer)</td>
-                                <td class="row-value" id="disp_refund">AED 0</td>
+                                <td class="row-value" id="disp_refund">-</td>
                             </tr>
                             <tr id="disp_row_balance_resale">
                                 <td class="row-label" id="label_balance_resale">Balance Resale Clause <span class="asterisk">*</span></td>
-                                <td class="row-value" id="disp_balance_resale">AED 0</td>
+                                <td class="row-value" id="disp_balance_resale">-</td>
                             </tr>
                             <tr id="disp_row_premium">
                                 <td class="row-label" id="label_premium_price">Premium (Selling Price - Original Price)</td>
-                                <td class="row-value" id="disp_premium">AED 0</td>
+                                <td class="row-value" id="disp_premium">-</td>
                             </tr>
                             <!-- Common Fees -->
                             <tr>
                                 <td class="row-label" id="label_admin_fees">Admin Fees (SAAS)</td>
-                                <td class="row-value" id="disp_admin_fees">AED 0</td>
+                                <td class="row-value" id="disp_admin_fees">-</td>
                             </tr>
                             <tr>
-                                <td class="row-label" id="label_adgm_transfer">ADGM (2% of Original Price)</td>
-                                <td class="row-value" id="disp_adgm_transfer">AED 0</td>
+                                <td class="row-label" id="label_adgm_transfer">ADGM Reg. Fee (2% of Original Price)</td>
+                                <td class="row-value" id="disp_adgm_transfer">-</td>
                             </tr>
                             <tr>
                                 <td class="row-label" id="label_adgm_termination">ADGM Termination Fee</td>
-                                <td class="row-value" id="disp_adgm_termination">AED 505</td>
+                                <td class="row-value" id="disp_adgm_termination">-</td>
                             </tr>
                             <tr>
                                 <td class="row-label" id="label_adgm_electronic">ADGM Electronic Service Fee</td>
-                                <td class="row-value" id="disp_adgm_electronic">AED 525</td>
+                                <td class="row-value" id="disp_adgm_electronic">-</td>
                             </tr>
                             <tr>
                                 <td class="row-label" id="label_agency_fees">Agency Fees (2% of Selling Price + Vat)</td>
-                                <td class="row-value" id="disp_agency_fees">AED 0</td>
+                                <td class="row-value" id="disp_agency_fees">-</td>
                             </tr>
                             <tr class="total-row">
                                 <td class="row-label">Total Initial Payment</td>
-                                <td class="row-value" id="disp_total">AED 0</td>
+                                <td class="row-value" id="disp_total">-</td>
                             </tr>
                             <!-- Villa/Townhouse Area Rows (hidden by default) -->
                             <tr id="disp_row_villa_internal" style="display: none;">
@@ -937,7 +937,7 @@ ACCESSIBILITY:
                             <!-- Plot Area Rows (hidden by default) -->
                             <tr id="disp_row_plot_size" style="display: none;">
                                 <td class="row-label">Plot Size (Sq.Ft)</td>
-                                <td class="row-value" id="disp_plot_size">-</td>
+                                <td class="row-value" id="disp_plot_size_only">-</td>
                             </tr>
                             <tr id="disp_row_allowed_build" style="display: none;">
                                 <td class="row-label">Allowed Build Area (Sq.Ft)</td>
@@ -1010,7 +1010,7 @@ ACCESSIBILITY:
                 <!-- Right Column: Floor Plan -->
                 <div class="column-right">
                     <div class="floorplan-frame">
-                        <img id="floorPlanImg" src="Asset%201@2x.png" alt="Floor Plan">
+                        <img id="floorPlanImg" src="assets/logos/Asset%201@2x.png" alt="Floor Plan">
                         <div id="imgPlaceholder" class="img-placeholder" style="display:none;">
                             <p class="placeholder-title">FLOOR PLAN IMAGE</p>
                             <p class="placeholder-sub">Upload from sidebar</p>
@@ -1021,7 +1021,7 @@ ACCESSIBILITY:
 
             <!-- Footer Bottom Right -->
             <div class="footer-area">
-                <div class="footer-proj" id="disp_project_footer">PROJECT NAME</div>
+                <div class="footer-proj" id="disp_project_footer">-</div>
                 <div class="footer-sub">SALE OFFER</div>
             </div>
 
@@ -1095,7 +1095,7 @@ ACCESSIBILITY:
                     </div>
                     <div class="input-group">
                         <label class="input-label">ADGM Label</label>
-                        <input type="text" id="labelAdgm" class="input-field" value="ADGM (2% of Original Price)">
+                        <input type="text" id="labelAdgm" class="input-field" value="ADGM Reg. Fee (2% of Original Price)">
                     </div>
                     <div class="input-group">
                         <label class="input-label">Agency Fees Label</label>

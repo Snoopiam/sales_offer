@@ -81,6 +81,6 @@ export default [
     },
     // Ignored files
     {
-        ignores: ['OLD/**', 'node_modules/**', '*.config.js'],
+        ignores: ['docs/archive/**', 'node_modules/**', '*.config.js'],
     },
 ];

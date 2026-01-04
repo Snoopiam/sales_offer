@@ -24,7 +24,8 @@
     "@vitest/ui": "^4.0.16",
     "eslint": "^9.0.0",
     "jsdom": "^27.4.0",
-    "vitest": "^4.0.16"
+    "vitest": "^4.0.16",
+    "xlsx": "^0.18.5"
   },
   "browserslist": [
     "Chrome >= 80",

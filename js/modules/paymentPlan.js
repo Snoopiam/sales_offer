@@ -50,11 +50,9 @@ export function initPaymentPlan() {
             amount: row.amount || ''
         }));
     } else {
+        // [FIX] Default: Empty payment plan - user adds rows or imports from Excel
         paymentRows = [
-            { id: generateId(), date: 'On Booking', percentage: '10', amount: '' },
-            { id: generateId(), date: '', percentage: '10', amount: '' },
-            { id: generateId(), date: '', percentage: '10', amount: '' },
-            { id: generateId(), date: 'On Handover', percentage: '70', amount: '' }
+            { id: generateId(), date: '', percentage: '', amount: '' }
         ];
     }
 
@@ -121,7 +119,7 @@ export function renderPaymentPlan() {
         });
 
         if (isHandoverRow(row)) {
-            amountInput.title = "Linked to Total Initial Payment";
+            amountInput.title = "Enter handover amount manually or import from Excel";
         }
 
         amountInput.addEventListener('input', (e) => handleRowInput(index, 'amount', e.target.value));
@@ -187,7 +185,7 @@ export function deletePaymentRow(index) {
 }
 
 export function calculatePaymentAmounts() {
-    const originalPrice = getNumericValue('u_original_price');
+    const originalPrice = getNumericValue('input-original-price');
 
     paymentRows.forEach((row, index) => {
         // Skip handover row in standard calc
@@ -207,29 +205,12 @@ export function calculatePaymentAmounts() {
 }
 
 /**
- * [UPDATED] Explicitly sync handover amount
- * Updates the row in the dataset AND the input on screen
+ * [DISABLED] No longer auto-syncs handover with Total Initial Payment
+ * Handover amount comes from: manual entry OR Excel import ONLY
  */
-export function syncHandoverWithTotal(totalAmount) {
-    // Use the relaxed matcher
-    const handoverIndex = paymentRows.findIndex(isHandoverRow);
-
-    // We allow 0 updates now (in case you clear the form)
-    if (handoverIndex !== -1) {
-        const newVal = Math.round(totalAmount);
-
-        // 1. Update Data Model
-        paymentRows[handoverIndex].amount = newVal;
-
-        // 2. Update Visual Input immediately
-        const amountInput = document.querySelector(`input[data-field="amount"][data-index="${handoverIndex}"]`);
-        if (amountInput) {
-            amountInput.value = newVal; // Update the box
-            // Visual flash effect to show it updated
-            amountInput.style.backgroundColor = 'rgba(98, 198, 193, 0.2)';
-            setTimeout(() => amountInput.style.backgroundColor = '', 500);
-        }
-    }
+export function syncHandoverWithTotal(_totalAmount) {
+    // No-op: Handover amount is set manually or via Excel import
+    // Do not auto-calculate
 }
 
 function validate() {
@@ -267,7 +248,7 @@ function updatePreviewInternal(explicitTotal) {
     const tbody = getById('payment_plan_tbody');
     if (!tbody) return;
 
-    const originalPrice = getNumericValue('u_original_price');
+    const originalPrice = getNumericValue('input-original-price');
 
     const totalInitial = (explicitTotal !== undefined && explicitTotal !== null)
         ? explicitTotal
@@ -283,15 +264,19 @@ function updatePreviewInternal(explicitTotal) {
 
         let amount = row.amount;
 
-        if (isHandover) {
-            // Force handover to match explicit total
-            amount = Math.round(totalInitial);
-            row.amount = amount;
-        } else if (!amount) {
+        // [FIX] Handover: Use manual/Excel value only - no auto-calculation
+        // Other rows: Calculate from percentage if amount is empty
+        if (!isHandover && !amount) {
             amount = Math.round((percent / 100) * originalPrice);
         }
 
         const tr = createElement('tr');
+
+        // Add total-row class to handover row (like Total Area and Total Initial Payment)
+        if (isHandover) {
+            tr.classList.add('total-row');
+        }
+
         const dateCell = createElement('td');
         dateCell.textContent = row.date || '-';
 
@@ -299,7 +284,10 @@ function updatePreviewInternal(explicitTotal) {
         percentCell.textContent = row.percentage ? row.percentage + '%' : '-';
 
         const amountCell = createElement('td', { style: { textAlign: 'right' } });
-        amountCell.textContent = formatCurrency(amount);
+        // [FIX] Show "-" when amount is empty (not "AED 0")
+        amountCell.textContent = (amount !== '' && amount !== null && amount !== undefined)
+            ? formatCurrency(amount)
+            : '-';
 
         tr.appendChild(dateCell);
         tr.appendChild(percentCell);

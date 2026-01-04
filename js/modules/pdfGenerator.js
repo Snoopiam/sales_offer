@@ -5,6 +5,25 @@
 
 import { getById, getValue } from '../utils/helpers.js';
 import { getCurrentTemplate } from './templates.js';
+import { MontserratBlack, MontserratBold, MontserratSemiBold, MontserratRegular } from '../fonts/montserrat-fonts.js';
+
+/**
+ * Register Montserrat fonts with jsPDF
+ * @param {jsPDF} doc - jsPDF document instance
+ */
+function registerFonts(doc) {
+    // Add fonts to virtual file system
+    doc.addFileToVFS('Montserrat-Black.ttf', MontserratBlack);
+    doc.addFileToVFS('Montserrat-Bold.ttf', MontserratBold);
+    doc.addFileToVFS('Montserrat-SemiBold.ttf', MontserratSemiBold);
+    doc.addFileToVFS('Montserrat-Regular.ttf', MontserratRegular);
+
+    // Register fonts with jsPDF
+    doc.addFont('Montserrat-Black.ttf', 'Montserrat', 'black');
+    doc.addFont('Montserrat-Bold.ttf', 'Montserrat', 'bold');
+    doc.addFont('Montserrat-SemiBold.ttf', 'Montserrat', 'semibold');
+    doc.addFont('Montserrat-Regular.ttf', 'Montserrat', 'normal');
+}
 
 /**
  * Generate text-based PDF matching the preview layout
@@ -39,13 +58,16 @@ export async function generateTextPDF(filename) {
         compress: true
     });
 
-    let yPos = headerBarHeight + 8;
+    // Register Montserrat fonts
+    registerFonts(doc);
+
+    let yPos = headerBarHeight + 5; // CSS: margin-top 5mm
 
     // Draw header bar
     drawHeaderBar(doc, pageWidth, headerBarHeight, primaryColor);
 
     // Draw logo
-    drawLogo(doc, pageWidth, margin);
+    drawLogo(doc, pageWidth);
 
     // Draw main title
     yPos = drawMainTitle(doc, margin, yPos);
@@ -83,15 +105,16 @@ function drawHeaderBar(doc, pageWidth, height, color) {
 
 /**
  * Draw company logo
+ * CSS: top: 12mm, right: 15mm, width: 130px (~34mm), height: 65px (~17mm)
  */
-function drawLogo(doc, pageWidth, margin) {
+function drawLogo(doc, pageWidth) {
     const logoImg = getById('logoImg');
-    if (logoImg && logoImg.src && !logoImg.src.includes('KP_blACK')) {
+    if (logoImg && logoImg.src) {
         try {
-            const logoWidth = 35;
-            const logoHeight = 17;
-            const logoX = pageWidth - margin - logoWidth;
-            const logoY = 12;
+            const logoWidth = 34;  // 130px ≈ 34mm
+            const logoHeight = 17; // 65px ≈ 17mm
+            const logoX = pageWidth - 15 - logoWidth; // right: 15mm
+            const logoY = 12; // top: 12mm
             doc.addImage(logoImg.src, 'PNG', logoX, logoY, logoWidth, logoHeight, undefined, 'FAST');
         } catch (e) {
             console.warn('Logo could not be added to PDF:', e);
@@ -104,12 +127,12 @@ function drawLogo(doc, pageWidth, margin) {
  * @returns {number} Updated Y position
  */
 function drawMainTitle(doc, margin, yPos) {
-    const unitModel = getValue('u_unit_model') || getById('disp_title')?.textContent || '1 Bedroom';
-    doc.setFontSize(24);
-    doc.setFont('helvetica', 'bold');
+    const unitModel = getValue('select-unit-model') || getById('disp_title')?.textContent || '-';
+    doc.setFontSize(30); // 40px CSS = 30pt PDF
+    doc.setFont('Montserrat', 'black'); // CSS: font-weight 900
     doc.setTextColor(31, 41, 55);
     doc.text(unitModel.toUpperCase(), margin, yPos);
-    return yPos + 12;
+    return yPos + 14; // Adjusted spacing for larger font
 }
 
 /**
@@ -158,7 +181,7 @@ function drawFinancialTable(doc, yPos, margin, tableWidth, primaryColor) {
 
     // Common fees
     rows.push(['Admin Fees (SAAS)', getDisplayValue('disp_admin_fees')]);
-    rows.push(['ADGM (2% of Original Price)', getDisplayValue('disp_adgm_transfer')]);
+    rows.push(['ADGM Reg. Fee (2% of Original Price)', getDisplayValue('disp_adgm_transfer')]);
     rows.push(['ADGM Termination Fee', getDisplayValue('disp_adgm_termination')]);
     rows.push(['ADGM Electronic Service Fee', getDisplayValue('disp_adgm_electronic')]);
     rows.push(['Agency Fees (2% + VAT)', getDisplayValue('disp_agency_fees')]);
@@ -219,7 +242,7 @@ function drawPaymentPlanTable(doc, yPos, margin, tableWidth, primaryColor) {
     // Title
     const ppTitle = getById('paymentPlanTitle')?.textContent || 'PAYMENT PLAN';
     doc.setFontSize(8);
-    doc.setFont('helvetica', 'bold');
+    doc.setFont('Montserrat', 'bold'); // CSS: font-weight 700
     doc.setTextColor(...primaryColor);
     doc.text(ppTitle.toUpperCase(), margin, yPos);
     yPos += 4;
@@ -228,7 +251,7 @@ function drawPaymentPlanTable(doc, yPos, margin, tableWidth, primaryColor) {
     doc.setFillColor(...primaryColor);
     doc.setFontSize(7);
     doc.setTextColor(255, 255, 255);
-    doc.setFont('helvetica', 'bold');
+    doc.setFont('Montserrat', 'bold'); // CSS: font-weight 700
     doc.rect(margin, yPos - 3, tableWidth, 5, 'F');
     doc.text('Date Of Payment', margin + 1, yPos);
     doc.text('%', margin + tableWidth * 0.45, yPos);
@@ -237,7 +260,7 @@ function drawPaymentPlanTable(doc, yPos, margin, tableWidth, primaryColor) {
 
     // Data rows
     doc.setTextColor(55, 65, 81);
-    doc.setFont('helvetica', 'normal');
+    doc.setFont('Montserrat', 'normal'); // CSS: font-weight 400
     doc.setFontSize(7);
 
     Array.from(ppBody.children).forEach(row => {
@@ -259,7 +282,7 @@ function drawPaymentPlanTable(doc, yPos, margin, tableWidth, primaryColor) {
 function drawFloorPlanImage(doc, rightColX, rightColWidth, headerBarHeight, pageHeight) {
     const floorPlanImg = getById('floorPlanImg');
 
-    if (!floorPlanImg || !floorPlanImg.src || floorPlanImg.src.includes('Asset')) {
+    if (!floorPlanImg || !floorPlanImg.src) {
         return;
     }
 
@@ -290,29 +313,32 @@ function drawFloorPlanImage(doc, rightColX, rightColWidth, headerBarHeight, page
 
 /**
  * Draw the footer section
+ * CSS: bottom: 12mm, right: 15mm
  */
 function drawFooter(doc, pageWidth, pageHeight, margin, primaryColor) {
-    const projectName = getValue('input-project-name') || getById('disp_project_footer')?.textContent || 'PROJECT NAME';
-    const footerY = pageHeight - 15;
+    const projectName = getValue('input-project-name') || getById('disp_project_footer')?.textContent || '-';
+    const footerY = pageHeight - 12; // CSS: bottom: 12mm
+    const footerX = pageWidth - 15;  // CSS: right: 15mm
 
-    // Project name
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'bold');
+    // Project name - 18px CSS = 14pt PDF, font-weight: 900
+    doc.setFontSize(14);
+    doc.setFont('Montserrat', 'black'); // CSS: font-weight 900
     doc.setTextColor(31, 41, 55);
-    doc.text(projectName.toUpperCase(), pageWidth - margin, footerY, { align: 'right' });
+    doc.text(projectName.toUpperCase(), footerX, footerY, { align: 'right' });
 
-    // "SALE OFFER" text
-    doc.setFontSize(8);
+    // "SALE OFFER" text - 12px CSS = 9pt PDF, margin-top: 4px
+    doc.setFontSize(9);
+    doc.setFont('Montserrat', 'normal');
     doc.setTextColor(...primaryColor);
-    doc.text('SALE OFFER', pageWidth - margin, footerY + 5, { align: 'right' });
+    doc.text('SALE OFFER', footerX, footerY + 5, { align: 'right' });
 
-    // Created by footer
+    // Created by footer - 9px CSS = 7pt PDF, bottom: 4mm
     const createdByEl = document.querySelector('.created-by-footer');
     if (createdByEl) {
-        doc.setFontSize(6);
+        doc.setFontSize(7);
         doc.setTextColor(107, 114, 128);
-        doc.setFont('helvetica', 'normal');
-        doc.text(createdByEl.textContent.trim().toUpperCase(), pageWidth / 2, pageHeight - 5, { align: 'center' });
+        doc.setFont('Montserrat', 'normal'); // CSS: font-weight 400
+        doc.text(createdByEl.textContent.trim().toUpperCase(), pageWidth / 2, pageHeight - 4, { align: 'center' });
     }
 }
 
@@ -323,9 +349,9 @@ function drawFooter(doc, pageWidth, pageHeight, margin, primaryColor) {
 function drawTableSection(doc, title, startY, margin, tableWidth, primaryColor, rows) {
     let yPos = startY;
 
-    // Section title
+    // Section title - CSS: font-weight 700
     doc.setFontSize(8);
-    doc.setFont('helvetica', 'bold');
+    doc.setFont('Montserrat', 'bold');
     doc.setTextColor(...primaryColor);
     doc.text(title, margin, yPos);
     yPos += 4;
@@ -338,13 +364,13 @@ function drawTableSection(doc, title, startY, margin, tableWidth, primaryColor, 
         doc.setDrawColor(243, 244, 246);
         doc.line(margin, yPos + 1, margin + tableWidth, yPos + 1);
 
-        // Label
-        doc.setFont('helvetica', 'normal');
+        // Label - CSS: font-weight 600
+        doc.setFont('Montserrat', 'semibold');
         doc.setTextColor(75, 85, 99);
         doc.text(label, margin, yPos);
 
-        // Value
-        doc.setFont('helvetica', isBold ? 'bold' : 'normal');
+        // Value - CSS: font-weight 500 (normal) or 800 (bold totals)
+        doc.setFont('Montserrat', isBold ? 'bold' : 'normal');
         doc.setTextColor(17, 24, 39);
         doc.text(String(value), margin + tableWidth, yPos, { align: 'right' });
 

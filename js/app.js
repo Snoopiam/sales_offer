@@ -264,24 +264,24 @@ function loadFormData() {
  * [CRITICAL UPDATE] Ensure sync logic works
  */
 function updatePreview() {
-    const unitType = getValue('u_unit_type').toLowerCase();
-    setText('disp_project_footer', getValue('input-project-name') || 'PROJECT NAME');
-    setText('display-unit-number', getValue('u_unit_number') || '-');
-    setText('disp_unit_type', getValue('u_unit_type') || '-');
-    setText('disp_title', getValue('u_unit_model') || '1 Bedroom');
-    setText('disp_views', getValue('u_views') || '-');
+    const unitType = getValue('input-unit-type').toLowerCase();
+    setText('disp_project_footer', getValue('input-project-name') || '-');
+    setText('display-unit-number', getValue('input-unit-number') || '-');
+    setText('disp_unit_type', getValue('input-unit-type') || '-');
+    setText('disp_title', getValue('select-unit-model') || '-');
+    setText('disp_views', getValue('select-views') || '-');
 
     updatePreviewAreaRows(unitType);
 
-    setText('disp_original_price', formatCurrency(getValue('u_original_price')));
-    setText('disp_selling_price', formatCurrency(getValue('u_selling_price')));
+    setText('disp_original_price', formatCurrency(getValue('input-original-price')));
+    setText('disp_selling_price', formatCurrency(getValue('input-selling-price')));
     setText('disp_refund', formatCurrency(getValue('input-refund-amount')));
-    setText('disp_balance_resale', formatCurrency(getValue('u_balance_resale')));
+    setText('disp_balance_resale', formatCurrency(getValue('input-balance-resale')));
     setText('disp_premium', formatCurrency(getValue('input-premium-amount')));
     setText('disp_admin_fees', formatCurrency(getValue('input-admin-fees')));
-    setText('disp_adgm_transfer', formatCurrency(getValue('u_adgm_transfer')));
-    setText('disp_adgm_termination', formatCurrency(getValue('u_adgm_termination_fee') || 505));
-    setText('disp_adgm_electronic', formatCurrency(getValue('u_adgm_electronic_fee') || 525));
+    setText('disp_adgm_transfer', formatCurrency(getValue('input-adgm-transfer')));
+    setText('disp_adgm_termination', formatCurrency(getValue('input-adgm-termination-fee')));
+    setText('disp_adgm_electronic', formatCurrency(getValue('input-adgm-electronic-fee')));
     setText('disp_agency_fees', formatCurrency(getValue('input-agency-fees')));
 
     const total = calculateTotal();
@@ -311,16 +311,16 @@ function updatePreviewAreaRows(unitType) {
 
     if (unitType === 'villa' || unitType === 'townhouse') {
         villaRows.forEach(id => { const row = getById(id); if (row) row.style.display = ''; });
-        setText('disp_villa_internal', getValue('u_villa_internal') || '-');
-        setText('disp_villa_terrace', getValue('u_villa_terrace') || '-');
-        setText('disp_built_up_area', getValue('u_built_up_area') || '-');
-        setText('disp_gross_floor_area', getValue('u_gross_floor_area') || '-');
-        setText('disp_villa_total', getValue('u_villa_total') || '-');
-        setText('disp_plot_size', getValue('u_plot_size') || '-');
+        setText('disp_villa_internal', getValue('input-villa-internal') || '-');
+        setText('disp_villa_terrace', getValue('input-villa-terrace') || '-');
+        setText('disp_built_up_area', getValue('input-built-up-area') || '-');
+        setText('disp_gross_floor_area', getValue('input-gross-floor-area') || '-');
+        setText('disp_villa_total', getValue('input-villa-total') || '-');
+        setText('disp_plot_size', getValue('input-plot-size') || '-');
     } else if (unitType === 'plot') {
         plotRows.forEach(id => { const row = getById(id); if (row) row.style.display = ''; });
-        setText('disp_plot_size', getValue('u_plot_size') || '-');
-        setText('disp_allowed_build', getValue('u_allowed_build') || '-');
+        setText('disp_plot_size_only', getValue('input-plot-size-only') || '-');
+        setText('disp_allowed_build', getValue('input-allowed-build') || '-');
     } else {
         standardRows.forEach(id => { const row = getById(id); if (row) row.style.display = ''; });
         setText('disp_internal', getValue('input-internal-area') || '-');
@@ -331,14 +331,12 @@ function updatePreviewAreaRows(unitType) {
 
 function clearForm() {
     queryAll('#inputPanel input[type="text"], #inputPanel input[type="number"]').forEach(input => input.value = '');
+    // [FIX] Clear to single empty row (matches new default)
     setPaymentPlan([
-        { date: 'On Booking', percentage: '10', amount: '' },
-        { date: '', percentage: '10', amount: '' },
-        { date: '', percentage: '10', amount: '' },
-        { date: 'On Handover', percentage: '70', amount: '' }
+        { date: '', percentage: '', amount: '' }
     ]);
     const img = getById('floorPlanImg');
-    if (img) img.src = 'Asset%201@2x.png';
+    if (img) img.src = 'assets/logos/Asset%201@2x.png';
     const placeholder = getById('imgPlaceholder');
     if (placeholder) placeholder.style.display = 'none';
     clearAllErrors();

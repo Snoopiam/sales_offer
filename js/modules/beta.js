@@ -206,7 +206,7 @@ function applyDatePickers() {
 // BETA FEATURE: Currency Formatting
 // ============================================
 function initCurrencyFormatting() {
-    const currencyFields = ['u_original_price', 'u_selling_price', 'input-refund-amount', 'input-premium-amount', 'input-admin-fees', 'u_adgm_transfer', 'input-agency-fees', 'u_balance_resale', 'u_amount_paid'];
+    const currencyFields = ['input-original-price', 'input-selling-price', 'input-refund-amount', 'input-premium-amount', 'input-admin-fees', 'input-adgm-transfer', 'input-agency-fees', 'input-balance-resale', 'input-amount-paid'];
 
     currencyFields.forEach(fieldId => {
         const input = getById(fieldId);
@@ -251,7 +251,7 @@ function initCurrencyFormatting() {
 // ============================================
 function initDropdowns() {
     // Unit Type dropdown - with show/hide logic for area fields
-    const unitTypeInput = getById('u_unit_type');
+    const unitTypeInput = getById('input-unit-type');
     if (unitTypeInput && !unitTypeInput.dataset.dropdownAdded) {
         createSelectDropdown(unitTypeInput, 'unitTypeOptions', [
             'Apartment', 'Villa', 'Townhouse', 'Penthouse', 'Duplex',
@@ -263,7 +263,7 @@ function initDropdowns() {
     }
 
     // Views dropdown - skip if already a native select element
-    const viewsInput = getById('u_views');
+    const viewsInput = getById('select-views');
     if (viewsInput && viewsInput.tagName !== 'SELECT' && !viewsInput.dataset.dropdownAdded) {
         createSelectDropdown(viewsInput, 'viewsOptions', [
             'Sea View', 'Marina View', 'Garden View', 'Pool View',
@@ -273,7 +273,7 @@ function initDropdowns() {
     }
 
     // Unit Model dropdown - skip if already a native select element
-    const bedroomsInput = getById('u_unit_model');
+    const bedroomsInput = getById('select-unit-model');
     if (bedroomsInput && bedroomsInput.tagName !== 'SELECT' && !bedroomsInput.dataset.dropdownAdded) {
         // Load custom options from storage
         const state = loadState();
@@ -541,7 +541,7 @@ function showCustomOptionModal(input, listId) {
  * Handle Unit Type changes - show/hide relevant area field groups
  */
 function handleUnitTypeChange() {
-    const unitType = getValue('u_unit_type').toLowerCase();
+    const unitType = getValue('input-unit-type').toLowerCase();
 
     // Get area groups
     const standardAreaGroup = getById('standardAreaGroup');
@@ -711,11 +711,11 @@ function renderDashboardGrid() {
     currentCard.appendChild(badge);
 
     const currentTitle = createElement('h4');
-    currentTitle.textContent = currentOffer.projectName || 'Untitled Offer';
+    currentTitle.textContent = currentOffer.projectName || '-';
     currentCard.appendChild(currentTitle);
 
     const currentUnit = createElement('p', { className: 'card-unit' });
-    currentUnit.textContent = `${currentOffer.unitNo || 'No unit'} - ${currentOffer.bedrooms || ''}`;
+    currentUnit.textContent = `${currentOffer.unitNo || '-'} - ${currentOffer.bedrooms || '-'}`;
     currentCard.appendChild(currentUnit);
 
     const currentPrice = createElement('p', { className: 'card-price' });
@@ -738,7 +738,7 @@ function renderDashboardGrid() {
         card.appendChild(title);
 
         const unit = createElement('p', { className: 'card-unit' });
-        unit.textContent = `${template.data.unitNo || 'No unit'} - ${template.data.bedrooms || ''}`;
+        unit.textContent = `${template.data.unitNo || '-'} - ${template.data.bedrooms || '-'}`;
         card.appendChild(unit);
 
         const price = createElement('p', { className: 'card-price' });
@@ -848,10 +848,10 @@ function shareViaWhatsApp() {
 
     const message = `*Sales Offer*
 
-*Project:* ${offer.projectName || 'N/A'}
-*Unit:* ${offer.unitNo || 'N/A'}
-*Type:* ${offer.bedrooms || 'N/A'}
-*Area:* ${offer.totalArea || 'N/A'}
+*Project:* ${offer.projectName || '-'}
+*Unit:* ${offer.unitNo || '-'}
+*Type:* ${offer.bedrooms || '-'}
+*Area:* ${offer.totalArea || '-'}
 
 *Price:* ${formatCurrency(offer.sellingPrice)}
 *Original:* ${formatCurrency(offer.originalPrice)}
@@ -1072,13 +1072,13 @@ function exportViaEmail() {
     const agency = parseFloat(offer.agencyFees) || 0;
     const total = refund + balance + premium + admin + adgm + agency;
 
-    const subject = `Sales Offer - ${offer.projectName || 'Property'} ${offer.unitNo || ''}`;
+    const subject = `Sales Offer - ${offer.projectName || '-'} ${offer.unitNo || ''}`;
     const body = `Sales Offer Details
 
-Project: ${offer.projectName || 'N/A'}
-Unit: ${offer.unitNo || 'N/A'}
-Type: ${offer.bedrooms || 'N/A'}
-Area: ${offer.totalArea || 'N/A'}
+Project: ${offer.projectName || '-'}
+Unit: ${offer.unitNo || '-'}
+Type: ${offer.bedrooms || '-'}
+Area: ${offer.totalArea || '-'}
 
 Selling Price: ${formatCurrency(offer.sellingPrice)}
 Original Price: ${formatCurrency(offer.originalPrice)}
@@ -1111,12 +1111,12 @@ function copyToClipboard() {
     const agency = parseFloat(offer.agencyFees) || 0;
     const total = refund + balance + premium + admin + adgm + agency;
 
-    const text = `Sales Offer - ${offer.projectName || 'Property'}
+    const text = `Sales Offer - ${offer.projectName || '-'}
 
-Project: ${offer.projectName || 'N/A'}
-Unit: ${offer.unitNo || 'N/A'}
-Type: ${offer.bedrooms || 'N/A'}
-Area: ${offer.totalArea || 'N/A'}
+Project: ${offer.projectName || '-'}
+Unit: ${offer.unitNo || '-'}
+Type: ${offer.bedrooms || '-'}
+Area: ${offer.totalArea || '-'}
 
 Selling Price: ${formatCurrency(offer.sellingPrice)}
 Original Price: ${formatCurrency(offer.originalPrice)}
@@ -1157,13 +1157,13 @@ function initTooltips() {
         'u_original_price': 'Developer\'s original list price',
         'u_selling_price': 'Your selling/offer price',
         'u_resale_clause': 'Minimum % that must be paid before resale is allowed',
-        'u_amount_paid_percent': 'Percentage of original price paid to developer',
-        'u_amount_paid': 'Amount in AED paid to developer',
+        'input-amount-paid-percent': 'Percentage of original price paid to developer',
+        'input-amount-paid': 'Amount in AED paid to developer',
         'input-refund-amount': 'Refund = Amount paid to developer',
-        'u_balance_resale': 'Balance = (Resale Clause % - Amount Paid %) × Original Price',
+        'input-balance-resale': 'Balance = (Resale Clause % - Amount Paid %) × Original Price',
         'input-premium-amount': 'Premium = Selling Price - Original Price',
         'input-admin-fees': 'Administrative fees (SAAS)',
-        'u_adgm_transfer': 'ADGM registration fee (2% of selling price)',
+        'input-adgm-transfer': 'ADGM registration fee (2% of original price)',
         'input-agency-fees': 'Agency commission (2% + VAT)'
     };
 

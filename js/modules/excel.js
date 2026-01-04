@@ -20,37 +20,37 @@ import { runAllCalculations } from './calculator.js';
  */
 const LABEL_TO_FIELD = {
     'project name': 'input-project-name',
-    'unit no': 'u_unit_number',
-    'unit type': 'u_unit_type',
-    'unit model': 'u_unit_model',
-    'views': 'u_views',
+    'unit no': 'input-unit-number',
+    'unit type': 'input-unit-type',
+    'unit model': 'select-unit-model',
+    'views': 'select-views',
     'internal area (sq.ft)': 'input-internal-area',
     'balcony area (sq.ft)': 'input-balcony-area',
     'total area (sq.ft)': 'input-total-area',
-    'original price': 'u_original_price',
-    'selling price': 'u_selling_price',
-    'paid percentage': 'u_amount_paid_percent',
-    'resale clause': 'u_resale_clause',
-    'balance resale clause (aed)': 'u_balance_resale',
+    'original price': 'input-original-price',
+    'selling price': 'input-selling-price',
+    'paid percentage': 'input-amount-paid-percent',
+    'resale clause': 'input-resale-clause',
+    'balance resale clause (aed)': 'input-balance-resale',
     'admin fees (saas)': 'input-admin-fees',
-    'adgm (2% of original price)': 'u_adgm_transfer',
-    'adgm termination fee': 'u_adgm_termination_fee',
-    'adgm electronic service fee': 'u_adgm_electronic_fee',
+    'adgm (2% of original price)': 'input-adgm-transfer',
+    'adgm termination fee': 'input-adgm-termination-fee',
+    'adgm electronic service fee': 'input-adgm-electronic-fee',
     'agency fees (2% of selling price + vat)': 'input-agency-fees'
 };
 
 /**
  * Fields that store percentages as decimals (0.3 = 30%)
  */
-const DECIMAL_PERCENT_FIELDS = ['u_amount_paid_percent', 'u_resale_clause'];
+const DECIMAL_PERCENT_FIELDS = ['input-amount-paid-percent', 'input-resale-clause'];
 
 /**
  * Numeric fields that should be parsed as numbers
  */
 const NUMERIC_FIELDS = [
-    'input-internal-area', 'input-balcony-area', 'input-total-area', 'u_original_price', 'u_selling_price',
-    'u_amount_paid_percent', 'u_resale_clause', 'u_balance_resale', 'input-admin-fees',
-    'u_adgm_transfer', 'u_adgm_termination_fee', 'u_adgm_electronic_fee', 'input-agency-fees'
+    'input-internal-area', 'input-balcony-area', 'input-total-area', 'input-original-price', 'input-selling-price',
+    'input-amount-paid-percent', 'input-resale-clause', 'input-balance-resale', 'input-admin-fees',
+    'input-adgm-transfer', 'input-adgm-termination-fee', 'input-adgm-electronic-fee', 'input-agency-fees'
 ];
 
 /**
@@ -232,7 +232,7 @@ function parseExcelLabelValue(jsonData) {
         }
 
         // Normalize Views values
-        if (fieldId === 'u_views' && typeof processedValue === 'string') {
+        if (fieldId === 'select-views' && typeof processedValue === 'string') {
             processedValue = processedValue.replace(/\s+Views$/i, ' View');
         }
 
@@ -253,7 +253,7 @@ function parseExcelLabelValue(jsonData) {
             combinedModel = `${unitModel} + ${extras.join(' + ')}`;
         }
 
-        setValue('u_unit_model', combinedModel);
+        setValue('select-unit-model', combinedModel);
         fieldsFound++;
     }
 
@@ -278,11 +278,24 @@ function parseExcelLabelValue(jsonData) {
 
 /**
  * Parse Payment Plan section from Excel
+ * Supports table format with header row: No. | % | Date | Amount (AED)
  */
 function parsePaymentPlanSection(jsonData, startRow) {
     const paymentPlan = [];
+    let dataStartRow = startRow;
 
-    for (let i = startRow; i < jsonData.length; i++) {
+    // Check if first row is a header row (table format)
+    const firstRow = jsonData[startRow];
+    if (firstRow && firstRow[0]) {
+        const firstCell = String(firstRow[0]).toLowerCase().trim();
+        // Detect header row: "no.", "no", "#", "installment", etc.
+        if (firstCell === 'no.' || firstCell === 'no' || firstCell === '#' ||
+            firstCell === 'installment' || firstCell.includes('no')) {
+            dataStartRow = startRow + 1; // Skip header row
+        }
+    }
+
+    for (let i = dataStartRow; i < jsonData.length; i++) {
         const row = jsonData[i];
         if (!row) continue;
 

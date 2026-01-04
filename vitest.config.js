@@ -93,9 +93,12 @@ export default defineConfig({
             // Coverage report formats
             reporter: [
                 'text',   // Terminal output (for quick viewing)
-                'html',   // Interactive HTML (coverage/index.html)
+                'html',   // Interactive HTML (tests/coverage/index.html)
                 'lcov'    // Standard format (for IDE/CI integration)
             ],
+
+            // Output directory for coverage reports
+            reportsDirectory: 'tests/coverage',
 
             // Which files to include in coverage analysis
             include: ['js/**/*.js'],
