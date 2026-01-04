@@ -4,3 +4,9 @@ tests/outputs/
 .DS_Store
 *.log
 nul
+
+# Environment files
+.env
+.env.local
+.env.*.local
+!.env.example
