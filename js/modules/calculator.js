@@ -86,14 +86,14 @@ const calculations = {
      * - Balcony: 173.94 Sq.Ft
      * - Total: 1092.32 Sq.Ft
      *
-     * RETURNS: String with "Sq.Ft" suffix, or empty string if zero
+     * RETURNS: Number string (Sq.Ft suffix added in display layer)
      */
     'input-total-area': () => {
         const internal = getNumericValue('input-internal-area');  // Get Internal Area input value
         const balcony = getNumericValue('input-balcony-area');    // Get Balcony Area input value
         const total = internal + balcony;
-        // Return formatted string with 2 decimal places, or empty if zero
-        return total > 0 ? `${total.toFixed(2)} Sq.Ft` : '';
+        // Return formatted number with 2 decimal places (Sq.Ft added in display)
+        return total > 0 ? total.toFixed(2) : '';
     },
 
     /**
@@ -315,13 +315,7 @@ export function calculateField(fieldId) {
         // STEP 4: Update the input element
         const el = getById(fieldId);  // getById(id) is shorthand for getElementById
         if (el) {
-            // Special case: input-total-area returns string with "Sq.Ft" suffix
-            // Other fields return numbers
-            if (fieldId === 'input-total-area') {
-                el.value = value;  // e.g., "1092.32 Sq.Ft"
-            } else {
-                el.value = value || '';  // Empty string if 0/null/undefined
-            }
+            el.value = value || '';  // Empty string if 0/null/undefined
         }
     }
 }

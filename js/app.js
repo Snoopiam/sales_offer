@@ -323,9 +323,12 @@ function updatePreviewAreaRows(unitType) {
         setText('disp_allowed_build', getValue('input-allowed-build') || '-');
     } else {
         standardRows.forEach(id => { const row = getById(id); if (row) row.style.display = ''; });
-        setText('disp_internal', getValue('input-internal-area') || '-');
-        setText('disp_balcony', getValue('input-balcony-area') || '-');
-        setText('display-total-area', getValue('input-total-area') || '-');
+        const internalVal = getValue('input-internal-area');
+        const balconyVal = getValue('input-balcony-area');
+        const totalVal = getValue('input-total-area');
+        setText('disp_internal', internalVal ? `${internalVal} Sq.Ft` : '-');
+        setText('disp_balcony', balconyVal ? `${balconyVal} Sq.Ft` : '-');
+        setText('display-total-area', totalVal ? `${totalVal} Sq.Ft` : '-');
     }
 }
 

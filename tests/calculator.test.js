@@ -354,7 +354,7 @@ describe('DOM-dependent calculator functions', () => {
             calculateField('input-total-area');
 
             const areaInput = document.getElementById('input-total-area');
-            expect(areaInput.value).toBe('1092.32 Sq.Ft');
+            expect(areaInput.value).toBe('1092.32');
         });
 
         it('calculates input-built-up-area for villas', () => {
@@ -484,7 +484,7 @@ describe('DOM-dependent calculator functions', () => {
 
             runAllCalculations();
 
-            expect(document.getElementById('input-total-area').value).toBe('1092.32 Sq.Ft');
+            expect(document.getElementById('input-total-area').value).toBe('1092.32');
             expect(document.getElementById('input-built-up-area').value).toBe('3000.00 Sq.Ft');
             expect(document.getElementById('input-refund-amount').value).toBe('400000');
             expect(document.getElementById('input-balance-resale').value).toBe('400000');
@@ -649,7 +649,7 @@ describe('DOM-dependent calculator functions', () => {
 
             initCalculator();
 
-            expect(document.getElementById('input-total-area').value).toBe('600.00 Sq.Ft');
+            expect(document.getElementById('input-total-area').value).toBe('600.00');
         });
 
         it('handles missing trigger field elements', () => {

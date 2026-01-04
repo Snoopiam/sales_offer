@@ -144,9 +144,9 @@ function drawPropertyDetailsTable(doc, yPos, margin, tableWidth, primaryColor) {
         ['Unit No', getDisplayValue('display-unit-number')],
         ['Unit Type', getDisplayValue('disp_unit_type')],
         ['Views', getDisplayValue('disp_views')],
-        ['Internal Area (Sq.Ft)', getDisplayValue('disp_internal')],
-        ['Balcony Area (Sq.Ft)', getDisplayValue('disp_balcony')],
-        ['Total Area (Sq.Ft)', getDisplayValue('display-total-area'), true]
+        ['Internal Area', getDisplayValue('disp_internal')],
+        ['Balcony Area', getDisplayValue('disp_balcony')],
+        ['Total Area', getDisplayValue('display-total-area'), true]
     ];
 
     yPos = drawTableSection(doc, 'PROPERTY DETAILS', yPos, margin, tableWidth, primaryColor, rows);

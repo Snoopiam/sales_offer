@@ -63,10 +63,15 @@ Templates are applied via class on `#a4Page`: `.template-landscape`, `.template-
 
 ### Element ID Naming
 Uses humanized, semantic IDs:
-- Input fields (sidebar): `u_unit_number`, `u_selling_price`, `u_admin_fees`
-- Display elements (preview): `disp_selling_price`, `disp_premium`, `disp_total`
+- Input fields (sidebar): `input-internal-area`, `input-selling-price`, `input-admin-fees`
+- Display elements (preview): `disp_selling_price`, `disp_premium`, `display-total-area`
 - Row visibility toggles: `disp_row_refund`, `disp_row_premium`
 - Lock buttons: `lockRefund`, `lockPremium`, `lockAdgm`, `lockAgency`
+
+### Value Formatting
+- **Currency**: Formatted via `formatCurrency()` helper (e.g., "1,234,567")
+- **Areas**: Raw numbers in inputs, "Sq.Ft" suffix added in display layer (`app.js`)
+- **Calculator outputs**: Return raw values; formatting happens in display functions
 
 ### CSS Variables
 Use variables defined in `css/main.css`:
